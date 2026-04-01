@@ -1,6 +1,6 @@
 {
   "name": "official-fe",
-  "version": "26.41.1118",
+  "version": "26.41.1345",
   "private": true,
   "scripts": {
     "dev": "next dev -p 27502",
@@ -67,7 +67,7 @@
   "seo": {
     "siteName": "胡志辉",
     "title": "胡志辉的个人网站",
-    "description": "胡志辉的个人网站，分享个人介绍、职业经历、项目经验与技术思考。我是一名程序员，2016年12月开始参加工作，长期从事 Web 前端与跨平台开发，熟悉 React、Vue、TypeScript、Electron 等技术栈。",
+    "description": "胡志辉的个人网站，介绍其自 2016 年 12 月以来在金融与医疗行业的软件开发经验，以及 AI 应用、Web 开发、移动端与跨平台方向的工作实践。",
     "keywords": [
       "胡志辉",
       "huzhihui",
@@ -92,7 +92,7 @@
     "publisher": "胡志辉",
     "og": {
       "title": "胡志辉的个人网站",
-      "description": "了解胡志辉的个人介绍、职业经历、项目经验与技术栈，欢迎通过 huzhihui.com 进一步认识我。",
+      "description": "了解胡志辉在金融与医疗行业的软件开发经验，以及 AI 应用、Web 开发、移动端与跨平台方向的工作实践。",
       "image": "https://huzhihui.com/opengraph-image",
       "url": "https://huzhihui.com",
       "siteName": "胡志辉",
@@ -102,7 +102,7 @@
     "twitter": {
       "card": "summary_large_image",
       "title": "胡志辉的个人网站",
-      "description": "胡志辉的个人网站，分享个人介绍、职业经历、项目经验与技术思考。",
+      "description": "胡志辉的个人网站，介绍其在金融与医疗行业的软件开发经验，以及 AI 应用、Web 开发、移动端与跨平台方向的工作实践。",
       "image": "https://huzhihui.com/twitter-image"
     },
     "jsonLd": {
@@ -115,7 +115,7 @@
           "alternateName": "Hu Zhihui",
           "url": "https://huzhihui.com",
           "jobTitle": "程序员",
-          "description": "胡志辉，目前是一名程序员，2016年12月开始参加工作，长期从事 Web 前端与跨平台开发。",
+          "description": "胡志辉，2016 年 12 月开始从事软件开发，先后参与金融和医疗行业系统建设，当前聚焦 AI 应用、Web 开发、移动端与跨平台交付。",
           "image": "https://huzhihui.com/opengraph-image",
           "knowsAbout": [
             "Web Frontend Development",
@@ -132,7 +132,7 @@
           "@id": "https://huzhihui.com/#website",
           "name": "胡志辉的个人网站",
           "url": "https://huzhihui.com",
-          "description": "胡志辉的个人网站，分享个人介绍、职业经历、项目经验与技术思考。",
+          "description": "胡志辉的个人网站，介绍其在金融与医疗行业的软件开发经验，以及 AI 应用、Web 开发、移动端与跨平台方向的工作实践。",
           "inLanguage": "zh-CN",
           "publisher": {
             "@id": "https://huzhihui.com/#person"
