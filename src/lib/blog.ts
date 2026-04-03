@@ -22,7 +22,6 @@ export type BlogPost = {
 };
 
 function getMarkdownFiles() {
-  console.log(BLOG_DIRECTORY);
   return fs
     .readdirSync(BLOG_DIRECTORY)
     .filter((file) => ['.md', '.mdx'].includes(path.extname(file)));
