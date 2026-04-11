@@ -1,3 +1,4 @@
+import { MarkdownBody } from '@/components/blog/markdown-body';
 import { CustomMDX } from '@/components/blog/mdx';
 import { formatBlogDate, getBlogPostBySlug, getBlogPosts } from '@/lib/blog';
 import type { Metadata } from 'next';
@@ -103,12 +104,12 @@ export default async function BlogPostPage(props: PageProps<'/blog/[slug]'>) {
   };
 
   return (
-    <section className="mx-auto w-full  container ">
+    <section className="mx-auto w-full">
       <script
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         type="application/ld+json"
       />
-      <header className="mb-10">
+      <header className="mb-8 border-b border-border/60 pb-6">
         <h1 className="title text-[clamp(2rem,5vw,2.9rem)] font-bold leading-tight tracking-[-0.04em] text-foreground">
           {post.metadata.title}
         </h1>
@@ -116,9 +117,9 @@ export default async function BlogPostPage(props: PageProps<'/blog/[slug]'>) {
           <p>{formatBlogDate(post.metadata.publishedAt)}</p>
         </div>
       </header>
-      <article className="prose prose-github max-w-none">
+      <MarkdownBody>
         <CustomMDX source={post.content} />
-      </article>
+      </MarkdownBody>
     </section>
   );
 }

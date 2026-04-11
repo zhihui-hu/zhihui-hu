@@ -96,7 +96,7 @@ export function MermaidDiagram({ chart, className }: MermaidDiagramProps) {
         {svg ? (
           <div
             aria-label="Mermaid diagram"
-            className="mermaid-diagram__content [&_svg]:mx-auto [&_svg]:block [&_svg]:h-auto [&_svg]:w-full [&_svg]:min-w-0"
+            className="mermaid-diagram__content [&_svg]:block [&_svg]:h-auto [&_svg]:w-full [&_svg]:min-w-0"
             dangerouslySetInnerHTML={{ __html: svg }}
             role="img"
           />

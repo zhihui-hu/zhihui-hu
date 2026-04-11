@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+@import 'github-markdown-css/github-markdown.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -137,6 +138,193 @@
 }
 
 @layer components {
+  .markdown-body {
+    @apply max-w-none min-w-0 text-base leading-7;
+    box-sizing: border-box;
+    min-width: 200px;
+    background-color: transparent;
+    padding: 0;
+  }
+
+  .markdown-body > :first-child {
+    margin-top: 0 !important;
+  }
+
+  .markdown-body :is(h1, h2, h3, h4, h5, h6) {
+    scroll-margin-top: 6rem;
+  }
+
+  .markdown-body .mermaid-diagram {
+    background-color: var(--bgColor-default);
+  }
+
+  .markdown-body ul:not(.contains-task-list) {
+    list-style-type: disc;
+  }
+
+  .markdown-body ol:not(.contains-task-list) {
+    list-style-type: decimal;
+  }
+
+  .markdown-body ul ul:not(.contains-task-list) {
+    list-style-type: circle;
+  }
+
+  .markdown-body ul ul ul:not(.contains-task-list) {
+    list-style-type: square;
+  }
+
+  .markdown-body li {
+    display: list-item;
+  }
+
+  .markdown-body .github-code-block {
+    background-color: transparent;
+  }
+
+  .markdown-body .github-code-content {
+    @apply overflow-x-auto;
+  }
+
+  .markdown-body .github-code-block pre {
+    margin: 0;
+  }
+
+  .markdown-body .github-code-block pre[data-theme] {
+    color: var(--shiki-light) !important;
+    background-color: var(--bgColor-muted);
+    border-radius: 6px;
+  }
+
+  .markdown-body .github-code-block pre[data-theme] code[data-theme] {
+    @apply block min-w-full border-0 bg-transparent p-0 text-[0.85rem];
+    line-height: 1.45;
+  }
+
+  .markdown-body .github-code-block pre[data-theme] code[data-theme] {
+    @apply m-0 min-w-full border-0 text-[0.85rem];
+    font-variant-ligatures: none;
+    line-height: 1.45;
+  }
+
+  .markdown-body .github-code-block pre[data-theme] code[data-theme],
+  .markdown-body
+    .github-code-block
+    pre[data-theme]
+    code[data-theme]
+    span[style*='--shiki-light'] {
+    color: var(--shiki-light) !important;
+    background-color: transparent !important;
+  }
+
+  .markdown-body[data-theme='dark'] .github-code-block pre[data-theme] {
+    color: var(--shiki-dark) !important;
+    background-color: #1f1f1f;
+  }
+
+  .markdown-body[data-theme='dark']
+    .github-code-block
+    pre[data-theme]
+    code[data-theme],
+  .markdown-body[data-theme='dark']
+    .github-code-block
+    pre[data-theme]
+    code[data-theme]
+    span[style*='--shiki-dark'] {
+    color: var(--shiki-dark) !important;
+    background-color: transparent !important;
+  }
+
+  .markdown-body .github-code-block [data-line] {
+    display: block;
+    min-height: 1.4em;
+  }
+
+  .markdown-body .github-code-copy {
+    @apply border-border/70 bg-background/85 text-muted-foreground hover:bg-background hover:text-foreground;
+  }
+
+  .markdown-body[data-theme='dark'] .github-code-copy {
+    border-color: #3c3c3c;
+    background-color: rgb(24 24 24 / 88%);
+    color: #9d9d9d;
+  }
+
+  .markdown-body[data-theme='dark'] .github-code-copy:hover {
+    background-color: #181818;
+    color: #cccccc;
+  }
+
+  .markdown-body .mermaid-diagram svg {
+    overflow: visible;
+  }
+
+  .markdown-body .mermaid-diagram foreignObject {
+    overflow: visible;
+  }
+
+  .markdown-body .mermaid-diagram :where(p, ul, ol, li) {
+    margin: 0 !important;
+    padding: 0;
+    line-height: 1.35 !important;
+  }
+
+  .markdown-body .mermaid-diagram :where(.nodeLabel, .edgeLabel, .labelBkg) {
+    line-height: 1.35 !important;
+  }
+
+  .markdown-body
+    .mermaid-diagram
+    :where(.nodeLabel p, .edgeLabel p, .labelBkg p) {
+    margin: 0 !important;
+    line-height: 1.35 !important;
+  }
+
+  .markdown-body
+    .mermaid-diagram
+    :where(.nodeLabel strong, .edgeLabel strong, .labelBkg strong) {
+    font-weight: 600;
+  }
+
+  .markdown-body
+    .mermaid-diagram
+    :where(.nodeLabel code, .edgeLabel code, .labelBkg code) {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  .markdown-body
+    .mermaid-diagram
+    :where(.nodeLabel pre, .edgeLabel pre, .labelBkg pre) {
+    margin: 0;
+    background: transparent;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .markdown-body .contains-task-list {
+    @apply list-none pl-0;
+  }
+
+  .markdown-body .task-list-item {
+    @apply flex items-start gap-3 pl-0;
+  }
+
+  .markdown-body .task-list-item::marker {
+    content: '';
+  }
+
+  .markdown-body .task-list-item input[type='checkbox'] {
+    @apply border-border accent-primary mt-1 size-4 rounded border;
+  }
+
+  .markdown-body .task-list-item p {
+    margin: 0;
+  }
+
   .prose {
     @apply text-foreground/90 text-base leading-7;
   }

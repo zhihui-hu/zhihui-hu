@@ -1,10 +1,50 @@
-import { CodeBlock } from '@/components/blog/code-block';
+import { CodeCopyButton } from '@/components/blog/code-copy-button';
+import { isSensitiveCodeSample } from '@/components/blog/code-safety';
 import { MermaidDiagram } from '@/components/blog/mermaid';
 import { cn } from '@/lib/utils';
 import { MDXRemote, type MDXRemoteProps } from 'next-mdx-remote/rsc';
 import Link from 'next/link';
 import React from 'react';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import rehypePrettyCode, {
+  type LineElement,
+  type Options as RehypePrettyCodeOptions,
+} from 'rehype-pretty-code';
+import rehypeSlug from 'rehype-slug';
 import remarkGfm from 'remark-gfm';
+
+type MarkdownElementProps = {
+  children?: React.ReactNode;
+  className?: string;
+  ['data-language']?: string;
+  ['data-line']?: string;
+  ['data-rehype-pretty-code-figure']?: string;
+  ['data-rehype-pretty-code-title']?: string;
+  ['data-rehype-pretty-code-caption']?: string;
+};
+
+const headingLinkIcon = {
+  type: 'element',
+  tagName: 'span',
+  properties: {
+    className: ['octicon', 'octicon-link'],
+  },
+  children: [],
+} as const;
+
+const prettyCodeOptions: RehypePrettyCodeOptions = {
+  theme: {
+    light: 'github-light',
+    dark: 'dark-plus',
+  },
+  keepBackground: false,
+  bypassInlineCode: true,
+  onVisitLine(line: LineElement) {
+    if (line.children.length === 0) {
+      line.children = [{ type: 'text', value: ' ' }];
+    }
+  },
+};
 
 function flattenText(children: React.ReactNode): string {
   return React.Children.toArray(children)
@@ -13,8 +53,14 @@ function flattenText(children: React.ReactNode): string {
         return child.toString();
       }
 
-      if (React.isValidElement<{ children?: React.ReactNode }>(child)) {
-        return flattenText(child.props.children);
+      if (React.isValidElement<MarkdownElementProps>(child)) {
+        const text = flattenText(child.props.children);
+
+        if (child.props['data-line'] !== undefined) {
+          return `${text}\n`;
+        }
+
+        return text;
       }
 
       return '';
@@ -22,18 +68,29 @@ function flattenText(children: React.ReactNode): string {
     .join('');
 }
 
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/[!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~]/g, '');
+function isTagElement(
+  node: React.ReactNode,
+  tagName: string,
+): node is React.ReactElement<MarkdownElementProps> {
+  return (
+    React.isValidElement<MarkdownElementProps>(node) && node.type === tagName
+  );
+}
+
+function findChildByTag(children: React.ReactNode, tagName: string) {
+  return React.Children.toArray(children).find((child) =>
+    isTagElement(child, tagName),
+  );
 }
 
 function parseLanguage(className?: string) {
   const match = className?.match(/language-([^\s]+)/);
 
   return match?.[1]?.toLowerCase() ?? '';
+}
+
+function extractCodeContent(children: React.ReactNode) {
+  return flattenText(children).replace(/\n$/, '');
 }
 
 function isStaticAssetLink(href: string) {
@@ -43,54 +100,14 @@ function isStaticAssetLink(href: string) {
   );
 }
 
-function shouldOpenInNewTab(href: string) {
-  return href !== '' && !href.startsWith('#');
-}
-
-function extractCodeBlock(children: React.ReactNode) {
-  const [child] = React.Children.toArray(children);
-
-  if (!React.isValidElement<React.ComponentProps<'code'>>(child)) {
-    return null;
-  }
-
-  return {
-    className: child.props.className,
-    content: flattenText(child.props.children).replace(/\n$/, ''),
-  };
-}
-
-function createHeading(level: 1 | 2 | 3 | 4 | 5 | 6) {
-  const Heading = ({
-    children,
-    className,
-    ...props
-  }: React.HTMLAttributes<HTMLHeadingElement>) => {
-    const text = flattenText(children);
-    const slug = slugify(text);
-
-    return React.createElement(
-      `h${level}`,
-      {
-        id: slug,
-        className: cn('group relative scroll-mt-24', className),
-        ...props,
-      },
-      [
-        React.createElement('a', {
-          key: `anchor-${slug}`,
-          href: `#${slug}`,
-          className: 'anchor',
-          'aria-label': `跳转到 ${text}`,
-        }),
-      ],
-      children,
-    );
-  };
-
-  Heading.displayName = `Heading${level}`;
-
-  return Heading;
+function isExternalLink(href: string) {
+  return (
+    href.startsWith('http://') ||
+    href.startsWith('https://') ||
+    href.startsWith('//') ||
+    href.startsWith('mailto:') ||
+    href.startsWith('tel:')
+  );
 }
 
 function CustomLink({
@@ -98,10 +115,14 @@ function CustomLink({
   className,
   ...props
 }: React.ComponentProps<'a'> & { href?: string }) {
-  const openInNewTab = shouldOpenInNewTab(href);
+  const openInNewTab = isExternalLink(href);
   const linkProps = openInNewTab
-    ? { rel: 'noreferrer noopener', target: '_blank' as const }
+    ? { rel: 'noopener noreferrer', target: '_blank' as const }
     : {};
+
+  if (href.startsWith('#')) {
+    return <a className={className} href={href} {...props} />;
+  }
 
   if (isStaticAssetLink(href)) {
     return <a className={className} href={href} {...linkProps} {...props} />;
@@ -109,28 +130,35 @@ function CustomLink({
 
   if (href.startsWith('/')) {
     return (
-      <Link
-        className={className}
-        href={href}
-        prefetch={openInNewTab ? false : undefined}
-        {...linkProps}
-        {...props}
-      />
+      <Link className={className} href={href} {...props}>
+        {props.children}
+      </Link>
     );
-  }
-
-  if (href.startsWith('#')) {
-    return <a className={className} href={href} {...props} />;
   }
 
   return <a className={className} href={href} {...linkProps} {...props} />;
 }
 
-function Code({ className, children, ...props }: React.ComponentProps<'code'>) {
+function Code({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<'code'> & { 'data-language'?: string }) {
+  const isBlockCode =
+    props['data-language'] !== undefined || parseLanguage(className) !== '';
+
+  if (isBlockCode) {
+    return (
+      <code className={className} {...props}>
+        {children}
+      </code>
+    );
+  }
+
   return (
     <code
       className={cn(
-        'rounded-md bg-muted px-1.5 py-0.5 font-mono text-[0.92em]',
+        'rounded-md border border-border/70 bg-muted/55 px-1.5 py-0.5 font-mono text-[0.92em]',
         className,
       )}
       {...props}
@@ -140,34 +168,82 @@ function Code({ className, children, ...props }: React.ComponentProps<'code'>) {
   );
 }
 
-function Pre({ children, className }: React.ComponentProps<'pre'>) {
-  const codeBlock = extractCodeBlock(children);
-
-  if (!codeBlock) {
+function PrettyCodeFigure({
+  children,
+  className,
+  ...props
+}: React.ComponentProps<'figure'> & {
+  'data-rehype-pretty-code-figure'?: string;
+}) {
+  if (props['data-rehype-pretty-code-figure'] === undefined) {
     return (
-      <pre
-        className={cn(
-          'my-6 overflow-x-auto rounded-xl border border-border bg-card',
-          className,
-        )}
-      >
+      <figure className={className} {...props}>
         {children}
-      </pre>
+      </figure>
     );
   }
 
-  const language = parseLanguage(codeBlock.className);
+  const preElement = findChildByTag(children, 'pre');
 
-  if (language === 'mermaid') {
-    return <MermaidDiagram chart={codeBlock.content} />;
+  if (!preElement) {
+    return (
+      <figure className={className} {...props}>
+        {children}
+      </figure>
+    );
   }
 
+  const language = preElement.props['data-language']?.toLowerCase() ?? 'text';
+  const code = extractCodeContent(preElement.props.children);
+
+  if (language === 'mermaid') {
+    return <MermaidDiagram chart={code} className={className} />;
+  }
+
+  const allowCopy = code !== '' && !isSensitiveCodeSample(code);
+  const titleElement = React.Children.toArray(children).find((child) => {
+    if (!React.isValidElement<MarkdownElementProps>(child)) {
+      return false;
+    }
+
+    return child.props['data-rehype-pretty-code-title'] !== undefined;
+  });
+  const title = React.isValidElement<MarkdownElementProps>(titleElement)
+    ? flattenText(titleElement.props.children).trim()
+    : '';
+  const captionElement = React.Children.toArray(children).find((child) => {
+    if (!React.isValidElement<MarkdownElementProps>(child)) {
+      return false;
+    }
+
+    return child.props['data-rehype-pretty-code-caption'] !== undefined;
+  });
+  const caption = React.isValidElement<MarkdownElementProps>(captionElement)
+    ? flattenText(captionElement.props.children).trim()
+    : '';
+
   return (
-    <CodeBlock
-      className={className}
-      code={codeBlock.content}
-      language={language}
-    />
+    <div
+      className={cn('github-code-block group relative my-4 w-full', className)}
+    >
+      {title ? (
+        <div className="github-code-title text-muted-foreground mb-2 font-mono text-xs">
+          {title}
+        </div>
+      ) : null}
+      {allowCopy ? (
+        <CodeCopyButton
+          className="github-code-copy absolute top-3 right-3 z-10 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+          value={code}
+        />
+      ) : null}
+      <div className="github-code-content">{preElement}</div>
+      {caption ? (
+        <div className="github-code-caption text-muted-foreground mt-2 text-sm">
+          {caption}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -205,22 +281,21 @@ function MarkdownInput({
 }
 
 const components = {
-  h1: createHeading(1),
-  h2: createHeading(2),
-  h3: createHeading(3),
-  h4: createHeading(4),
-  h5: createHeading(5),
-  h6: createHeading(6),
   a: CustomLink,
-  pre: Pre,
   code: Code,
+  figure: PrettyCodeFigure,
   table: Table,
   input: MarkdownInput,
   img: (props: React.ComponentProps<'img'>) => (
     // Markdown images do not consistently provide dimensions, so we keep
     // them as plain img tags in article content.
     // eslint-disable-next-line @next/next/no-img-element
-    <img alt={props.alt || ''} loading="lazy" {...props} />
+    <img
+      alt={props.alt || ''}
+      className={cn('h-auto max-w-full', props.className)}
+      loading="lazy"
+      {...props}
+    />
   ),
 };
 
@@ -240,6 +315,22 @@ export function CustomMDX({
           remarkPlugins: [
             ...(options?.mdxOptions?.remarkPlugins || []),
             remarkGfm,
+          ],
+          rehypePlugins: [
+            ...(options?.mdxOptions?.rehypePlugins || []),
+            rehypeSlug,
+            [
+              rehypeAutolinkHeadings,
+              {
+                behavior: 'prepend',
+                properties: {
+                  ariaLabel: 'Link to section',
+                  className: ['anchor'],
+                },
+                content: headingLinkIcon,
+              },
+            ],
+            [rehypePrettyCode, prettyCodeOptions],
           ],
         },
       }}
