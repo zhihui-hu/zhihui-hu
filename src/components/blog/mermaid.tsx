@@ -2,6 +2,7 @@
 
 import { CodeCopyButton } from '@/components/blog/code-copy-button';
 import { isSensitiveCodeSample } from '@/components/blog/code-safety';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { startTransition, useEffect, useId, useState } from 'react';
 
@@ -16,10 +17,49 @@ type MermaidDiagramProps = {
   className?: string;
 };
 
+function MermaidSkeleton() {
+  return (
+    <div
+      aria-hidden="true"
+      className="mermaid-skeleton flex min-h-52 flex-col gap-5 rounded-xl border border-dashed border-border/70 bg-muted/15 p-5"
+    >
+      <div className="flex items-center justify-between gap-4">
+        <Skeleton className="h-3 w-24 rounded-full" />
+        <Skeleton className="h-8 w-8 rounded-md" />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_3rem_minmax(0,1fr)] md:items-center">
+        <div className="flex flex-col gap-3">
+          <Skeleton className="h-14 w-full rounded-xl" />
+          <Skeleton className="h-4 w-3/4 rounded-full" />
+        </div>
+        <Skeleton className="mx-auto h-1 w-full rounded-full" />
+        <div className="flex flex-col gap-3">
+          <Skeleton className="h-14 w-full rounded-xl" />
+          <Skeleton className="h-4 w-2/3 rounded-full" />
+        </div>
+      </div>
+
+      <div className="flex items-center justify-center gap-3">
+        <Skeleton className="h-10 w-10 rounded-full" />
+        <Skeleton className="h-1 w-10 rounded-full" />
+        <Skeleton className="h-10 w-10 rounded-full" />
+        <Skeleton className="hidden h-1 w-10 rounded-full sm:block" />
+        <Skeleton className="hidden h-10 w-10 rounded-full sm:block" />
+      </div>
+
+      <p className="text-center text-xs text-muted-foreground">
+        Mermaid 图表加载中...
+      </p>
+    </div>
+  );
+}
+
 export function MermaidDiagram({ chart, className }: MermaidDiagramProps) {
   const diagramId = useId().replace(/:/g, '');
   const [svg, setSvg] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [isRendering, setIsRendering] = useState(Boolean(chart.trim()));
   const allowCopy = !isSensitiveCodeSample(chart);
 
   useEffect(() => {
@@ -30,9 +70,16 @@ export function MermaidDiagram({ chart, className }: MermaidDiagramProps) {
         startTransition(() => {
           setSvg('');
           setError(null);
+          setIsRendering(false);
         });
         return;
       }
+
+      startTransition(() => {
+        setSvg('');
+        setError(null);
+        setIsRendering(true);
+      });
 
       try {
         const mermaid = (await import('mermaid')).default;
@@ -55,6 +102,7 @@ export function MermaidDiagram({ chart, className }: MermaidDiagramProps) {
         startTransition(() => {
           setSvg(output);
           setError(null);
+          setIsRendering(false);
         });
       } catch (renderError) {
         if (cancelled) {
@@ -68,6 +116,7 @@ export function MermaidDiagram({ chart, className }: MermaidDiagramProps) {
               ? renderError.message
               : 'Mermaid 渲染失败',
           );
+          setIsRendering(false);
         });
       }
     }
@@ -92,7 +141,10 @@ export function MermaidDiagram({ chart, className }: MermaidDiagramProps) {
         </span>
         {allowCopy ? <CodeCopyButton value={chart} /> : null}
       </div>
-      <div className="overflow-x-auto overflow-y-visible px-4 py-4">
+      <div
+        aria-busy={isRendering}
+        className="overflow-x-auto overflow-y-visible px-4 py-4"
+      >
         {svg ? (
           <div
             aria-label="Mermaid diagram"
@@ -100,9 +152,11 @@ export function MermaidDiagram({ chart, className }: MermaidDiagramProps) {
             dangerouslySetInnerHTML={{ __html: svg }}
             role="img"
           />
+        ) : isRendering ? (
+          <MermaidSkeleton />
         ) : (
           <div className="flex min-h-40 items-center justify-center rounded-lg border border-dashed border-border bg-muted/20 px-4 text-sm text-muted-foreground">
-            {error || '正在渲染 Mermaid 图表...'}
+            {error || 'Mermaid 图表暂时无法显示'}
           </div>
         )}
       </div>

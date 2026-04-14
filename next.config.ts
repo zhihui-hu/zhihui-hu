@@ -1,7 +1,11 @@
 import { format } from 'date-fns';
 import { NextConfig } from 'next';
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  experimental: {
+    viewTransition: true,
+  },
+};
 
 const proxy = async () => {
   return [

@@ -107,6 +107,7 @@ export function useBlogExternalLinkWarning() {
 
 type BlogLinkProps = React.ComponentProps<'a'> & {
   href?: string;
+  transitionTypes?: string[];
 };
 
 export function BlogLink({
@@ -114,6 +115,7 @@ export function BlogLink({
   onClick,
   rel,
   target,
+  transitionTypes,
   ...props
 }: BlogLinkProps) {
   const { dialog, openWarning } = useBlogExternalLinkWarning();
@@ -137,7 +139,12 @@ export function BlogLink({
 
   if (isBlogInternalPath(href)) {
     return (
-      <Link href={href} onClick={onClick} {...props}>
+      <Link
+        href={href}
+        onClick={onClick}
+        transitionTypes={transitionTypes}
+        {...props}
+      >
         {props.children}
       </Link>
     );
@@ -148,6 +155,7 @@ export function BlogLink({
       <Link
         href={getBlogSafeInternalHref(resolvedUrl)}
         onClick={onClick}
+        transitionTypes={transitionTypes}
         {...props}
       >
         {props.children}

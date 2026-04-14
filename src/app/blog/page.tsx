@@ -1,4 +1,5 @@
 import { BlogPosts } from '@/components/blog/posts';
+import { BlogPageTransition } from '@/components/blog/view-transitions';
 import { formatBlogRelativeDate, getBlogPosts } from '@/lib/blog';
 import type { Metadata } from 'next';
 
@@ -36,8 +37,10 @@ export default function BlogPage() {
   }));
 
   return (
-    <section>
-      <BlogPosts posts={posts} />
-    </section>
+    <BlogPageTransition>
+      <section>
+        <BlogPosts posts={posts} />
+      </section>
+    </BlogPageTransition>
   );
 }
