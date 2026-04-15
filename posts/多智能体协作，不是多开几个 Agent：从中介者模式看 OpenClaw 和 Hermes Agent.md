@@ -2,7 +2,7 @@
 title: 多智能体协作，不是多开几个 Agent：从中介者模式看 OpenClaw 和 Hermes Agent
 slug: multi-agent-openclaw-hermes-mediator-pattern
 image: /assets/imgs/multi-agent-openclaw-hermes-mediator-pattern-banner.png
-publishedAt: 2026-04-14T11:12
+publishedAt: 2026-04-15T09:12
 summary: 多智能体不是多开几个 Agent，而是把软件行业过去二十年已经踩明白的网关、工作流、监督树和控制回路重新搬回 LLM 时代。结合 OpenClaw 和 Hermes Agent 这两条路线，这篇文章从中介者模式、业务架构演进和伪代码三个层面，解释多智能体真正的竞争点为什么会落在编排、隔离、上下文治理和失败恢复上。
 keywords:
   - 多智能体协作

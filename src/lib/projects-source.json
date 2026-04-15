@@ -1,0 +1,450 @@
+{
+  "products": [
+    {
+      "slug": "bigv",
+      "name": "笨嘴神器",
+      "route": "/products/bigv",
+      "logo": "/assets/projects/bigv-logo.png",
+      "overview": "笨嘴神器是一个面向投资场景的微信小程序，书有引力官网将其定位为“跨时代的 融合人工智能(AI)的 投资利器”，围绕机会发现、资金观察、宏观研判和 AI 问答提供辅助能力。",
+      "tags": ["AI 投资", "微信小程序", "Vue 3", "TypeScript"],
+      "detail": {
+        "headline": "官网重点展示机会大师、巨鲸一眼清、宏观一眼清和笨嘴Chat 四个模块，把策略发现、资金异动观察、宏观判断与 AI 投资辅助整合进一个小程序入口。",
+        "categories": ["金融科技", "AI 投资工具", "微信小程序", "WebView 工具"],
+        "attributes": [
+          {
+            "label": "官网定位",
+            "text": "跨时代的 融合人工智能(AI)的 投资利器"
+          },
+          {
+            "label": "核心模块",
+            "text": "机会大师 / 巨鲸一眼清 / 宏观一眼清 / 笨嘴Chat"
+          },
+          {
+            "label": "项目二维码",
+            "module": "笨嘴神器",
+            "kind": "qr-code",
+            "url": "https://c18e-1257416358.cos.accelerate.myqcloud.com/IMG_4492.JPG",
+            "type": "image"
+          }
+        ],
+        "introduction": [
+          "官网重点展示四个能力模块：机会大师、巨鲸一眼清、宏观一眼清、笨嘴Chat，分别覆盖策略发现、海外资金异动观察、宏观与行业判断，以及 AI 辅助投资问答。",
+          "其中机会大师强调“板块 + 策略秘籍 + 自选，一键交火”；巨鲸一眼清聚焦海外资金短时间大规模加减仓板块排行榜；宏观一眼清主打“宏观看得懂，行业选得准”；笨嘴Chat 则突出 AI 辅助投资体验。",
+          "结合项目实际落地，产品也与基金大 V 合作，通过小程序与 WebView 工具形态承载投研内容与数据能力，提升内容分发效率和用户参与度。"
+        ],
+        "development": [
+          {
+            "name": "笨嘴神器",
+            "period": {
+              "start": "2021-10",
+              "end": null,
+              "ongoing": true,
+              "text": "2021-10 ～ 至今"
+            },
+            "summary": [
+              "官网产品页将笨嘴神器定位为 AI 投资工具，核心模块由机会大师、巨鲸一眼清、宏观一眼清和笨嘴Chat 组成。",
+              "机会大师强调“板块 + 策略秘籍 + 自选，一键交火”；巨鲸一眼清聚焦海外资金短时间大规模加减仓板块排行榜；宏观一眼清主打宏观看得懂、行业选得准；笨嘴Chat 提供 AI 辅助投资体验。",
+              "考虑到金融行业系统审核困难、监管严格且审核流程时间较长，为了确保企业能够灵活控制页面内容并保障用户体验，本项目采用了以下整体架构。",
+              "在小程序中，使用原生 API 支持用户授权相关功能，以确保用户在使用过程中的安全和便利性。",
+              "页面工具内容采用 WebView 展示的方式，使得能够灵活地发布、部署、更新和回滚页面内容。通过这种方式，能够在不影响整体应用的情况下，快速调整和优化页面内容。",
+              "将 WebView 模块拆分为单一工具微服务，以便同时进行开发和部署。这种模块化的设计使得能够更加高效地开发和维护各个工具模块。",
+              "在单一工具模块的页面开发中，统一采用 Vue 3 + TypeScript + Pinia 的技术栈。这样的选择不仅能够提供良好的开发体验和代码可维护性，还能够保证页面的性能和稳定性。",
+              "为了实现灵活的数据通信，统一使用 URL 参数和持久化储存的方式来进行数据传递和存储。这样的设计使得页面之间的数据交互更加方便，同时也能够保证数据的安全性和一致性。",
+              "根据该模式，项目在两个月内已经进行了 21 次迭代，而小程序只经历了一次审核过程。同时，还接入了 20 多家大 V 合作伙伴，日收益峰值达到了 10 万元，月收益达到了 100 万元。"
+            ],
+            "techStack": [
+              "原生小程序 API",
+              "微服务",
+              "Vue 3",
+              "TypeScript",
+              "Pinia",
+              "URL 参数通信",
+              "持久化存储"
+            ],
+            "resources": [],
+            "screenshots": [
+              {
+                "image": "https://objectstorage.eu-marseille-1.oraclecloud.com/n/axwlydfzmjel/b/onefile/o/uploads/2026/04/b6b6ad3e7afe3ba6d65d23d6b557ec44d77bf5a32e84c6160b78085e8abd8b32.png"
+              },
+              {
+                "image": "https://objectstorage.eu-marseille-1.oraclecloud.com/n/axwlydfzmjel/b/onefile/o/uploads/2026/04/bb54ba066ed1d2a0791ed4d26889b5412a5e1b0e681fa1028e385d1671cf5b84.png"
+              },
+              {
+                "image": "https://objectstorage.eu-marseille-1.oraclecloud.com/n/axwlydfzmjel/b/onefile/o/uploads/2026/04/46c1a20a7783901e79329ea91c0328b729e231589850e77a9af415b65f3b5123.png"
+              },
+              {
+                "image": "https://objectstorage.eu-marseille-1.oraclecloud.com/n/axwlydfzmjel/b/onefile/o/uploads/2026/04/0a6ba1ba37f5823fc47987e35e6b3ca218c30d9aed0d7769c22b1a79804ea760.png"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "slug": "doctor-doctor",
+      "name": "叮铃医生（医生端）",
+      "url": "https://apps.apple.com/cn/app/%E5%8F%AE%E9%93%83%E5%8C%BB%E7%94%9F-%E5%8C%BB%E7%94%9F%E7%89%88/id1475864364",
+      "route": "/products/doctor",
+      "logo": "/assets/projects/doctor/appstore-logo.jpg",
+      "overview": "叮铃医生（医生端）是一款面向医生端的医疗应用，覆盖问诊咨询、处方查询、日程安排、健康宣教、个人排班、医生名片与患者线上开药等核心场景。",
+      "tags": ["医疗", "在线问诊", "iPhone", "UniApp", "医生端"],
+      "detail": {
+        "headline": "医生端医疗 App 聚焦线上问诊、处方查询、日程管理与患者开药等场景，强调缩短医患沟通链路，让线上咨询更顺畅。",
+        "categories": ["医疗", "医生端 App", "iPhone 应用"],
+        "attributes": [
+          {
+            "label": "苹果客户端",
+            "module": "叮铃医生（医生版）",
+            "kind": "app-store",
+            "url": "https://apps.apple.com/cn/app/%E5%8F%AE%E9%93%83%E5%8C%BB%E7%94%9F-%E5%8C%BB%E7%94%9F%E7%89%88/id1475864364"
+          },
+          {
+            "label": "提供者",
+            "text": "北京新里程叮铃科技有限公司"
+          },
+          {
+            "label": "适用设备",
+            "text": "iPhone"
+          },
+          {
+            "label": "兼容系统",
+            "text": "iOS 12.0 或更高版本"
+          },
+          {
+            "label": "语言",
+            "text": "简体中文、英语"
+          },
+          {
+            "label": "年龄分级",
+            "text": "16+"
+          }
+        ],
+        "introduction": [
+          "App Store 当前展示的“叮铃医生（医生版）”由北京新里程叮铃科技有限公司提供，分类为“医疗”，主要面向 iPhone 医生端使用场景。",
+          "官方功能说明覆盖问诊咨询、查询处方、查看日程安排、健康宣教、个人排班、医生个人名片，以及患者线上开药等能力。",
+          "商店信息显示该应用支持简体中文和英语，年龄分级为 16+；官方同时提示，涉及医疗决策时应前往专业医疗机构并咨询执业医生，本应用不提供医疗决策服务。"
+        ],
+        "development": [
+          {
+            "name": "医生端",
+            "period": {
+              "start": "2020-01",
+              "end": null,
+              "ongoing": true,
+              "text": "2020-01 ～ 至今"
+            },
+            "summary": [
+              "App Store 当前将“叮铃医生（医生版）”归类为医疗类应用，产品定位聚焦医生端线上问诊与日常工作协同场景。",
+              "官方功能说明覆盖问诊咨询、处方查询、日程安排、健康宣教、个人排班、医生名片以及患者线上开药，这些能力共同构成了医生端的核心使用路径。",
+              "作为医生端 App Owner，我负责 Android 和 iOS 双端开发、应用上架、证书管理与版本控制，并结合团队现有技术栈与交付周期选择 UniApp 方案落地。",
+              "项目集成腾讯 TIM 实现在线问诊，配合个推完成消息触达，通过本地数据库缓存历史聊天记录，并使用 sensors.js 简化埋点接入与分析。",
+              "随着移动平台政策和审核要求持续变化，我们持续跟进 iOS 与 Android 的能力适配、提审和问题修复，确保版本能够稳定上线。"
+            ],
+            "techStack": [
+              "UniApp",
+              "腾讯 TIM",
+              "个推",
+              "本地数据库缓存",
+              "sensors.js"
+            ],
+            "resources": [],
+            "screenshots": [
+              {
+                "image": "/assets/projects/doctor/screen-1.png"
+              },
+              {
+                "image": "/assets/projects/doctor/screen-2.png"
+              },
+              {
+                "image": "/assets/projects/doctor/screen-3.png"
+              },
+              {
+                "image": "/assets/projects/doctor/screen-4.png"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "slug": "doctor-patient",
+      "name": "叮铃医生（患者端）",
+      "url": "https://h5.51dling.com/h5",
+      "route": "/products/doctor",
+      "logo": "/assets/projects/dling.png",
+      "overview": "叮铃医生（患者端）是一个面向微信场景的患者服务 Web App，围绕电话咨询与线上问诊提供更轻量的触达入口。",
+      "tags": ["医疗", "患者端", "微信 H5", "Vue 2", "在线咨询"],
+      "detail": {
+        "headline": "患者端以微信 H5 形态承载电话咨询与线上问诊服务，主要服务关心父母健康的一二线城市白领人群。",
+        "categories": ["医疗", "患者端 H5", "微信 Web App"],
+        "attributes": [
+          {
+            "label": "线上地址（微信）",
+            "module": "患者端",
+            "kind": "website",
+            "url": "https://h5.51dling.com/h5"
+          },
+          {
+            "label": "提供者",
+            "text": "北京新里程叮铃科技有限公司"
+          },
+          {
+            "label": "适用平台",
+            "text": "微信 / H5"
+          }
+        ],
+        "introduction": [
+          "患者端服务是一个面向微信端的 Web App，旨在提供电话咨询服务，让用户能够快速获得医生的建议和咨询。",
+          "主要面向一二线城市的白领人群，他们关心并关怀自己父母的健康，希望通过更轻量的入口获得医疗咨询服务。",
+          "项目整体以单页面应用方式构建，在保证咨询流程完整性的同时，尽量降低用户访问和使用门槛。"
+        ],
+        "development": [
+          {
+            "name": "患者端",
+            "period": {
+              "start": "2020-01",
+              "end": "2021-03",
+              "ongoing": false,
+              "text": "2020-01 ～ 2021-03"
+            },
+            "summary": [
+              "患者端服务是一个面向微信端的 Web App，旨在提供电话咨询服务，让用户能够快速获得医生的建议和咨询。主要面向一二线城市的白领人群，他们关心并关怀自己的父母的健康。",
+              "该项目使用 Vue 2.x 进行开发，是一个单页面应用。我们基于 Axios 对 HTTP 客户端进行了封装，使用 SCSS + PostCSS 编写样式，并使用 Karma + Mocha 进行单元测试。",
+              "在构建过程中，我们使用 Webpack 进行打包，并使用 ESLint 来统一代码风格。作为该项目的一部分，我负责架构方面的工作，利用 transition 组件实现了路由切换动画，并利用 Webpack 的 Code Split 特性实现组件的异步加载，以优化页面加载时间。"
+            ],
+            "techStack": [
+              "Vue 2.x",
+              "Axios",
+              "SCSS",
+              "PostCSS",
+              "Karma",
+              "Mocha",
+              "Webpack",
+              "ESLint"
+            ],
+            "resources": [
+              {
+                "label": "新里程&智康二期改版联调问题汇总",
+                "url": "https://docs.qq.com/sheet/DQVhoUXF5TmZ6cUZ1?tab=BB08J2"
+              },
+              {
+                "label": "一期优化需求问题汇总",
+                "url": "https://docs.qq.com/sheet/DQVVab05SZ3VVZ0xJ?tab=BB08J2"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "slug": "fof-pro-web",
+      "name": "FOF PRO（Web 端）",
+      "url": "https://pro.fofinvesting.com/",
+      "route": "/products/fof-pro",
+      "logo": "/assets/projects/fof-pro-logo.png",
+      "overview": "FOF PRO Web 端是一套面向 FOF、MOM 与委外投资场景的投研投顾平台，覆盖投前、投中和投后流程。",
+      "tags": ["基金投研", "Web 平台", "React", "TypeScript", "投顾平台"],
+      "detail": {
+        "headline": "作为核心 Web 平台，FOF PRO 围绕基金分析、持仓研究、流程协同与投研模板构建完整的机构级投顾工作台。",
+        "categories": ["金融科技", "投研投顾", "Web 平台"],
+        "attributes": [
+          {
+            "label": "线上地址",
+            "module": "FOF PRO",
+            "kind": "website",
+            "url": "https://pro.fofinvesting.com/"
+          }
+        ],
+        "introduction": [
+          "它致力于为基金行业提供各种专业分析解决方案，涵盖收益和持仓等方面的需求。",
+          "FOF PRO 注重用户体验和易用性。界面设计简洁直观，操作流程清晰，强大的功能和功能模块能够满足基金行业的多样化需求。",
+          "无论是在投资决策阶段还是投资执行和监控阶段，系统都能提供准确、及时的数据和分析报告，帮助基金管理人和投资者进行有效的资产配置和风险管理。"
+        ],
+        "development": [
+          {
+            "name": "FOF PRO",
+            "period": {
+              "start": "2021-06",
+              "end": null,
+              "ongoing": true,
+              "text": "2021-06 ～ 至今"
+            },
+            "summary": [
+              "FOF PRO 基于 FOFinvesting 的升级版本，它是多年业务和经验积累的结晶。我们致力于打造行业标杆产品，以提高自身竞争力并优化用户体验。",
+              "FOF PRO 2.0 在 FOFinvesting 的基础上进行了全面升级和改进。我们深入倾听用户反馈和需求，结合市场趋势和行业标准，对系统进行了全面的优化和升级，目标是提供更高效、更智能的功能，使用户能够更轻松地进行 FOF 投资和管理。",
+              "FOF PRO 2.0 不仅保留了 FOFinvesting 的优点和功能，还引入了新的特性和创新。我们提升了系统的性能和稳定性，增加了更多的分析工具和数据指标，使用户能够更全面地了解 FOF 投资的情况，同时优化了用户界面和交互设计。",
+              "项目一共 299 个页面、上百张图表、千余个模块。我主要负责项目前端架构搭建和投研模板模块。",
+              "项目采用 React、TypeScript、Umi 和 Antd 等技术栈，完全拥抱 React 最新特性，例如使用 Hooks 进行开发，通过合理的架构和开发方式，为用户提供高质量、稳定可靠的应用。"
+            ],
+            "techStack": ["React", "TypeScript", "Umi", "Antd", "Hooks"],
+            "resources": [
+              {
+                "label": "投研模板文档",
+                "url": "https://docs.qq.com/doc/DQWRqWUpXZ2xUbnFs"
+              },
+              {
+                "label": "微信关注",
+                "text": "FOF PRO"
+              },
+              {
+                "label": "开发日志",
+                "url": "/log/FOF-PRO.html"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "slug": "fof-pro-app",
+      "name": "FOF PRO（App 端）",
+      "url": "https://apps.apple.com/cn/app/fof-pro/id1633056491",
+      "route": "/products/fof-pro",
+      "logo": "/assets/projects/fof-pro-logo.png",
+      "overview": "FOF PRO App 端延续平台能力，把基金投研与投顾服务带到移动端，服务更轻量的随身查看和协同场景。",
+      "tags": ["基金投研", "App", "uni-app", "移动端"],
+      "detail": {
+        "headline": "移动端围绕平台能力做轻量延展，强调随时查看投研信息与业务协同，使用 uni-app 完成跨端交付。",
+        "categories": ["金融科技", "投研投顾", "App"],
+        "attributes": [
+          {
+            "label": "苹果客户端",
+            "module": "FOF PRO App",
+            "kind": "app-store",
+            "url": "https://apps.apple.com/cn/app/fof-pro/id1633056491"
+          }
+        ],
+        "introduction": [
+          "FOF PRO 的产品能力并不只停留在桌面端，移动端承担了投研信息随时查看和业务协同的延伸职责。",
+          "在整体产品体系里，App 端更强调轻量触达与跨场景可用性，配合 Web 平台形成更完整的交付闭环。",
+          "项目最终选择数字天堂的 uni-app 方案，以兼顾开发效率和多端交付节奏。"
+        ],
+        "development": [
+          {
+            "name": "FOF PRO App",
+            "period": {
+              "start": "2020-01",
+              "end": null,
+              "ongoing": true,
+              "text": "2020-01 ～ 至今"
+            },
+            "summary": ["APP 使用数字天堂 uni-app 进行开发。"],
+            "techStack": ["uni-app"],
+            "resources": []
+          }
+        ]
+      }
+    },
+    {
+      "slug": "fof-pro-miniapp",
+      "name": "FOF PRO（小程序端）",
+      "route": "/products/fof-pro",
+      "logo": "/assets/projects/fof-pro-logo.png",
+      "overview": "FOF PRO 小程序端是平台在微信场景下的延伸入口，用更轻量的交互承接基金投研与内容触达。",
+      "tags": ["基金投研", "小程序", "uni-app", "轻量入口"],
+      "detail": {
+        "headline": "小程序端作为微信场景下的轻量入口，延续平台能力，强调快速访问、便捷触达与多端联动。",
+        "categories": ["金融科技", "投研投顾", "小程序"],
+        "attributes": [
+          {
+            "label": "小程序二维码",
+            "module": "FOF PRO 小程序",
+            "kind": "qr-code",
+            "url": "https://c18e-1257416358.cos.accelerate.myqcloud.com/IMG_4486.JPG",
+            "type": "image"
+          }
+        ],
+        "introduction": [
+          "FOF PRO 小程序承担的是平台在微信生态内的轻量化入口角色，方便更高频的访问和内容分发。",
+          "它与 Web 平台、App 端共同构成完整的多端产品矩阵，让不同使用场景下的基金投研需求都能被更自然地承接。",
+          "在工程落地上，小程序端同样采用 uni-app，以便复用跨端交付经验和维护方式。"
+        ],
+        "development": [
+          {
+            "name": "FOF PRO 小程序",
+            "period": {
+              "start": "2020-01",
+              "end": null,
+              "ongoing": true,
+              "text": "2020-01 ～ 至今"
+            },
+            "summary": ["小程序使用数字天堂 uni-app 进行开发。"],
+            "techStack": ["uni-app"],
+            "resources": [],
+            "screenshots": [
+              {
+                "image": "https://c18e-1257416358.cos.accelerate.myqcloud.com/IMG_4487.PNG"
+              },
+              {
+                "image": "https://c18e-1257416358.cos.accelerate.myqcloud.com/IMG_4491.PNG"
+              },
+              {
+                "image": "https://c18e-1257416358.cos.accelerate.myqcloud.com/IMG_4489.PNG"
+              },
+              {
+                "image": "https://c18e-1257416358.cos.accelerate.myqcloud.com/IMG_4488.PNG"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "slug": "openalpha",
+      "name": "基金研究开放平台",
+      "route": "/products/openalpha",
+      "logo": "/assets/projects/openalpha-logo.png",
+      "overview": "OpenAlpha 开放平台销售基金指标 API，支持定制 API 和深度数据合作，支持会员充值调用和套餐两种模式。",
+      "tags": ["基金 API", "Vue 3", "Element Plus", "开放平台"],
+      "detail": {
+        "categories": ["金融科技", "开放平台", "API 服务"],
+        "attributes": [
+          {
+            "label": "线上地址",
+            "module": "OpenAlpha",
+            "kind": "website",
+            "url": "https://openalpha.cn/"
+          }
+        ],
+        "introduction": [
+          "平台包含会员销售、大 V 入驻支持，主要服务人群包括投顾、自媒体、机构、个人和量化用户。"
+        ],
+        "development": [
+          {
+            "name": "OpenAlpha",
+            "period": {
+              "start": "2021-09",
+              "end": "2021-12",
+              "ongoing": false,
+              "text": "2021-09 ～ 2021-12"
+            },
+            "summary": [
+              "国内首家基金 API 数据销售平台。",
+              "OpenAlpha 使用 Vite 打包，全面拥抱 Vue 3 + TypeScript，UI 框架基于 Element Plus。",
+              "我主要负责订单模块以及账号管理模块，并通过动态引入阿里 iconfont 资源，实现图标资源动态添加到页面显示。"
+            ],
+            "techStack": [
+              "Vite",
+              "Vue 3",
+              "TypeScript",
+              "Element Plus",
+              "iconfont"
+            ],
+            "resources": [],
+            "screenshots": [
+              {
+                "image": "src/public/images/openalpha-1.png"
+              },
+              {
+                "image": "src/public/images/openalpha-2.png"
+              },
+              {
+                "image": "src/public/images/openalpha-3.png"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

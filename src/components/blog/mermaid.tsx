@@ -2,15 +2,10 @@
 
 import { CodeCopyButton } from '@/components/blog/code-copy-button';
 import { isSensitiveCodeSample } from '@/components/blog/code-safety';
+import { useActiveTheme } from '@/components/theme/use-active-theme';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { startTransition, useEffect, useId, useState } from 'react';
-
-function getMermaidTheme() {
-  return document.documentElement.classList.contains('dark')
-    ? 'dark'
-    : 'neutral';
-}
 
 type MermaidDiagramProps = {
   chart: string;
@@ -57,6 +52,7 @@ function MermaidSkeleton() {
 
 export function MermaidDiagram({ chart, className }: MermaidDiagramProps) {
   const diagramId = useId().replace(/:/g, '');
+  const activeTheme = useActiveTheme();
   const [svg, setSvg] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isRendering, setIsRendering] = useState(Boolean(chart.trim()));
@@ -87,7 +83,7 @@ export function MermaidDiagram({ chart, className }: MermaidDiagramProps) {
         mermaid.initialize({
           startOnLoad: false,
           securityLevel: 'strict',
-          theme: getMermaidTheme(),
+          theme: activeTheme === 'dark' ? 'dark' : 'neutral',
         });
 
         const { svg: output } = await mermaid.render(
@@ -126,7 +122,7 @@ export function MermaidDiagram({ chart, className }: MermaidDiagramProps) {
     return () => {
       cancelled = true;
     };
-  }, [chart, diagramId]);
+  }, [activeTheme, chart, diagramId]);
 
   return (
     <div

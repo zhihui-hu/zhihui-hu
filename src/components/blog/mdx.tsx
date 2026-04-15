@@ -276,29 +276,78 @@ type BlogMdxSourceProps = Omit<MDXRemoteProps, 'source'> & {
   source: string;
 };
 
-const blockedTagPattern = /<\s*(script)\b/gi;
+const blockedTagPattern = /<\s*(script)\b/i;
+const fencePattern = /^(`{3,}|~{3,})/;
 
-function getLineNumber(source: string, index: number) {
-  return source.slice(0, index).split('\n').length;
+function stripInlineCode(line: string) {
+  let result = '';
+  let index = 0;
+
+  while (index < line.length) {
+    if (line[index] !== '`') {
+      result += line[index];
+      index += 1;
+      continue;
+    }
+
+    let tickCount = 1;
+
+    while (line[index + tickCount] === '`') {
+      tickCount += 1;
+    }
+
+    const fence = '`'.repeat(tickCount);
+    const closingIndex = line.indexOf(fence, index + tickCount);
+
+    if (closingIndex === -1) {
+      result += line[index];
+      index += 1;
+      continue;
+    }
+
+    result += ' '.repeat(closingIndex + tickCount - index);
+    index = closingIndex + tickCount;
+  }
+
+  return result;
 }
 
 function findBlockedTagIssue(source: string): BlogMdxIssue | null {
-  const match = blockedTagPattern.exec(source);
+  const lines = source.split('\n');
+  let activeFence: string | null = null;
 
-  if (!match || match.index === undefined) {
-    blockedTagPattern.lastIndex = 0;
-    return null;
+  for (const [lineIndex, line] of lines.entries()) {
+    const trimmedLine = line.trimStart();
+    const fenceMatch = trimmedLine.match(fencePattern);
+
+    if (activeFence) {
+      if (
+        fenceMatch &&
+        fenceMatch[1][0] === activeFence[0] &&
+        fenceMatch[1].length >= activeFence.length
+      ) {
+        activeFence = null;
+      }
+
+      continue;
+    }
+
+    if (fenceMatch) {
+      activeFence = fenceMatch[1];
+      continue;
+    }
+
+    if (blockedTagPattern.test(stripInlineCode(line))) {
+      return {
+        title: '文章内容包含不可渲染的 script 标签',
+        description:
+          '当前博客正文不允许直接渲染 <script>。如果你只是想展示脚本代码，请改成 fenced code block，例如 ```html 或 ```js。',
+        detail: `在第 ${lineIndex + 1} 行检测到 <script> 标签，已阻止本次渲染。`,
+      };
+    }
   }
 
-  const lineNumber = getLineNumber(source, match.index);
-  blockedTagPattern.lastIndex = 0;
-
-  return {
-    title: '文章内容包含不可渲染的 script 标签',
-    description:
-      '当前博客正文不允许直接渲染 <script>。如果你只是想展示脚本代码，请改成 fenced code block，例如 ```html 或 ```js。',
-    detail: `在第 ${lineNumber} 行检测到 <script> 标签，已阻止本次渲染。`,
-  };
+  return null;
 }
 
 function getMdxErrorDetail(error: unknown) {

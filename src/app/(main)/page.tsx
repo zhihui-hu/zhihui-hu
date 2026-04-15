@@ -1,47 +1,80 @@
+import { BlogPosts } from '@/components/blog/posts';
+import { SectionHeader } from '@/components/home/section-header';
+import { ProjectGrid } from '@/components/projects/project-card';
 import { Button } from '@/components/ui/button';
+import { formatBlogRelativeDate, getBlogPosts } from '@/lib/blog';
+import { getProjects } from '@/lib/projects';
 import { MailIcon } from 'lucide-react';
 
 export default function Page() {
+  const posts = getBlogPosts()
+    .slice(0, 5)
+    .map((post) => ({
+      ...post,
+      formattedPublishedAt: formatBlogRelativeDate(post.metadata.publishedAt),
+    }));
+
+  const projects = getProjects().slice(0, 4);
+
   return (
-    <main className="flex min-h-screen items-center bg-background text-foreground">
-      <section className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-16 md:px-10">
-        <h1 className="text-5xl leading-none font-semibold tracking-tight sm:text-6xl md:text-7xl">
-          胡志辉
-        </h1>
-        <div className="flex flex-col gap-4">
-          <p className="max-w-3xl text-base leading-8 text-muted-foreground md:text-lg">
-            自 2016 年 12
-            月开始从事软件开发，先后参与金融和医疗行业系统建设与产品交付。金融方向的工作覆盖业务流程、数据准确性、权限控制和系统稳定性；医疗方向的工作覆盖多角色协作、信息完整性和过程留痕。当前聚焦
-            AI 应用、Web
-            开发、移动端与跨平台交付，工作内容涵盖需求分析、界面实现和多端落地。
-          </p>
-          <div className="flex items-center gap-3">
-            <Button asChild size="icon" variant="outline">
-              <a
-                aria-label="发送邮件到 i@huzhihui.com"
-                href="mailto:i@huzhihui.com"
-                title="i@huzhihui.com"
-              >
-                <MailIcon aria-hidden="true" />
-                <span className="sr-only">i@huzhihui.com</span>
-              </a>
-            </Button>
-            <Button asChild size="icon" variant="outline">
-              <a
-                aria-label="打开 GitHub 主页"
-                href="https://github.com/zhihui-hu/"
-                rel="noreferrer"
-                target="_blank"
-                title="github.com/zhihui-hu"
-              >
-                <GitHubLogo />
-                <span className="sr-only">github.com/zhihui-hu</span>
-              </a>
-            </Button>
+    <>
+      {/* ── Hero ──────────────────────────────────────────── */}
+      <section className="flex min-h-[50vh] items-center">
+        <div className="flex w-full  flex-col gap-8 py-16">
+          <h1 className="text-5xl leading-none font-semibold tracking-tight sm:text-6xl md:text-7xl">
+            胡志辉
+          </h1>
+          <div className="flex flex-col gap-4">
+            <p className="max-w-3xl text-base leading-8 text-muted-foreground md:text-lg">
+              自 2016 年 12
+              月开始从事软件开发，先后参与金融和医疗行业系统建设与产品交付。金融方向的工作覆盖业务流程、数据准确性、权限控制和系统稳定性；医疗方向的工作覆盖多角色协作、信息完整性和过程留痕。当前聚焦
+              AI 应用、Web
+              开发、移动端与跨平台交付，工作内容涵盖需求分析、界面实现和多端落地。
+            </p>
+            <div className="flex items-center gap-3">
+              <Button asChild size="icon" variant="outline">
+                <a
+                  aria-label="发送邮件到 i@huzhihui.com"
+                  href="mailto:i@huzhihui.com"
+                  title="i@huzhihui.com"
+                >
+                  <MailIcon aria-hidden="true" />
+                  <span className="sr-only">i@huzhihui.com</span>
+                </a>
+              </Button>
+              <Button asChild size="icon" variant="outline">
+                <a
+                  aria-label="打开 GitHub 主页"
+                  href="https://github.com/zhihui-hu/"
+                  rel="noreferrer"
+                  target="_blank"
+                  title="github.com/zhihui-hu"
+                >
+                  <GitHubLogo />
+                  <span className="sr-only">github.com/zhihui-hu</span>
+                </a>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
-    </main>
+
+      {/* ── Latest Posts ──────────────────────────────────── */}
+      <section className="w-full  py-12">
+        <div className="flex flex-col gap-6">
+          <SectionHeader href="/blog" title="最新文章" />
+          <BlogPosts limit={5} posts={posts} />
+        </div>
+      </section>
+
+      {/* ── Latest Projects ──────────────────────────────── */}
+      <section className="w-full  pb-20 pt-4">
+        <div className="flex flex-col gap-6">
+          <SectionHeader href="/projects" title="最新作品" />
+          <ProjectGrid projects={projects} />
+        </div>
+      </section>
+    </>
   );
 }
 

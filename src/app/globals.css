@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-@import 'github-markdown-css/github-markdown.css';
+@import '../styles/github-markdown.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -53,7 +53,7 @@
   --blog-view-transition-exit: 150ms;
   --blog-view-transition-enter: 220ms;
   --blog-view-transition-slide-offset: 48px;
-  --background: oklch(1 0 0);
+  --background: oklch(0.97 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -134,6 +134,12 @@
     @apply font-sans;
     min-width: 360px;
   }
+
+  @supports (view-transition-name: none) {
+    :root {
+      view-transition-name: root;
+    }
+  }
 }
 
 ::selection {
@@ -141,6 +147,28 @@
 }
 
 @layer components {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-old(root) {
+    z-index: 1;
+  }
+
+  ::view-transition-new(root) {
+    z-index: 9999;
+  }
+
+  [data-theme-switching='dark']::view-transition-old(root) {
+    z-index: 9999;
+  }
+
+  [data-theme-switching='dark']::view-transition-new(root) {
+    z-index: 1;
+  }
+
   ::view-transition-group(.blog-title-share) {
     animation-duration: 320ms;
     animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
@@ -187,598 +215,6 @@
         var(--blog-view-transition-exit) both blog-view-fade,
       360ms ease-in-out both blog-view-slide;
   }
-
-  .markdown-body {
-    @apply max-w-none min-w-0 text-base leading-7;
-    box-sizing: border-box;
-    min-width: 200px;
-    background-color: transparent;
-    padding: 0;
-  }
-
-  .markdown-body > :first-child {
-    margin-top: 0 !important;
-  }
-
-  .markdown-body :is(h1, h2, h3, h4, h5, h6) {
-    scroll-margin-top: 6rem;
-  }
-
-  .markdown-body .mermaid-diagram {
-    background-color: var(--bgColor-default);
-  }
-
-  .markdown-body .mermaid-skeleton {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .markdown-body .mermaid-skeleton::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      100deg,
-      transparent 10%,
-      rgb(255 255 255 / 24%) 50%,
-      transparent 90%
-    );
-    transform: translateX(-100%);
-    animation: mermaid-skeleton-shimmer 1.8s ease-in-out infinite;
-    pointer-events: none;
-  }
-
-  .markdown-body ul:not(.contains-task-list) {
-    list-style-type: disc;
-  }
-
-  .markdown-body ol:not(.contains-task-list) {
-    list-style-type: decimal;
-  }
-
-  .markdown-body ul ul:not(.contains-task-list) {
-    list-style-type: circle;
-  }
-
-  .markdown-body ul ul ul:not(.contains-task-list) {
-    list-style-type: square;
-  }
-
-  .markdown-body li {
-    display: list-item;
-  }
-
-  .markdown-body .github-code-block {
-    background-color: transparent;
-  }
-
-  .markdown-body .github-code-content {
-    @apply overflow-x-auto;
-  }
-
-  .markdown-body .github-code-block pre {
-    margin: 0;
-  }
-
-  .markdown-body .github-code-block pre[data-theme] {
-    color: var(--shiki-light) !important;
-    background-color: var(--bgColor-muted);
-    border-radius: 6px;
-  }
-
-  .markdown-body .github-code-block pre[data-theme] code[data-theme] {
-    @apply block min-w-full border-0 bg-transparent p-0 text-[0.85rem];
-    line-height: 1.45;
-  }
-
-  .markdown-body .github-code-block pre[data-theme] code[data-theme] {
-    @apply m-0 min-w-full border-0 text-[0.85rem];
-    font-variant-ligatures: none;
-    line-height: 1.45;
-  }
-
-  .markdown-body .github-code-block pre[data-theme] code[data-theme],
-  .markdown-body
-    .github-code-block
-    pre[data-theme]
-    code[data-theme]
-    span[style*='--shiki-light'] {
-    color: var(--shiki-light) !important;
-    background-color: transparent !important;
-  }
-
-  .markdown-body[data-theme='dark'] .github-code-block pre[data-theme] {
-    color: var(--shiki-dark) !important;
-    background-color: #1f1f1f;
-  }
-
-  .markdown-body[data-theme='dark']
-    .github-code-block
-    pre[data-theme]
-    code[data-theme],
-  .markdown-body[data-theme='dark']
-    .github-code-block
-    pre[data-theme]
-    code[data-theme]
-    span[style*='--shiki-dark'] {
-    color: var(--shiki-dark) !important;
-    background-color: transparent !important;
-  }
-
-  .markdown-body .github-code-block [data-line] {
-    display: block;
-    min-height: 1.4em;
-  }
-
-  .markdown-body .github-code-copy {
-    @apply border-border/70 bg-background/85 text-muted-foreground hover:bg-background hover:text-foreground;
-  }
-
-  .markdown-body[data-theme='dark'] .github-code-copy {
-    border-color: #3c3c3c;
-    background-color: rgb(24 24 24 / 88%);
-    color: #9d9d9d;
-  }
-
-  .markdown-body[data-theme='dark'] .github-code-copy:hover {
-    background-color: #181818;
-    color: #cccccc;
-  }
-
-  .markdown-body .mermaid-diagram svg {
-    overflow: visible;
-  }
-
-  .markdown-body .mermaid-diagram foreignObject {
-    overflow: visible;
-  }
-
-  .markdown-body .mermaid-diagram :where(p, ul, ol, li) {
-    margin: 0 !important;
-    padding: 0;
-    line-height: 1.35 !important;
-  }
-
-  .markdown-body .mermaid-diagram :where(.nodeLabel, .edgeLabel, .labelBkg) {
-    line-height: 1.35 !important;
-  }
-
-  .markdown-body
-    .mermaid-diagram
-    :where(.nodeLabel p, .edgeLabel p, .labelBkg p) {
-    margin: 0 !important;
-    line-height: 1.35 !important;
-  }
-
-  .markdown-body
-    .mermaid-diagram
-    :where(.nodeLabel strong, .edgeLabel strong, .labelBkg strong) {
-    font-weight: 600;
-  }
-
-  .markdown-body
-    .mermaid-diagram
-    :where(.nodeLabel code, .edgeLabel code, .labelBkg code) {
-    border: 0;
-    background: transparent;
-    padding: 0;
-    font-size: inherit;
-    line-height: inherit;
-  }
-
-  .markdown-body
-    .mermaid-diagram
-    :where(.nodeLabel pre, .edgeLabel pre, .labelBkg pre) {
-    margin: 0;
-    background: transparent;
-    padding: 0;
-    overflow: visible;
-  }
-
-  .markdown-body .contains-task-list {
-    @apply list-none pl-0;
-  }
-
-  .markdown-body .task-list-item {
-    @apply flex items-start gap-3 pl-0;
-  }
-
-  .markdown-body .task-list-item::marker {
-    content: '';
-  }
-
-  .markdown-body .task-list-item input[type='checkbox'] {
-    @apply border-border accent-primary mt-1 size-4 rounded border;
-  }
-
-  .markdown-body .task-list-item p {
-    margin: 0;
-  }
-
-  .prose {
-    @apply text-foreground/90 text-base leading-7;
-  }
-
-  .prose.prose-github {
-    @apply text-foreground/85 max-w-none text-base leading-7;
-  }
-
-  .prose.prose-github > :first-child {
-    margin-top: 0 !important;
-  }
-
-  .prose.prose-github .anchor {
-    @apply invisible absolute left-0 -ml-6 pr-2 no-underline;
-    width: auto;
-    max-width: none;
-    cursor: pointer;
-  }
-
-  .prose.prose-github a {
-    @apply text-primary decoration-border/80 font-medium underline decoration-[0.08em] underline-offset-4 transition-colors;
-  }
-
-  .prose.prose-github p {
-    @apply my-4 leading-8;
-  }
-
-  .prose.prose-github h1 {
-    @apply border-border/70 text-foreground mt-12 mb-5 border-b pb-3 text-[2.25rem] leading-tight font-semibold tracking-tight;
-  }
-
-  .prose.prose-github h2 {
-    @apply border-border/70 text-foreground mt-12 mb-4 border-b pb-2 text-[1.7rem] leading-tight font-semibold tracking-tight;
-  }
-
-  .prose.prose-github h3 {
-    @apply text-foreground mt-10 mb-3 text-[1.35rem] leading-8 font-semibold tracking-tight;
-  }
-
-  .prose.prose-github h4 {
-    @apply text-foreground mt-8 mb-3 text-[1.1rem] leading-7 font-semibold;
-  }
-
-  .prose.prose-github strong {
-    @apply text-foreground font-semibold;
-  }
-
-  .prose.prose-github ul {
-    @apply marker:text-muted-foreground my-4 list-disc pl-6;
-  }
-
-  .prose.prose-github ol {
-    @apply marker:text-muted-foreground my-4 list-decimal pl-6;
-  }
-
-  .prose.prose-github li {
-    @apply my-1.5 pl-1 leading-7;
-  }
-
-  .prose.prose-github li > p {
-    @apply my-2;
-  }
-
-  .prose.prose-github blockquote {
-    @apply border-border/80 text-muted-foreground my-6 border-l-4 pl-4;
-  }
-
-  .prose.prose-github img {
-    @apply border-border/70 bg-card my-6 block h-auto w-full rounded-xl border;
-  }
-
-  .prose.prose-github hr {
-    @apply border-border/70 my-10 border-0 border-t;
-  }
-
-  .prose.prose-github code {
-    @apply border-border/70 bg-muted/55 text-foreground rounded-md border px-1.5 py-0.5 font-mono text-[0.875em];
-  }
-
-  .prose.prose-github pre {
-    @apply my-6 overflow-x-auto rounded-none bg-transparent text-sm;
-  }
-
-  .prose.prose-github pre code {
-    @apply block rounded-none border-0 bg-transparent p-0 text-[0.85rem];
-    line-height: inherit;
-  }
-
-  .prose.prose-github .github-code-block {
-    @apply border-border/70 bg-background overflow-hidden rounded-md border;
-  }
-
-  .prose.prose-github .github-code-block .github-code-content {
-    @apply bg-background overflow-x-auto;
-  }
-
-  .prose.prose-github .github-code-block .shiki {
-    @apply m-0 min-w-full border-0 px-4 py-3.5 text-[0.85rem];
-    font-variant-ligatures: none;
-    line-height: 1.45;
-  }
-
-  .prose.prose-github .github-code-block .shiki,
-  .prose.prose-github .github-code-block .shiki span {
-    color: var(--shiki-light) !important;
-    background-color: var(--shiki-light-bg) !important;
-  }
-
-  .dark .prose.prose-github .github-code-block .shiki,
-  .dark .prose.prose-github .github-code-block .shiki span {
-    color: var(--shiki-dark) !important;
-    background-color: var(--shiki-dark-bg) !important;
-  }
-
-  .prose.prose-github .github-code-block .shiki code {
-    @apply block min-w-full;
-  }
-
-  .prose.prose-github .github-code-block .line {
-    display: block;
-    min-height: 1.4em;
-  }
-
-  .prose.prose-github .mermaid-diagram svg {
-    overflow: visible;
-  }
-
-  .prose.prose-github .mermaid-diagram foreignObject {
-    overflow: visible;
-  }
-
-  .prose.prose-github .mermaid-diagram :where(p, ul, ol, li) {
-    margin: 0 !important;
-    padding: 0;
-    line-height: 1.35 !important;
-  }
-
-  .prose.prose-github
-    .mermaid-diagram
-    :where(.nodeLabel, .edgeLabel, .labelBkg) {
-    line-height: 1.35 !important;
-  }
-
-  .prose.prose-github
-    .mermaid-diagram
-    :where(.nodeLabel p, .edgeLabel p, .labelBkg p) {
-    margin: 0 !important;
-    line-height: 1.35 !important;
-  }
-
-  .prose.prose-github
-    .mermaid-diagram
-    :where(.nodeLabel strong, .edgeLabel strong, .labelBkg strong) {
-    font-weight: 600;
-  }
-
-  .prose.prose-github
-    .mermaid-diagram
-    :where(.nodeLabel code, .edgeLabel code, .labelBkg code) {
-    border: 0;
-    background: transparent;
-    padding: 0;
-    font-size: inherit;
-    line-height: inherit;
-  }
-
-  .prose.prose-github
-    .mermaid-diagram
-    :where(.nodeLabel pre, .edgeLabel pre, .labelBkg pre) {
-    margin: 0;
-    background: transparent;
-    padding: 0;
-    overflow: visible;
-  }
-
-  .prose.prose-github img {
-    @apply border-border/70 my-8 block h-auto max-w-full rounded-md border;
-  }
-
-  .prose.prose-github .contains-task-list {
-    @apply list-none pl-0;
-  }
-
-  .prose.prose-github .task-list-item {
-    @apply flex items-start gap-3 pl-0;
-  }
-
-  .prose.prose-github .task-list-item::marker {
-    content: '';
-  }
-
-  .prose.prose-github .task-list-item input[type='checkbox'] {
-    @apply border-border accent-primary mt-1 size-4 rounded border;
-  }
-
-  .prose.prose-github .task-list-item p {
-    @apply my-0;
-  }
-
-  .prose.prose-github table {
-    @apply border-border/70 bg-background w-full border-collapse border text-sm leading-6;
-    display: table;
-  }
-
-  .prose.prose-github thead {
-    @apply bg-muted/40;
-  }
-
-  .prose.prose-github tr {
-    @apply border-border/60 border-b;
-  }
-
-  .prose.prose-github th {
-    @apply border-border/50 text-foreground border-r px-3 py-2 text-left font-semibold last:border-r-0;
-  }
-
-  .prose.prose-github td {
-    @apply border-border/40 border-r px-3 py-2 align-top last:border-r-0;
-  }
-
-  .prose .anchor {
-    @apply invisible absolute no-underline;
-    margin-left: -1em;
-    padding-right: 0.5em;
-    width: 80%;
-    max-width: 700px;
-    cursor: pointer;
-  }
-
-  .anchor:hover {
-    @apply visible;
-  }
-
-  .prose a {
-    @apply text-primary decoration-border underline decoration-[0.08em] underline-offset-2 transition-all;
-  }
-
-  .prose .anchor::after {
-    @apply text-muted-foreground/50;
-    content: '#';
-  }
-
-  .prose *:hover > .anchor {
-    @apply visible;
-  }
-
-  .prose pre {
-    @apply overflow-x-auto bg-transparent text-sm;
-  }
-
-  .prose code {
-    @apply bg-muted text-foreground border-border/70 rounded-md border px-1.5 py-0.5 font-mono text-[0.85em];
-  }
-
-  .prose pre code {
-    @apply block rounded-none border-0 bg-transparent px-4 py-4;
-    border: initial;
-    line-height: 1;
-  }
-
-  .prose .github-code-block {
-    @apply border-border bg-card my-6 overflow-hidden rounded-xl border;
-  }
-
-  .prose .github-code-block pre {
-    @apply m-0 rounded-none border-0 bg-transparent p-0;
-  }
-
-  .prose .github-code-block pre code {
-    @apply block min-w-full rounded-none border-0 bg-transparent p-0 text-[0.85rem];
-    line-height: 0.8;
-  }
-
-  .prose .github-code-block .github-code-content {
-    @apply overflow-x-auto;
-  }
-
-  .prose .github-code-block .shiki {
-    @apply m-0 min-w-full border-0 px-4 py-3 text-[0.85rem];
-    line-height: 1;
-  }
-
-  .prose .github-code-block .shiki code {
-    @apply block min-w-full;
-  }
-
-  .prose .github-code-block .line {
-    display: block;
-    min-height: 0;
-  }
-
-  .prose img {
-    @apply border-border my-6 rounded-xl border;
-  }
-
-  .prose p {
-    @apply my-5 leading-7;
-  }
-
-  .prose h1 {
-    @apply border-border text-foreground mt-10 mb-4 border-b pb-3 text-4xl font-semibold tracking-tight;
-  }
-
-  .prose h2 {
-    @apply border-border text-foreground mt-10 mb-4 border-b pb-2 text-3xl font-semibold tracking-tight;
-  }
-
-  .prose h3 {
-    @apply text-foreground mt-8 mb-3 text-2xl font-semibold tracking-tight;
-  }
-
-  .prose h4 {
-    @apply text-foreground mt-8 mb-3 text-xl font-semibold tracking-tight;
-  }
-
-  .prose strong {
-    @apply text-foreground font-semibold;
-  }
-
-  .prose ul {
-    @apply marker:text-muted-foreground my-5 list-disc pl-6;
-  }
-
-  .prose ol {
-    @apply marker:text-muted-foreground my-5 list-decimal pl-6;
-  }
-
-  .prose li {
-    @apply my-1.5 pl-1;
-  }
-
-  .prose blockquote {
-    @apply border-border text-muted-foreground my-6 border-l-4 pl-4;
-  }
-
-  .prose hr {
-    @apply border-border my-8 border-0 border-t;
-  }
-
-  .prose .contains-task-list {
-    @apply list-none pl-0;
-  }
-
-  .prose .task-list-item {
-    @apply flex items-start gap-3 pl-0;
-  }
-
-  .prose .task-list-item::marker {
-    content: '';
-  }
-
-  .prose .task-list-item input[type='checkbox'] {
-    @apply border-border accent-primary mt-1 size-4 rounded border;
-  }
-
-  .prose .task-list-item p {
-    @apply my-0;
-  }
-
-  .prose > :first-child {
-    margin-top: 1.25em !important;
-    margin-bottom: 1.25em !important;
-  }
-
-  .prose table {
-    @apply bg-card w-full border-collapse text-sm;
-    display: table;
-  }
-
-  .prose thead {
-    @apply bg-muted/60;
-  }
-
-  .prose tr {
-    @apply border-border border-b;
-  }
-
-  .prose th {
-    @apply text-foreground px-4 py-3 text-left font-semibold;
-  }
-
-  .prose td {
-    @apply px-4 py-3 align-top;
-  }
 }
 
 @keyframes blog-view-fade {
@@ -813,25 +249,11 @@
   }
 }
 
-@keyframes mermaid-skeleton-shimmer {
-  from {
-    transform: translateX(-100%);
-  }
-
-  to {
-    transform: translateX(100%);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(*),
   ::view-transition-new(*),
   ::view-transition-group(*) {
     animation-delay: 0s !important;
-    animation-duration: 0s !important;
-  }
-
-  .markdown-body .mermaid-skeleton::after {
     animation-duration: 0s !important;
   }
 }
@@ -859,4 +281,59 @@ pre {
 .underline-hover:hover {
   background-size: 100% 1px;
   background-position: left bottom;
+}
+
+/* ── Navigation progress bar ──────────────────────────────── */
+
+.nav-progress-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 99999;
+  height: 2.5px;
+  pointer-events: none;
+}
+
+.nav-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--foreground);
+  border-radius: 0 1px 1px 0;
+  box-shadow: 0 0 2px var(--foreground);
+  transition: width 0ms;
+}
+
+.nav-progress-container[data-state='loading'] .nav-progress-bar {
+  width: 85%;
+  transition: width 8s cubic-bezier(0.2, 0.5, 0, 1) 100ms;
+}
+
+.nav-progress-container[data-state='complete'] .nav-progress-bar {
+  width: 100%;
+  transition: width 300ms ease-out;
+}
+
+.nav-progress-container[data-state='complete'] {
+  animation: nav-progress-fade 300ms ease-out 150ms forwards;
+}
+
+@keyframes nav-progress-fade {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-progress-bar {
+    transition-duration: 0s !important;
+  }
+
+  .nav-progress-container[data-state='complete'] {
+    animation-duration: 0s !important;
+  }
 }

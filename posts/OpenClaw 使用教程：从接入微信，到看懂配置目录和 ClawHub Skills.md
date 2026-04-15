@@ -26,6 +26,8 @@ tags:
   - 工具使用
 ---
 
+![OpenClaw 教程：新 Mac 从 0 配到国产 AI、飞书微信和无人值守头图](/assets/imgs/openclaw-wechat-config-clawhub-skills-guide-banner.png)
+
 我自己第一次在新 Mac 上配 OpenClaw，最容易乱的不是命令。
 
 而是顺序。

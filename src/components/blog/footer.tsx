@@ -40,9 +40,8 @@ export function BlogFooter() {
     <footer className="mb-16 mt-12 w-full border-t border-border/60 pt-5 pb-[calc(env(safe-area-inset-bottom,0px)+0.25rem)]">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-muted-foreground sm:text-sm">
-          © 2016 - {new Date().getFullYear()} 胡志辉
+          CC BY-NC 4.0 | 2016 - {new Date().getFullYear()} © 胡志辉
         </p>
-
         <ul className="flex flex-wrap gap-2 text-sm">
           {footerLinks.map((item) => {
             const Icon = item.icon;

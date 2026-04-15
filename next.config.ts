@@ -5,6 +5,31 @@ const nextConfig: NextConfig = {
   experimental: {
     viewTransition: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'is1-ssl.mzstatic.com',
+        port: '',
+        pathname: '/image/thumb/**',
+        search: '',
+      },
+      {
+        protocol: 'https',
+        hostname: 'objectstorage.eu-marseille-1.oraclecloud.com',
+        port: '',
+        pathname: '/n/axwlydfzmjel/b/onefile/o/uploads/**',
+        search: '',
+      },
+      {
+        protocol: 'http',
+        hostname: 'www.shuyouyinli.com',
+        port: '',
+        pathname: '/**',
+        search: '',
+      },
+    ],
+  },
 };
 
 const proxy = async () => {
@@ -19,8 +44,10 @@ const proxy = async () => {
 switch (process.env.NODE_ENV) {
   case 'production':
     nextConfig.output = 'export';
-    nextConfig.images = {};
-    nextConfig.images.unoptimized = true;
+    nextConfig.images = {
+      ...nextConfig.images,
+      unoptimized: true,
+    };
     break;
   case 'development':
     nextConfig.rewrites = proxy;
