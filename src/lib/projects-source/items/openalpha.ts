@@ -3,95 +3,41 @@ import type { ProjectSource } from '../types';
 export const openalphaProjectSource: ProjectSource = {
   slug: 'openalpha',
   name: '基金研究开放平台',
-  url: 'https://openalpha.cn/',
   route: '/products/openalpha',
   logo: '/assets/projects/openalpha-logo.png',
   overview:
     'OpenAlpha 开放平台销售基金指标 API，支持定制 API 和深度数据合作，支持会员充值调用和套餐两种模式。',
   tags: ['基金 API', 'Vue 3', 'Element Plus', '开放平台'],
-  detail: {
-    hero: {
-      companyName: '西筹科技',
-      companyUrl: 'https://openalpha.cn/',
-      metaLine: '2021-09 ～ 2021-12 · 支持 Web 与 API 服务',
-      actions: [
-        {
-          kind: 'website',
-          label: '在线',
-          url: 'https://openalpha.cn/',
-        },
-      ],
-    },
-    metrics: [
-      {
-        label: '项目周期',
-        value: '2021-09 ～ 2021-12',
-        sub: '交付跨度',
-      },
-      {
-        label: '分类',
-        value: '金融科技',
-        sub: '开放平台',
-      },
-      {
-        label: '平台',
-        value: 'Web 平台 / API 服务',
-        sub: '基金 API',
-      },
-      {
-        label: '提供者',
-        value: '西筹科技',
-        href: 'https://openalpha.cn/',
-      },
-    ],
-    categories: ['金融科技', '开放平台', 'API 服务'],
-    attributes: [
-      {
-        label: '适用平台',
-        text: 'Web 平台 / API 服务',
-      },
-      {
-        label: '价格',
-        text: '商业化服务',
-      },
-      {
-        label: '线上地址',
-        module: 'OpenAlpha',
-        kind: 'website',
-        url: 'https://openalpha.cn/',
-      },
-    ],
-    introduction: [
-      '平台包含会员销售、大 V 入驻支持，主要服务人群包括投顾、自媒体、机构、个人和量化用户。',
-    ],
-    development: [
-      {
-        name: 'OpenAlpha',
-        period: {
-          start: '2021-09',
-          end: '2021-12',
-          ongoing: false,
-          text: '2021-09 ～ 2021-12',
-        },
-        summary: [
-          '国内首家基金 API 数据销售平台。',
-          'OpenAlpha 使用 Vite 打包，全面拥抱 Vue 3 + TypeScript，UI 框架基于 Element Plus。',
-          '我主要负责订单模块以及账号管理模块，并通过动态引入阿里 iconfont 资源，实现图标资源动态添加到页面显示。',
-        ],
-        techStack: ['Vite', 'Vue 3', 'TypeScript', 'Element Plus', 'iconfont'],
-        resources: [],
-        screenshots: [
-          {
-            image: 'src/public/images/openalpha-1.png',
-          },
-          {
-            image: 'src/public/images/openalpha-2.png',
-          },
-          {
-            image: 'src/public/images/openalpha-3.png',
-          },
-        ],
-      },
-    ],
+  urls: {
+    official: 'https://openalpha.cn/',
+    web: 'https://openalpha.cn/',
   },
+  companyName: '西筹科技',
+  startDate: '2021-09',
+  endDate: '2021-12',
+  industry: '金融科技',
+  categories: ['开放平台', 'API 服务'],
+  platforms: ['Web 平台', 'API 服务'],
+  langs: ['中文简体'],
+  price: '商业化服务',
+  introduction: [
+    '平台包含会员销售、大 V 入驻支持，主要服务人群包括投顾、自媒体、机构、个人和量化用户。',
+  ],
+  summary: [
+    '国内首家基金 API 数据销售平台。',
+    'OpenAlpha 使用 Vite 打包，全面拥抱 Vue 3 + TypeScript，UI 框架基于 Element Plus。',
+    '我主要负责订单模块以及账号管理模块，并通过动态引入阿里 iconfont 资源，实现图标资源动态添加到页面显示。',
+  ],
+  techStack: ['Vite', 'Vue 3', 'TypeScript', 'Element Plus', 'iconfont'],
+  screenshots: [
+    {
+      image: 'src/public/images/openalpha-1.png',
+    },
+    {
+      image: 'src/public/images/openalpha-2.png',
+    },
+    {
+      image: 'src/public/images/openalpha-3.png',
+    },
+  ],
 };

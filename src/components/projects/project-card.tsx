@@ -43,6 +43,11 @@ export function ProjectCard({ project }: ProjectCardProps) {
               </span>
             )}
           </div>
+          {project.companyName && (
+            <p className="mt-1 text-[0.76rem] leading-5 text-muted-foreground/80">
+              {project.companyName}
+            </p>
+          )}
           <ProjectCardDescription description={project.description} />
         </div>
       </div>

@@ -5,10 +5,10 @@ import { cache } from 'react';
 import { PROJECT_SOURCES } from './projects-source';
 import type {
   ProjectSource,
-  ProjectSourceAttribute,
-  ProjectSourceDevelopment,
-  ProjectSourcePeriod,
+  ProjectSourceAsset,
   ProjectSourceResource,
+  ProjectSourceScreenshot,
+  ProjectSourceUrls,
 } from './projects-source';
 
 type ProjectScreenshot = {
@@ -28,7 +28,7 @@ export type ProjectHeroAction = {
 };
 
 export type ProjectHero = {
-  companyName: string;
+  companyName?: string;
   companyUrl?: string;
   metaLine: string;
   actions: ProjectHeroAction[];
@@ -100,6 +100,13 @@ export type Project = {
   listTags: string[];
   url?: string;
   repo?: string;
+  companyName?: string;
+  industry?: string;
+  categories: string[];
+  platforms: string[];
+  langs: string[];
+  priceLabel?: string;
+  sourceUrls: ProjectSourceUrls;
   publishedAt?: string;
   timeLabel?: string;
   detail: ProjectDetail;
@@ -164,23 +171,40 @@ function collectProjectTags(
 }
 
 function getProjectListTags(projectSource: ProjectSource) {
-  return collectProjectTags([projectSource.tags]);
+  return collectProjectTags(
+    [
+      projectSource.industry ? [projectSource.industry] : [],
+      projectSource.categories,
+      projectSource.platforms,
+      projectSource.tags,
+    ],
+    6,
+  );
 }
 
 function getProjectTags(projectSource: ProjectSource) {
   return collectProjectTags(
     [
       projectSource.tags,
-      ...(projectSource.detail.development || []).map(
-        (development) => development.techStack,
-      ),
+      projectSource.techStack,
+      projectSource.categories,
+      projectSource.platforms,
+      projectSource.langs,
+      projectSource.industry ? [projectSource.industry] : [],
     ],
     8,
   );
 }
 
 function getProjectOverview(projectSource: ProjectSource) {
-  return projectSource.overview || projectSource.description || '';
+  return (
+    projectSource.overview ||
+    projectSource.description ||
+    projectSource.headline ||
+    projectSource.introduction?.[0] ||
+    projectSource.summary?.[0] ||
+    ''
+  );
 }
 
 function readProjectSources(): ProjectSource[] {
@@ -247,17 +271,44 @@ function isNonEmptyString(value: string | undefined): value is string {
   return Boolean(value);
 }
 
-function normalizeAttribute(
-  attribute: ProjectSourceAttribute,
-): ProjectAttribute {
+function normalizeText(value?: string | null) {
+  const nextValue = value?.trim();
+
+  return nextValue || undefined;
+}
+
+function normalizeStringList(values?: readonly string[]) {
+  return (values || []).map(normalizeText).filter(isNonEmptyString);
+}
+
+function normalizeSourceUrls(projectSource: ProjectSource): ProjectSourceUrls {
   return {
-    label: attribute.label,
-    module: attribute.module,
-    value: attribute.text || attribute.module || attribute.url,
-    url: attribute.url,
-    kind: attribute.kind,
-    type: attribute.type,
+    official: normalizeText(projectSource.urls?.official),
+    web: normalizeText(projectSource.urls?.web),
+    ios: normalizeText(projectSource.urls?.ios),
+    android: normalizeText(projectSource.urls?.android),
+    mp: normalizeText(projectSource.urls?.mp),
   };
+}
+
+function getProjectCompanyUrl(urls: ProjectSourceUrls) {
+  return urls.official || urls.web;
+}
+
+function getPrimaryProjectUrl(urls: ProjectSourceUrls) {
+  return urls.web || urls.official || urls.ios || urls.android;
+}
+
+function normalizePriceLabel(price?: string | number) {
+  if (price === undefined || price === null) {
+    return undefined;
+  }
+
+  if (typeof price === 'number') {
+    return price === 0 ? '免费' : String(price);
+  }
+
+  return normalizeText(price);
 }
 
 function normalizeResource(resource: ProjectSourceResource): ProjectResource {
@@ -269,136 +320,347 @@ function normalizeResource(resource: ProjectSourceResource): ProjectResource {
   };
 }
 
-function normalizeDevelopment(
-  development: ProjectSourceDevelopment,
-): ProjectDevelopment {
-  return {
-    name: development.name,
-    period: development.period,
-    summary: development.summary || [],
-    techStack: development.techStack || [],
-    resources: (development.resources || []).map(normalizeResource),
-    screenshots: (development.screenshots || [])
-      .map((item) => normalizeImagePath(item.image))
-      .filter(isNonEmptyString)
-      .map((image) => ({
-        image,
-      })),
-    assets: (development.assets || []).reduce<ProjectAsset[]>(
-      (result, item) => {
-        const image = normalizeImagePath(item.image);
-
-        if (!image) {
-          return result;
-        }
-
-        result.push({
-          label: item.label,
-          image,
-        });
-
-        return result;
-      },
-      [],
-    ),
-  };
-}
-
-function collectDetailScreenshots(
-  development: ProjectDevelopment[],
-): ProjectScreenshot[] {
+function normalizeScreenshots(screenshots?: ProjectSourceScreenshot[]) {
   const seen = new Set<string>();
 
-  return development.flatMap((item) =>
-    (item.screenshots || []).filter((screenshot) => {
-      if (seen.has(screenshot.image)) {
-        return false;
-      }
+  return (screenshots || []).reduce<ProjectScreenshot[]>((result, item) => {
+    const image = normalizeImagePath(item.image);
 
-      seen.add(screenshot.image);
-      return true;
-    }),
-  );
+    if (!image || seen.has(image)) {
+      return result;
+    }
+
+    seen.add(image);
+    result.push({ image });
+    return result;
+  }, []);
 }
 
-function getProjectTimeline(projectSource: ProjectSource) {
-  const periods = (projectSource.detail.development || [])
-    .map((item) => item.period)
-    .filter((period): period is ProjectSourcePeriod => Boolean(period?.start));
+function normalizeAssets(assets?: ProjectSourceAsset[]) {
+  return (assets || []).reduce<ProjectAsset[]>((result, item) => {
+    const image = normalizeImagePath(item.image);
 
-  if (periods.length === 0) {
-    return {
-      publishedAt: undefined,
-      timeLabel: undefined,
-    };
+    if (!image) {
+      return result;
+    }
+
+    result.push({
+      label: item.label,
+      image,
+    });
+
+    return result;
+  }, []);
+}
+
+function normalizeEndDate(endDate?: string | null) {
+  const value = normalizeText(endDate);
+
+  if (!value || value === '至今') {
+    return undefined;
   }
 
-  const starts = periods
-    .map((period) => period.start)
-    .sort((a, b) => a.localeCompare(b));
-  const hasOngoing = periods.some((period) => period.ongoing || !period.end);
-  const ends = periods
-    .map((period) => period.end)
-    .filter((end): end is string => Boolean(end))
-    .sort((a, b) => a.localeCompare(b));
-  const startedAt = starts[0];
-  const endedAt = hasOngoing ? undefined : ends.at(-1);
+  return value;
+}
+
+function buildPeriod(projectSource: ProjectSource): ProjectPeriod | undefined {
+  const start = normalizeText(projectSource.startDate);
+
+  if (!start) {
+    return undefined;
+  }
+
+  const end = normalizeEndDate(projectSource.endDate);
+  const ongoing = Boolean(projectSource.ongoing || !end);
 
   return {
-    publishedAt: startedAt,
-    timeLabel: startedAt ? `${startedAt} ～ ${endedAt || '至今'}` : undefined,
+    start,
+    end: end ?? null,
+    ongoing,
+    text: `${start} ～ ${ongoing ? '至今' : end}`,
   };
+}
+
+function buildProjectHeroActions(urls: ProjectSourceUrls): ProjectHeroAction[] {
+  const actions: ProjectHeroAction[] = [];
+
+  if (urls.web) {
+    actions.push({
+      kind: 'website',
+      label: '在线',
+      url: urls.web,
+    });
+  }
+
+  if (urls.official && urls.official !== urls.web) {
+    actions.push({
+      kind: 'website',
+      label: '官网',
+      url: urls.official,
+    });
+  }
+
+  if (urls.ios) {
+    actions.push({
+      kind: 'ios',
+      label: 'iOS 下载',
+      url: urls.ios,
+    });
+  }
+
+  if (urls.android) {
+    actions.push({
+      kind: 'android',
+      label: 'Android 下载',
+      url: urls.android,
+    });
+  }
+
+  if (urls.mp) {
+    actions.push({
+      kind: 'qr',
+      label: '小程序二维码',
+      imageSrc: urls.mp,
+    });
+  }
+
+  return actions;
+}
+
+function buildProjectMetrics(
+  projectSource: ProjectSource,
+  urls: ProjectSourceUrls,
+  priceLabel?: string,
+): ProjectMetric[] {
+  const metrics: ProjectMetric[] = [];
+  const period = buildPeriod(projectSource);
+  const categories = normalizeStringList(projectSource.categories);
+  const platforms = normalizeStringList(projectSource.platforms);
+  const langs = normalizeStringList(projectSource.langs);
+  const companyUrl = getProjectCompanyUrl(urls);
+
+  if (period) {
+    metrics.push({
+      label: '项目周期',
+      value: period.text,
+      sub: '交付跨度',
+    });
+  }
+
+  if (projectSource.industry || categories.length > 0) {
+    const value = projectSource.industry || categories[0];
+    const sub = categories.join(' / ');
+
+    if (value) {
+      metrics.push({
+        label: '分类',
+        value,
+        sub: sub || undefined,
+      });
+    }
+  }
+
+  if (platforms.length > 0) {
+    metrics.push({
+      label: '平台',
+      value: platforms.join(' / '),
+      sub: langs.join(' / ') || undefined,
+    });
+  }
+
+  if (projectSource.companyName) {
+    metrics.push({
+      label: '提供者',
+      value: projectSource.companyName,
+      href: companyUrl,
+      sub: priceLabel,
+    });
+  }
+
+  return metrics;
+}
+
+function buildProjectAttributes(
+  projectSource: ProjectSource,
+  urls: ProjectSourceUrls,
+  priceLabel?: string,
+): ProjectAttribute[] {
+  const attributes: ProjectAttribute[] = [];
+  const platforms = normalizeStringList(projectSource.platforms);
+  const langs = normalizeStringList(projectSource.langs);
+  const companyUrl = getProjectCompanyUrl(urls);
+
+  if (urls.web) {
+    attributes.push({
+      label: '线上地址',
+      module: projectSource.name,
+      value: urls.web,
+      url: urls.web,
+      kind: 'website',
+    });
+  }
+
+  if (urls.official && urls.official !== urls.web) {
+    attributes.push({
+      label: '官网地址',
+      module: projectSource.companyName || projectSource.name,
+      value: urls.official,
+      url: urls.official,
+      kind: 'website',
+    });
+  }
+
+  if (urls.ios) {
+    attributes.push({
+      label: '苹果客户端',
+      module: projectSource.name,
+      value: urls.ios,
+      url: urls.ios,
+      kind: 'app-store',
+    });
+  }
+
+  if (urls.android) {
+    attributes.push({
+      label: '安卓客户端',
+      module: projectSource.name,
+      value: urls.android,
+      url: urls.android,
+      kind: 'android',
+    });
+  }
+
+  if (urls.mp) {
+    attributes.push({
+      label: '小程序二维码',
+      module: projectSource.name,
+      value: urls.mp,
+      url: urls.mp,
+      kind: 'qr-code',
+      type: 'image',
+    });
+  }
+
+  if (projectSource.companyName) {
+    attributes.push({
+      label: '提供者',
+      value: projectSource.companyName,
+      url: companyUrl,
+    });
+  }
+
+  if (platforms.length > 0) {
+    attributes.push({
+      label: '适用平台',
+      value: platforms.join(' / '),
+    });
+  }
+
+  if (langs.length > 0) {
+    attributes.push({
+      label: '语言',
+      value: langs.join(' / '),
+    });
+  }
+
+  if (priceLabel) {
+    attributes.push({
+      label: '价格',
+      value: priceLabel,
+    });
+  }
+
+  return attributes;
+}
+
+function buildProjectDevelopment(
+  projectSource: ProjectSource,
+): ProjectDevelopment[] {
+  const summary = normalizeStringList(projectSource.summary);
+  const techStack = normalizeStringList(projectSource.techStack);
+  const resources = (projectSource.resources || []).map(normalizeResource);
+  const screenshots = normalizeScreenshots(projectSource.screenshots);
+  const assets = normalizeAssets(projectSource.assets);
+
+  if (
+    summary.length === 0 &&
+    techStack.length === 0 &&
+    resources.length === 0 &&
+    screenshots.length === 0 &&
+    assets.length === 0
+  ) {
+    return [];
+  }
+
+  return [
+    {
+      name: projectSource.name,
+      period: buildPeriod(projectSource),
+      summary,
+      techStack,
+      resources,
+      screenshots,
+      assets,
+    },
+  ];
+}
+
+function buildHeroMetaLine(projectSource: ProjectSource) {
+  const parts = [
+    buildPeriod(projectSource)?.text,
+    normalizeStringList(projectSource.platforms).join(' / ') || undefined,
+  ].filter(isNonEmptyString);
+
+  return parts.join(' · ');
 }
 
 function toProject(projectSource: ProjectSource): Project {
-  const timeline = getProjectTimeline(projectSource);
-  const development = (projectSource.detail.development || []).map(
-    normalizeDevelopment,
-  );
+  const sourceUrls = normalizeSourceUrls(projectSource);
+  const priceLabel = normalizePriceLabel(projectSource.price);
+  const development = buildProjectDevelopment(projectSource);
+  const categories = normalizeStringList(projectSource.categories);
+  const platforms = normalizeStringList(projectSource.platforms);
+  const langs = normalizeStringList(projectSource.langs);
+  const timeline = buildPeriod(projectSource);
+  const screenshots = normalizeScreenshots(projectSource.screenshots);
 
   return {
     slug: projectSource.slug,
     name: projectSource.name,
     route: `/projects/${projectSource.slug}`,
     sourceRoute: projectSource.route,
-    logo: normalizeLogoPath(projectSource.logo || projectSource.detail.logo),
+    logo: normalizeLogoPath(projectSource.logo),
     description: getProjectOverview(projectSource),
     tags: getProjectTags(projectSource),
     listTags: getProjectListTags(projectSource),
-    url: projectSource.url,
+    url: getPrimaryProjectUrl(sourceUrls),
     repo: projectSource.repo,
-    publishedAt: timeline.publishedAt,
-    timeLabel: timeline.timeLabel,
+    companyName: projectSource.companyName,
+    industry: projectSource.industry,
+    categories,
+    platforms,
+    langs,
+    priceLabel,
+    sourceUrls,
+    publishedAt: timeline?.start,
+    timeLabel: timeline?.text,
     detail: {
-      logo: normalizeLogoPath(projectSource.detail.logo || projectSource.logo),
-      headline:
-        projectSource.detail.headline || getProjectOverview(projectSource),
-      categories: projectSource.detail.categories || [],
-      attributes: (projectSource.detail.attributes || []).map(
-        normalizeAttribute,
-      ),
+      logo: normalizeLogoPath(projectSource.logo),
+      headline: projectSource.headline || getProjectOverview(projectSource),
+      categories,
+      attributes: buildProjectAttributes(projectSource, sourceUrls, priceLabel),
       hero: {
-        companyName: projectSource.detail.hero.companyName,
-        companyUrl: projectSource.detail.hero.companyUrl,
-        metaLine: projectSource.detail.hero.metaLine,
-        actions: projectSource.detail.hero.actions.map((action) => ({
-          kind: action.kind,
-          label: action.label,
-          url: action.url,
-          imageSrc: action.imageSrc,
-        })),
-        compact: projectSource.detail.hero.compact,
+        companyName: projectSource.companyName,
+        companyUrl: getProjectCompanyUrl(sourceUrls),
+        metaLine: buildHeroMetaLine(projectSource),
+        actions: buildProjectHeroActions(sourceUrls),
+        compact: Boolean(sourceUrls.ios || sourceUrls.android || sourceUrls.mp),
       },
-      metrics: projectSource.detail.metrics.map((metric) => ({
-        label: metric.label,
-        value: metric.value,
-        sub: metric.sub,
-        href: metric.href,
-      })),
-      screenshots: collectDetailScreenshots(development),
-      introduction: projectSource.detail.introduction || [
-        getProjectOverview(projectSource),
-      ],
+      metrics: buildProjectMetrics(projectSource, sourceUrls, priceLabel),
+      screenshots,
+      introduction: normalizeStringList(projectSource.introduction).length
+        ? normalizeStringList(projectSource.introduction)
+        : [getProjectOverview(projectSource)],
       development,
     },
   };
