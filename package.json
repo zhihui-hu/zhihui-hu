@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "sync:post-assets": "node scripts/upload-post-assets-to-onefile.mjs",
     "prepare": "husky",
     "build:stage": "NODE_ENV=production sh -c 'set -a; . .env.stage; set +a; next build'",
     "deploy": "next build && npx wrangler deploy"

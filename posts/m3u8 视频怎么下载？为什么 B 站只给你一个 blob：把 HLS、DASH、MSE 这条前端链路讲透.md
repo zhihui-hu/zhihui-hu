@@ -19,7 +19,7 @@ tags:
   - 前端
 ---
 
-![m3u8 视频怎么下载？为什么 B 站只给你一个 blob：把 HLS、DASH、MSE 这条前端链路讲透](/assets/imgs/how-to-download-m3u8-video-bilibili-blob-dash-mse.png)
+![m3u8 视频怎么下载？为什么 B 站只给你一个 blob：把 HLS、DASH、MSE 这条前端链路讲透](https://img.huzhihui.com/uploads/2026/04/how-to-download-m3u8-video-bilibili-blob-dash-mse_dhxrvi10qh8o.png)
 
 写“怎么下载 m3u8 视频”最容易犯的错，就是把所有网页视频都当成同一种东西。
 

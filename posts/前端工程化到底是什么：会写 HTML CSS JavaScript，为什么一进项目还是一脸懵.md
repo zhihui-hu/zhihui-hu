@@ -1,7 +1,7 @@
 ---
 title: 前端工程化到底是什么：会写 HTML CSS JavaScript，为什么一进项目还是一脸懵
 slug: frontend-engineering-beginner-guide-why-projects-feel-hard
-image: /assets/imgs/frontend-engineering-beginner-guide-why-projects-feel-hard-banner.png
+image: https://img.huzhihui.com/uploads/2026/04/frontend-engineering-beginner-guide-why-projects-feel-hard-banner_dhxrum837jns.png
 publishedAt: 2026-04-15T09:30
 summary: 你明明会写 HTML、CSS、JavaScript，自己做几个页面也能跑，可一进真实项目就先被 `package.json`、Vite、TypeScript、`.env`、CI/CD 砸得发懵。前端工程化不是背工具名，而是学会用模块化、构建、环境管理、规范和自动化，把“能写页面”变成“能接项目、能协作、能稳定交付”。
 keywords:
@@ -28,7 +28,7 @@ tags:
   - package.json
 ---
 
-![前端工程化文章头图](/assets/imgs/frontend-engineering-beginner-guide-why-projects-feel-hard-banner.png)
+![前端工程化文章头图](https://img.huzhihui.com/uploads/2026/04/frontend-engineering-beginner-guide-why-projects-feel-hard-banner_dhxrum837jns.png)
 
 很多人第一次进前端项目，不是先被业务难住，而是先被仓库目录吓住。
 

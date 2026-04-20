@@ -2,7 +2,7 @@
 title: Axios 投毒复盘：攻击者只改了一个 package.json，为什么整台开发机都要按失陷处理
 slug: axios-supply-chain-attack-package-json
 publishedAt: 2026-04-14T10:38
-image: /assets/imgs/axios-supply-chain-attack-package-json-banner.png
+image: https://img.huzhihui.com/uploads/2026/04/axios-supply-chain-attack-package-json-banner_dhxrv8pa0808.png
 summary: 复盘 axios@1.14.1 和 0.30.4 两个恶意版本如何借助 plain-crypto-js@4.2.1 的 postinstall 下发跨平台 RAT，以及为什么这次事件应该按整台开发机失陷来处置。
 keywords:
   - Axios 投毒
@@ -25,7 +25,7 @@ tags:
   - CI/CD
 ---
 
-![Axios 投毒文章头图](/assets/imgs/axios-supply-chain-attack-package-json-banner.png)
+![Axios 投毒文章头图](https://img.huzhihui.com/uploads/2026/04/axios-supply-chain-attack-package-json-banner_dhxrv8pa0808.png)
 
 我把这次 Axios 投毒的几份公开材料连着看完，最不舒服的地方，不是有人改了多少源码。
 

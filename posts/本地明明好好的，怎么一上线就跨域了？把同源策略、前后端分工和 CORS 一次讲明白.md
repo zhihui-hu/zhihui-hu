@@ -1,7 +1,7 @@
 ---
 title: 本地明明好好的，怎么一上线就跨域了？把同源策略、前后端分工和 CORS 一次讲明白
 slug: frontend-cors-explained-with-nextjs-react-vue-node
-image: /assets/imgs/frontend-cors-explained-with-nextjs-react-vue-node-banner.png
+image: https://img.huzhihui.com/uploads/2026/04/frontend-cors-explained-with-nextjs-react-vue-node-banner_dhxrtnqrgs2o.png
 publishedAt: 2026-04-18T15:02
 summary: 很多跨域问题，不是代码上线才突然坏掉，而是你本地开发时被 dev server 和代理暂时“护住了”。真想把这事搞明白，第一步不是搜 React、Vue、Next.js 跨域怎么配，而是先用大白话把浏览器同源策略想通：它到底在防什么、没有它会怎样、前后端各自该怎么处理。
 keywords:
@@ -19,7 +19,7 @@ tags:
   - FastAPI
 ---
 
-![本地明明好好的，怎么一上线就跨域了？把同源策略、前后端分工和 CORS 一次讲明白头图](/assets/imgs/frontend-cors-explained-with-nextjs-react-vue-node-banner.png)
+![本地明明好好的，怎么一上线就跨域了？把同源策略、前后端分工和 CORS 一次讲明白头图](https://img.huzhihui.com/uploads/2026/04/frontend-cors-explained-with-nextjs-react-vue-node-banner_dhxrtnqrgs2o.png)
 很多跨域问题，最烦的不是报错本身。
 
 而是它特别会骗人。

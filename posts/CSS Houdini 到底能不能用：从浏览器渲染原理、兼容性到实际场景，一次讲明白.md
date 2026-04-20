@@ -2,7 +2,7 @@
 title: CSS Houdini 到底能不能用：从浏览器渲染原理、兼容性到实际场景，一次讲明白
 slug: css-houdini-browser-rendering-compatibility-guide
 publishedAt: 2026-04-19T00:40
-image: /assets/imgs/css-houdini-browser-rendering-compatibility-guide-banner.png
+image: https://img.huzhihui.com/uploads/2026/04/css-houdini-browser-rendering-compatibility-guide-banner_dhxrv9m5r3t4.png
 summary: CSS Houdini 当年被很多人讲成“CSS 超能力”，可真到项目里，问题反而更现实：它到底解决了什么旧问题，为什么它比传统 polyfill 更靠近浏览器渲染管线，哪些 API 现在真的能用，哪些还只是适合看 demo。这篇我会把 Houdini 放回 style、layout、paint、composite 这条链里讲，也会顺手把一件事讲清楚：今天谈它，离不开兼容性判断，更离不开渐进增强。
 keywords:
   - CSS Houdini
@@ -18,7 +18,7 @@ tags:
   - 兼容性
 ---
 
-![CSS Houdini 到底能不能用：从浏览器渲染原理、兼容性到实际场景，一次讲明白](/assets/imgs/css-houdini-browser-rendering-compatibility-guide-banner.png)
+![CSS Houdini 到底能不能用：从浏览器渲染原理、兼容性到实际场景，一次讲明白](https://img.huzhihui.com/uploads/2026/04/css-houdini-browser-rendering-compatibility-guide-banner_dhxrv9m5r3t4.png)
 
 `CSS Houdini` 这个词，第一次听很容易把人带偏。
 

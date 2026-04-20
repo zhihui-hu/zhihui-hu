@@ -1,7 +1,7 @@
 ---
 title: 面试官：如何让AI稳定回复JSON？
 slug: how-to-make-ai-return-stable-json
-image: /assets/imgs/how-to-make-ai-return-stable-json-banner.png
+image: https://img.huzhihui.com/uploads/2026/04/how-to-make-ai-return-stable-json-banner_dhxrudm12vag.png
 publishedAt: 2026-04-15T17:44
 summary: 这题真正难的，不是说一句“请严格返回 JSON”，而是把大模型为什么天然不稳定、ChatGPT 的 `json_schema` 和 `strict: true` 底层怎么做，以及线上系统该怎么兜底，顺着一轮面试追问讲清楚。
 keywords:
@@ -21,7 +21,7 @@ tags:
   - 工程实践
 ---
 
-![面试官：如何让AI稳定回复JSON？头图](/assets/imgs/how-to-make-ai-return-stable-json-banner.png)
+![面试官：如何让AI稳定回复JSON？头图](https://img.huzhihui.com/uploads/2026/04/how-to-make-ai-return-stable-json-banner_dhxrudm12vag.png)
 
 这题如果真放到面试里，难点从来不是 `prompt`。
 

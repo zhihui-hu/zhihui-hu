@@ -1,7 +1,7 @@
 ---
 title: OpenClaw 教程：新 Mac 从 0 配到国产 AI、飞书微信和无人值守
 slug: openclaw-wechat-config-clawhub-skills-guide
-image: /assets/imgs/openclaw-wechat-config-clawhub-skills-guide-banner.png
+image: https://img.huzhihui.com/uploads/2026/04/openclaw-wechat-config-clawhub-skills-guide-banner_dhxrvptr4j6o.png
 publishedAt: 2026-04-13T18:38
 summary: 这篇默认按一台全新的 macOS 机器来写，顺着更真实的上手顺序往下走：先装 OpenClaw、跑通 Gateway，再接国产 AI 和飞书微信，然后把基础配置、记忆、ClawHub Skills、配置目录和无人值守一步步配顺。
 keywords:
@@ -26,7 +26,7 @@ tags:
   - 工具使用
 ---
 
-![OpenClaw 教程：新 Mac 从 0 配到国产 AI、飞书微信和无人值守头图](/assets/imgs/openclaw-wechat-config-clawhub-skills-guide-banner.png)
+![OpenClaw 教程：新 Mac 从 0 配到国产 AI、飞书微信和无人值守头图](https://img.huzhihui.com/uploads/2026/04/openclaw-wechat-config-clawhub-skills-guide-banner_dhxrvptr4j6o.png)
 
 我自己第一次在新 Mac 上配 OpenClaw，最容易乱的不是命令。
 

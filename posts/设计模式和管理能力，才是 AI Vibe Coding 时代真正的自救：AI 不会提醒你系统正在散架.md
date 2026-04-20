@@ -1,7 +1,7 @@
 ---
 title: 设计模式和管理能力，才是 AI Vibe Coding 时代真正的自救：AI 不会提醒你系统正在散架
 slug: design-patterns-and-management-self-rescue-in-ai-vibe-coding-era
-image: /assets/imgs/design-patterns-and-management-self-rescue-in-ai-vibe-coding-era-banner.png
+image: https://img.huzhihui.com/uploads/2026/04/design-patterns-and-management-self-rescue-in-ai-vibe-coding-era-banner_dhxrv0vb35q8.png
 publishedAt: 2026-04-17T11:17
 summary: AI Vibe Coding 最大的错觉，是把“能很快写出来”误当成“系统仍然可控”。这篇不复读 23 个模式，而是挑 8 个最适合 AI 编程场景的设计模式，说明它们如何帮你守住边界、变化点和协作关系。再往下一层，真正稀缺的是管理复杂度的能力，而这恰好最不会被 AI 主动提醒。
 keywords:
@@ -22,7 +22,7 @@ tags:
   - 工程管理
 ---
 
-![前端难点在哪头图](/assets/imgs/design-patterns-and-management-self-rescue-in-ai-vibe-coding-era-banner.png)
+![前端难点在哪头图](https://img.huzhihui.com/uploads/2026/04/design-patterns-and-management-self-rescue-in-ai-vibe-coding-era-banner_dhxrv0vb35q8.png)
 
 我现在越来越警惕一种很顺的感觉。
 
