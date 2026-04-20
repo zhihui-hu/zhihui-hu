@@ -4,7 +4,7 @@ export const fofProWebProjectSource: ProjectSource = {
   slug: 'fof-pro-web',
   name: 'FOF PRO（Web 端）',
   route: '/products/fof-pro',
-  logo: '/assets/projects/fof-pro-logo.png',
+  logo: 'https://img.huzhihui.com/uploads/2026/04/fof-pro-logo_dhxzck5wom6g.png',
   overview:
     'FOF PRO Web 端是一套面向 FOF、MOM 与委外投资场景的投研投顾平台，覆盖投前、投中和投后流程。',
   tags: ['基金投研', 'Web 平台', 'React', 'TypeScript', '投顾平台'],

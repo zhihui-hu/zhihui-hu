@@ -4,7 +4,7 @@ export const openalphaProjectSource: ProjectSource = {
   slug: 'openalpha',
   name: '基金研究开放平台',
   route: '/products/openalpha',
-  logo: '/assets/projects/openalpha-logo.png',
+  logo: 'https://img.huzhihui.com/uploads/2026/04/openalpha-logo_dhxzcl4tuftc.png',
   overview:
     'OpenAlpha 开放平台销售基金指标 API，支持定制 API 和深度数据合作，支持会员充值调用和套餐两种模式。',
   tags: ['基金 API', 'Vue 3', 'Element Plus', '开放平台'],
@@ -31,13 +31,16 @@ export const openalphaProjectSource: ProjectSource = {
   techStack: ['Vite', 'Vue 3', 'TypeScript', 'Element Plus', 'iconfont'],
   screenshots: [
     {
-      image: 'src/public/images/openalpha-1.png',
+      image:
+        'https://img.huzhihui.com/uploads/2026/04/openalpha-1_dhy02cdz4s6v.png',
     },
     {
-      image: 'src/public/images/openalpha-2.png',
+      image:
+        'https://img.huzhihui.com/uploads/2026/04/openalpha-1_dhy02cdz4s6v.png',
     },
     {
-      image: 'src/public/images/openalpha-3.png',
+      image:
+        'https://img.huzhihui.com/uploads/2026/04/openalpha-1_dhy02cdz4s6v.png',
     },
   ],
 };

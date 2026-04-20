@@ -4,7 +4,7 @@ export const bigvProjectSource: ProjectSource = {
   slug: 'bigv',
   name: '笨嘴神器',
   route: '/products/bigv',
-  logo: '/assets/projects/bigv-logo.png',
+  logo: 'https://img.huzhihui.com/uploads/2026/04/bigv-logo_dhxzcjex05vs.png',
   overview:
     '笨嘴神器是一个面向投资场景的微信小程序，数有引力官网将其定位为“跨时代的 融合人工智能(AI)的 投资利器”，围绕机会发现、资金观察、宏观研判和 AI 问答提供辅助能力。',
   tags: ['AI 投资', '微信小程序', 'Vue 3', 'TypeScript'],

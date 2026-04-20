@@ -4,7 +4,7 @@ export const doctorPatientProjectSource: ProjectSource = {
   slug: 'doctor-patient',
   name: '叮铃医生（患者端）',
   route: '/products/doctor',
-  logo: '/assets/projects/dling.png',
+  logo: 'https://img.huzhihui.com/uploads/2026/04/dling_dhxzckmr2b08.png',
   overview:
     '叮铃医生（患者端）是一个面向微信场景的患者服务 Web App，围绕电话咨询与线上问诊提供更轻量的触达入口。',
   tags: ['医疗', '患者端', '微信 H5', 'Vue 2', '在线咨询'],

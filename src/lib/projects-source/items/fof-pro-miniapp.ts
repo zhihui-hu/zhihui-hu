@@ -4,7 +4,7 @@ export const fofProMiniappProjectSource: ProjectSource = {
   slug: 'fof-pro-miniapp',
   name: 'FOF PRO（小程序端）',
   route: '/products/fof-pro',
-  logo: '/assets/projects/fof-pro-logo.png',
+  logo: 'https://img.huzhihui.com/uploads/2026/04/fof-pro-logo_dhxzck5wom6g.png',
   overview:
     'FOF PRO 小程序端是平台在微信场景下的延伸入口，用更轻量的交互承接基金投研与内容触达。',
   tags: ['基金投研', '小程序', 'uni-app', '轻量入口'],

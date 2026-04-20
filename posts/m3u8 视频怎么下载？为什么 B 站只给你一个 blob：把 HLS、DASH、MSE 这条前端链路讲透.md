@@ -2,7 +2,7 @@
 title: m3u8 视频怎么下载？为什么 B 站只给你一个 blob：把 HLS、DASH、MSE 这条前端链路讲透
 slug: how-to-download-m3u8-video-bilibili-blob-dash-mse
 publishedAt: 2026-04-17T18:20
-image: /assets/imgs/how-to-download-m3u8-video-bilibili-blob-dash-mse-banner.png
+image: https://img.huzhihui.com/uploads/2026/04/how-to-download-m3u8-video-bilibili-blob-dash-mse_dhxrvi10qh8o.png
 summary: 真把“怎么下载 m3u8 视频”讲深，第一步不是写脚本，而是先承认不是所有网页视频都在用 `m3u8`。我在 2026-04-17 抓了一条 B 站公开页，页面里给出的已经是 `dash.video[]` 和 `dash.audio[]`，再加 `SegmentBase.Initialization`、`indexRange` 和签名 URL，最后播放器才通过 `MediaSource` 生成一个 `blob:` 地址挂到 `<video>` 上。也就是说，`blob:` 往往是最后一步，不是第一步。
 keywords:
   - m3u8 下载
