@@ -387,7 +387,7 @@ function buildProjectHeroActions(urls: ProjectSourceUrls): ProjectHeroAction[] {
   if (urls.web) {
     actions.push({
       kind: 'website',
-      label: '在线',
+      label: '在线体验',
       url: urls.web,
     });
   }

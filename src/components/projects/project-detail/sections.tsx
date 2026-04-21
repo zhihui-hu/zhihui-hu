@@ -3,7 +3,8 @@ import { cn } from '@/lib/utils';
 import { MonitorSmartphoneIcon } from 'lucide-react';
 import Link from 'next/link';
 
-import { ProjectImagePreview } from './image-preview';
+import { Badge } from '../../ui/badge';
+import { ProjectImageGallery, ProjectImagePreview } from './image-preview';
 import { isExternalUrl } from './shared';
 
 export function DevelopmentCard({ item }: { item: ProjectDevelopment }) {
@@ -112,29 +113,41 @@ export function ScreenshotShelf({
     return null;
   }
 
+  const previewImages = screenshots.map((screenshot, index) => ({
+    alt: `${project.name} 界面预览 ${index + 1}`,
+    caption: `${project.name} 的第 ${index + 1} 张界面截图`,
+    src: screenshot.image,
+  }));
+
   return (
     <div className="flex flex-col gap-3 mt-4">
-      <div className="flex items-center gap-2">
-        <MonitorSmartphoneIcon className="size-4 text-muted-foreground" />
-        <h2 className="text-[20px] font-bold tracking-tight text-foreground">
-          界面预览
-        </h2>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <MonitorSmartphoneIcon className="size-4 text-muted-foreground" />
+          <h2 className="text-[20px] font-bold tracking-tight text-foreground">
+            界面预览
+          </h2>
+        </div>
+        <Badge
+          className="rounded-full bg-muted/40 px-2.5 text-[11px] text-muted-foreground"
+          variant="outline"
+        >
+          {screenshots.length} 张截图
+        </Badge>
       </div>
 
       <div className="-mx-4 overflow-x-auto px-4 pb-2 hide-scrollbar mt-1">
-        <div className="flex gap-4">
-          {screenshots.map((screenshot, index) => (
-            <ProjectImagePreview
-              alt={`${project.name} 界面预览 ${index + 1}`}
-              buttonClassName={cn(
-                'w-[200px] shrink-0 rounded-[1.25rem] border border-border/40 sm:w-[240px]',
-                screenshots.length === 1 && 'w-full max-w-sm',
-              )}
-              key={`${project.slug}-${screenshot.image}`}
-              src={screenshot.image}
-            />
-          ))}
-        </div>
+        <ProjectImageGallery
+          buttonClassName={cn(
+            'w-[220px] shrink-0 snap-start rounded-[1.4rem] border-border/50 bg-card/70 shadow-sm sm:w-[260px]',
+            screenshots.length === 1 && 'w-full max-w-3xl',
+          )}
+          imageClassName={cn(
+            'h-[320px] w-full object-contain bg-linear-to-b from-background to-muted/50 p-3 sm:h-[360px]',
+            screenshots.length === 1 && 'h-[420px] sm:h-[520px]',
+          )}
+          images={previewImages}
+        />
       </div>
     </div>
   );

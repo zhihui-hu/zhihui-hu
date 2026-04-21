@@ -6,8 +6,8 @@ export const fofProMiniappProjectSource: ProjectSource = {
   route: '/products/fof-pro',
   logo: 'https://img.huzhihui.com/uploads/2026/04/fof-pro-logo_dhxzck5wom6g.png',
   overview:
-    'FOF PRO 小程序端是平台在微信场景下的延伸入口，用更轻量的交互承接基金投研与内容触达。',
-  tags: ['基金投研', '小程序', 'uni-app', '轻量入口'],
+    'FOF PRO 小程序端是产品在微信生态里的轻量触达入口，围绕基金投研、基金数据库和财富管理场景，把核心能力延伸到更高频的移动访问链路中。',
+  tags: ['基金投研', '微信小程序', 'uni-app', '财富管理'],
   urls: {
     official: 'https://qutke.com/',
     mp: 'https://c18e-1257416358.cos.accelerate.myqcloud.com/IMG_4486.JPG',
@@ -16,19 +16,23 @@ export const fofProMiniappProjectSource: ProjectSource = {
   startDate: '2020-01',
   ongoing: true,
   industry: '金融科技',
-  categories: ['投研投顾', '小程序'],
+  categories: ['投研工具', '微信小程序'],
   platforms: ['微信小程序'],
   langs: ['中文简体'],
   price: 0,
   headline:
-    '小程序端作为微信场景下的轻量入口，延续平台能力，强调快速访问、便捷触达与多端联动。',
+    '本产品更适合作为 FOF PRO 在微信场景下的轻量入口，用更低门槛的方式承接高频访问与内容触达。',
   introduction: [
-    'FOF PRO 小程序承担的是平台在微信生态内的轻量化入口角色，方便更高频的访问和内容分发。',
-    '它与 Web 平台、App 端共同构成完整的多端产品矩阵，让不同使用场景下的基金投研需求都能被更自然地承接。',
-    '在工程落地上，小程序端同样采用 uni-app，以便复用跨端交付经验和维护方式。',
+    '我把小程序端理解为统一产品矩阵中的轻量入口，它不追求承载最完整的工作流，而是更适合高频查看、分享和触达。',
+    '它与 Web 平台、App 端形成分工互补：Web 端承载完整业务，App 端负责移动协同，小程序端则强化微信环境下的低门槛使用。',
+    '在工程落地上，小程序端同样采用 uni-app，以复用跨端交付经验和维护方式。',
   ],
-  summary: ['小程序使用数字天堂 uni-app 进行开发。'],
-  techStack: ['uni-app'],
+  summary: [
+    '小程序端与 Web 平台、App 端共同构成 FOF PRO 的多端产品矩阵，让基金研究和财富管理相关信息能够在微信场景中更自然地被访问。',
+    '这一端更强调轻量访问和快速触达，因此我在功能取舍上会优先保证核心信息到达效率，而不是简单复制 Web 端结构。',
+    '小程序使用数字天堂 uni-app 进行开发。',
+  ],
+  techStack: ['uni-app', '微信小程序'],
   screenshots: [
     {
       image: 'https://c18e-1257416358.cos.accelerate.myqcloud.com/IMG_4487.PNG',

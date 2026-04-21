@@ -11,7 +11,12 @@ import {
 } from '@/components/ui/dialog';
 import type { Project, ProjectHero, ProjectHeroAction } from '@/lib/projects';
 import { cn } from '@/lib/utils';
-import { ExternalLinkIcon, QrCodeIcon } from 'lucide-react';
+import {
+  DownloadIcon,
+  ExternalLinkIcon,
+  GlobeIcon,
+  QrCodeIcon,
+} from 'lucide-react';
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
 
@@ -79,13 +84,20 @@ function HeroLinkAction({ action }: { action: ProjectHeroAction }) {
     return null;
   }
 
-  const className =
-    'h-8 rounded-full border-white/10 bg-white/96 px-3.5 text-[12px] font-semibold text-black shadow-[0_14px_40px_rgba(0,0,0,0.25)] hover:bg-white sm:h-9 sm:px-5 sm:text-[13px]';
+  const isPrimary = action.kind === 'website';
+  const Icon = isPrimary ? GlobeIcon : DownloadIcon;
+  const className = cn(
+    'h-9 rounded-full border px-4 text-[12.5px] font-semibold shadow-[0_14px_32px_rgba(0,0,0,0.22)] backdrop-blur-md sm:h-10 sm:px-5 sm:text-[13px]',
+    isPrimary
+      ? 'border-white/18 bg-white text-black hover:bg-white/92'
+      : 'border-white/14 bg-white/10 text-white hover:bg-white/18 hover:text-white',
+  );
 
   if (isExternalUrl(action.url)) {
     return (
-      <Button asChild className={className} size="sm">
-        <a href={action.url} rel="noreferrer" target="_blank">
+      <Button asChild className={className} size="lg">
+        <a href={action.url} rel="noopener noreferrer" target="_blank">
+          <Icon data-icon="inline-start" />
           <span>{action.label}</span>
           <ExternalLinkIcon data-icon="inline-end" />
         </a>
@@ -94,8 +106,11 @@ function HeroLinkAction({ action }: { action: ProjectHeroAction }) {
   }
 
   return (
-    <Button asChild className={className} size="sm">
-      <Link href={action.url}>{action.label}</Link>
+    <Button asChild className={className} size="lg">
+      <Link href={action.url}>
+        <Icon data-icon="inline-start" />
+        {action.label}
+      </Link>
     </Button>
   );
 }
@@ -115,8 +130,8 @@ function HeroQrAction({
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          className="h-8 rounded-full border-white/18 bg-white/10 px-3.5 text-[12px] font-semibold text-white shadow-none backdrop-blur-sm hover:bg-white/16 hover:text-white sm:h-9 sm:px-5 sm:text-[13px]"
-          size="sm"
+          className="h-9 rounded-full border-white/14 bg-white/10 px-4 text-[12.5px] font-semibold text-white shadow-[0_14px_32px_rgba(0,0,0,0.18)] backdrop-blur-md hover:bg-white/18 hover:text-white sm:h-10 sm:px-5 sm:text-[13px]"
+          size="lg"
           variant="outline"
         >
           <QrCodeIcon data-icon="inline-start" />

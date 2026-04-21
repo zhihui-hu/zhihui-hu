@@ -6,8 +6,8 @@ export const fofProAppProjectSource: ProjectSource = {
   route: '/products/fof-pro',
   logo: 'https://is1-ssl.mzstatic.com/image/thumb/Purple116/v4/37/90/df/3790df9c-a98f-7481-6204-f0ea84869e35/AppIcon-0-0-1x_U007emarketing-0-0-0-5-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/400x400ia-75.jpg',
   overview:
-    'FOF PRO App 端延续平台能力，把基金投研与投顾服务带到移动端，服务更轻量的随身查看和协同场景。',
-  tags: ['基金投研', 'App', 'uni-app', '移动端'],
+    'FOF PRO App 端是面向企业和高净值客户的移动投研工具，把理财、基金投资和研究咨询能力延伸到移动端场景中。',
+  tags: ['基金投资', '投研工具', 'App', 'uni-app'],
   urls: {
     official: 'https://qutke.com/',
     ios: 'https://apps.apple.com/cn/app/fof-pro/id1633056491',
@@ -16,19 +16,23 @@ export const fofProAppProjectSource: ProjectSource = {
   startDate: '2020-01',
   ongoing: true,
   industry: '金融科技',
-  categories: ['投研投顾', 'App'],
+  categories: ['投研工具', '移动端 App'],
   platforms: ['iPhone', 'Android'],
-  langs: ['中文简体'],
+  langs: ['中文简体', '英语'],
   price: 0,
   headline:
-    '移动端围绕平台能力做轻量延展，强调随时查看投研信息与业务协同，使用 uni-app 完成跨端交付。',
+    '本产品强调随时可用和轻量触达，让基金研究与理财分析能力不只停留在桌面端。',
   introduction: [
-    'FOF PRO 的产品能力并不只停留在桌面端，移动端承担了投研信息随时查看和业务协同的延伸职责。',
-    '在整体产品体系里，App 端更强调轻量触达与跨场景可用性，配合 Web 平台形成更完整的交付闭环。',
-    '项目最终选择数字天堂的 uni-app 方案，以兼顾开发效率和多端交付节奏。',
+    '我把 App 端定位成 Web 平台的移动延伸，不只是信息查看器，而是要在移动场景下继续承接基金投资与研究咨询相关能力。',
+    '相比 Web 端，这一端更强调便携性、即时性和低学习成本，让用户在移动环境里也能快速获取投研信息。',
+    '项目最终采用 uni-app 进行跨端开发，以兼顾 iPhone 和 Android 两侧的交付效率。',
   ],
-  summary: ['APP 使用数字天堂 uni-app 进行开发。'],
-  techStack: ['uni-app'],
+  summary: [
+    '本产品承担的是基金投资与理财研究工具的移动化触达职责，而不只是桌面端的附属查看器。',
+    '它与 FOF PRO Web 端共同组成统一产品矩阵，让投研信息查阅、沟通和工作流协同可以在移动场景继续发生。',
+    '我使用数字天堂 uni-app 完成双端交付，在保证开发效率的同时尽量统一两端体验。',
+  ],
+  techStack: ['uni-app', 'iOS', 'Android'],
   screenshots: [
     {
       image:
