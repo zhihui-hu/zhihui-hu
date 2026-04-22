@@ -28,8 +28,6 @@ export type ProjectHeroAction = {
 };
 
 export type ProjectHero = {
-  companyName?: string;
-  companyUrl?: string;
   metaLine: string;
   actions: ProjectHeroAction[];
   compact?: boolean;
@@ -75,18 +73,6 @@ export type ProjectDevelopment = {
   assets?: ProjectAsset[];
 };
 
-export type ProjectDetail = {
-  logo?: string;
-  headline?: string;
-  categories?: string[];
-  attributes?: ProjectAttribute[];
-  hero: ProjectHero;
-  metrics: ProjectMetric[];
-  screenshots: ProjectScreenshot[];
-  introduction: string[];
-  development: ProjectDevelopment[];
-};
-
 const PUBLIC_ROOT = join(process.cwd(), 'public');
 
 export type Project = {
@@ -101,6 +87,8 @@ export type Project = {
   url?: string;
   repo?: string;
   companyName?: string;
+  ageRating?: string;
+  category?: string;
   industry?: string;
   categories: string[];
   platforms: string[];
@@ -109,7 +97,13 @@ export type Project = {
   sourceUrls: ProjectSourceUrls;
   publishedAt?: string;
   timeLabel?: string;
-  detail: ProjectDetail;
+  headline?: string;
+  attributes: ProjectAttribute[];
+  hero: ProjectHero;
+  metrics: ProjectMetric[];
+  screenshots: ProjectScreenshot[];
+  introduction: string[];
+  development: ProjectDevelopment[];
 };
 
 function compareProjectByStartedAtDesc(left: Project, right: Project) {
@@ -464,7 +458,14 @@ function buildProjectMetrics(
     metrics.push({
       label: '平台',
       value: platforms.join(' / '),
-      sub: langs.join(' / ') || undefined,
+    });
+  }
+
+  if (langs.length > 0) {
+    metrics.push({
+      label: '语言',
+      value: `${langs.length} 种`,
+      sub: langs.join(' / '),
     });
   }
 
@@ -473,7 +474,27 @@ function buildProjectMetrics(
       label: '提供者',
       value: projectSource.companyName,
       href: companyUrl,
-      sub: priceLabel,
+    });
+  }
+
+  if (projectSource.ageRating) {
+    metrics.push({
+      label: '年龄',
+      value: projectSource.ageRating,
+    });
+  }
+
+  if (projectSource.category) {
+    metrics.push({
+      label: '类别',
+      value: projectSource.category,
+    });
+  }
+
+  if (priceLabel) {
+    metrics.push({
+      label: '价格',
+      value: priceLabel,
     });
   }
 
@@ -623,6 +644,8 @@ function toProject(projectSource: ProjectSource): Project {
   const langs = normalizeStringList(projectSource.langs);
   const timeline = buildPeriod(projectSource);
   const screenshots = normalizeScreenshots(projectSource.screenshots);
+  const introduction = normalizeStringList(projectSource.introduction);
+  const overview = getProjectOverview(projectSource);
 
   return {
     slug: projectSource.slug,
@@ -630,12 +653,14 @@ function toProject(projectSource: ProjectSource): Project {
     route: `/projects/${projectSource.slug}`,
     sourceRoute: projectSource.route,
     logo: normalizeLogoPath(projectSource.logo),
-    description: getProjectOverview(projectSource),
+    description: overview,
     tags: getProjectTags(projectSource),
     listTags: getProjectListTags(projectSource),
     url: getPrimaryProjectUrl(sourceUrls),
     repo: projectSource.repo,
     companyName: projectSource.companyName,
+    ageRating: normalizeText(projectSource.ageRating),
+    category: normalizeText(projectSource.category),
     industry: projectSource.industry,
     categories,
     platforms,
@@ -644,25 +669,17 @@ function toProject(projectSource: ProjectSource): Project {
     sourceUrls,
     publishedAt: timeline?.start,
     timeLabel: timeline?.text,
-    detail: {
-      logo: normalizeLogoPath(projectSource.logo),
-      headline: projectSource.headline || getProjectOverview(projectSource),
-      categories,
-      attributes: buildProjectAttributes(projectSource, sourceUrls, priceLabel),
-      hero: {
-        companyName: projectSource.companyName,
-        companyUrl: getProjectCompanyUrl(sourceUrls),
-        metaLine: buildHeroMetaLine(projectSource),
-        actions: buildProjectHeroActions(sourceUrls),
-        compact: Boolean(sourceUrls.ios || sourceUrls.android || sourceUrls.mp),
-      },
-      metrics: buildProjectMetrics(projectSource, sourceUrls, priceLabel),
-      screenshots,
-      introduction: normalizeStringList(projectSource.introduction).length
-        ? normalizeStringList(projectSource.introduction)
-        : [getProjectOverview(projectSource)],
-      development,
+    headline: projectSource.headline || overview,
+    attributes: buildProjectAttributes(projectSource, sourceUrls, priceLabel),
+    hero: {
+      metaLine: buildHeroMetaLine(projectSource),
+      actions: buildProjectHeroActions(sourceUrls),
+      compact: Boolean(sourceUrls.ios || sourceUrls.android || sourceUrls.mp),
     },
+    metrics: buildProjectMetrics(projectSource, sourceUrls, priceLabel),
+    screenshots,
+    introduction: introduction.length > 0 ? introduction : [overview],
+    development,
   };
 }
 

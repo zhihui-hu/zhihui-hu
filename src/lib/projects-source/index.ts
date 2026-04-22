@@ -5,6 +5,7 @@ import { fofProWebProjectSource } from './items/fof-pro-web';
 import { doctorDoctorProjectSource } from './items/njh-doctor';
 import { doctorPatientProjectSource } from './items/njh-patient';
 import { openalphaProjectSource } from './items/openalpha';
+import { openalphaAdminProjectSource } from './items/openalpha-admin';
 
 export const PROJECT_SOURCES = [
   bigvProjectSource,
@@ -14,6 +15,7 @@ export const PROJECT_SOURCES = [
   fofProAppProjectSource,
   fofProMiniappProjectSource,
   openalphaProjectSource,
+  openalphaAdminProjectSource,
 ];
 
 export type {

@@ -50,7 +50,7 @@ export function BlogNavbar() {
   return (
     <header
       className={cn(
-        'sticky top-0 z-40 mb-4 border-b border-border/60 bg-background/80 backdrop-blur-md transition-transform duration-300 sm:mb-8',
+        'sticky top-0 z-40 mb-4 border-b border-border/55 bg-background/62 shadow-sm shadow-black/5 backdrop-blur-xl supports-[backdrop-filter]:bg-background/38 sm:mb-8',
         isVisible ? 'translate-y-0' : '-translate-y-[120%]',
       )}
     >

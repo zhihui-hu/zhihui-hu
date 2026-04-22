@@ -36,6 +36,8 @@ export type ProjectSource = {
   startDate?: string;
   endDate?: string | null;
   ongoing?: boolean;
+  ageRating?: string;
+  category?: string;
   industry?: string;
   categories?: string[];
   platforms?: string[];

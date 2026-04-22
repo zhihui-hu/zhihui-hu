@@ -9,27 +9,6 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'is1-ssl.mzstatic.com',
-        port: '',
-        pathname: '/image/thumb/**',
-        search: '',
-      },
-      {
-        protocol: 'https',
-        hostname: 'objectstorage.eu-marseille-1.oraclecloud.com',
-        port: '',
-        pathname: '/**',
-        search: '',
-      },
-      {
-        protocol: 'http',
-        hostname: 'www.shuyouyinli.com',
-        port: '',
-        pathname: '/**',
-        search: '',
-      },
-      {
-        protocol: 'https',
         hostname: 'img.huzhihui.com',
         port: '',
         pathname: '/**',

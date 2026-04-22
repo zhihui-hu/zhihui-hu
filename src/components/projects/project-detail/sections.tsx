@@ -1,6 +1,6 @@
 import type { Project, ProjectDevelopment } from '@/lib/projects';
 import { cn } from '@/lib/utils';
-import { MonitorSmartphoneIcon } from 'lucide-react';
+import { DotIcon, MonitorSmartphoneIcon } from 'lucide-react';
 import Link from 'next/link';
 
 import { Badge } from '../../ui/badge';
@@ -9,32 +9,30 @@ import { isExternalUrl } from './shared';
 
 export function DevelopmentCard({ item }: { item: ProjectDevelopment }) {
   return (
-    <div className="flex flex-col gap-3 py-2 border-b border-border/40 pb-6 last:border-0 last:pb-2">
-      <div className="flex items-start justify-between gap-4">
-        <h3 className="text-[16px] font-bold text-foreground leading-tight">
-          {item.name}
-        </h3>
-        {item.period && (
-          <span className="text-[13px] text-muted-foreground/80 shrink-0 mt-[2px]">
-            {item.period.text}
-          </span>
-        )}
-      </div>
-
+    <div className="flex flex-col gap-5 py-1">
       <div className="flex flex-col gap-4 text-[15px] leading-relaxed text-muted-foreground/90">
-        <ul className="flex list-disc flex-col gap-1.5 pl-5">
+        <ul className="flex flex-col gap-3">
           {item.summary.map((point) => (
-            <li key={point} className="pl-1 marker:text-muted-foreground/50">
-              {point}
+            <li key={point} className="flex items-start gap-2.5">
+              <DotIcon className="mt-[1px] size-4 shrink-0 text-primary/70" />
+              <span>{point}</span>
             </li>
           ))}
         </ul>
 
         {item.techStack && item.techStack.length > 0 && (
-          <p className="text-[14px]">
-            <span className="font-semibold text-foreground/80">技术栈：</span>
-            {item.techStack.join(', ')}
-          </p>
+          <div className="flex flex-col gap-2">
+            <p className="text-[14px] font-semibold text-foreground/80">
+              技术栈
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {item.techStack.map((tech) => (
+                <Badge key={`${item.name}-${tech}`} variant="outline">
+                  {tech}
+                </Badge>
+              ))}
+            </div>
+          </div>
         )}
 
         {item.resources && item.resources.length > 0 && (
@@ -74,7 +72,7 @@ export function DevelopmentCard({ item }: { item: ProjectDevelopment }) {
       </div>
 
       {item.assets && item.assets.length > 0 && (
-        <div className="flex flex-col gap-3 mt-4">
+        <div className="mt-2 flex flex-col gap-3">
           <p className="text-[14px] font-medium text-foreground">补充图片</p>
           <div className="grid gap-3 grid-cols-2 sm:grid-cols-3">
             {item.assets.map((asset) => (
@@ -121,30 +119,23 @@ export function ScreenshotShelf({
 
   return (
     <div className="flex flex-col gap-3 mt-4">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <MonitorSmartphoneIcon className="size-4 text-muted-foreground" />
-          <h2 className="text-[20px] font-bold tracking-tight text-foreground">
-            界面预览
-          </h2>
-        </div>
-        <Badge
-          className="rounded-full bg-muted/40 px-2.5 text-[11px] text-muted-foreground"
-          variant="outline"
-        >
-          {screenshots.length} 张截图
-        </Badge>
+      <div className="flex items-center gap-2">
+        <MonitorSmartphoneIcon className="size-4 text-muted-foreground" />
+        <h2 className="text-[20px] font-bold tracking-tight text-foreground">
+          界面预览
+        </h2>
       </div>
 
       <div className="-mx-4 overflow-x-auto px-4 pb-2 hide-scrollbar mt-1">
         <ProjectImageGallery
           buttonClassName={cn(
-            'w-[220px] shrink-0 snap-start rounded-[1.4rem] border-border/50 bg-card/70 shadow-sm sm:w-[260px]',
-            screenshots.length === 1 && 'w-full max-w-3xl',
+            'snap-start',
+            screenshots.length === 1 && 'max-w-full',
           )}
           imageClassName={cn(
-            'h-[320px] w-full object-contain bg-linear-to-b from-background to-muted/50 p-3 sm:h-[360px]',
-            screenshots.length === 1 && 'h-[420px] sm:h-[520px]',
+            'h-[360px] w-auto max-w-none bg-transparent sm:h-[420px] lg:h-[480px]',
+            screenshots.length === 1 &&
+              'h-[460px] max-w-full sm:h-[560px] lg:h-[70vh]',
           )}
           images={previewImages}
         />

@@ -1,6 +1,7 @@
 'use client';
 
 /* eslint-disable @next/next/no-img-element -- this header uses duplicated icon layers for glow rendering */
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -9,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 import type { Project, ProjectHero, ProjectHeroAction } from '@/lib/projects';
 import { cn } from '@/lib/utils';
 import {
@@ -18,7 +20,7 @@ import {
   QrCodeIcon,
 } from 'lucide-react';
 import Link from 'next/link';
-import type { CSSProperties } from 'react';
+import { type CSSProperties, useState } from 'react';
 
 import { isExternalUrl } from './shared';
 
@@ -122,9 +124,15 @@ function HeroQrAction({
   action: ProjectHeroAction;
   projectName: string;
 }) {
-  if (!action.imageSrc) {
+  const [loadedImageSrc, setLoadedImageSrc] = useState<string | null>(null);
+  const imageSrc = action.imageSrc;
+
+  if (!imageSrc) {
     return null;
   }
+
+  const qrImageSrc = imageSrc;
+  const isImageLoaded = loadedImageSrc === qrImageSrc;
 
   return (
     <Dialog>
@@ -143,11 +151,22 @@ function HeroQrAction({
           <DialogTitle>{projectName}</DialogTitle>
         </DialogHeader>
         <div className="overflow-hidden rounded-xl bg-white p-4">
-          <img
-            alt={`${projectName} 二维码`}
-            className="mx-auto size-full object-contain"
-            src={action.imageSrc}
-          />
+          <div className="relative aspect-square w-full overflow-hidden rounded-lg">
+            {!isImageLoaded && (
+              <Skeleton className="absolute inset-0 rounded-lg bg-muted" />
+            )}
+            <img
+              alt={`${projectName} 二维码`}
+              className={cn(
+                'absolute inset-0 size-full object-contain transition-opacity duration-200',
+                isImageLoaded ? 'opacity-100' : 'opacity-0',
+              )}
+              onLoad={() => {
+                setLoadedImageSrc(qrImageSrc);
+              }}
+              src={qrImageSrc}
+            />
+          </div>
         </div>
       </DialogContent>
     </Dialog>
@@ -168,33 +187,6 @@ function HeroActionButton({
   return <HeroLinkAction action={action} />;
 }
 
-function CompanyLink({ name, url }: { name?: string; url?: string }) {
-  if (!name) {
-    return null;
-  }
-
-  const className =
-    'truncate text-[14px] leading-snug font-medium text-white/80 transition-opacity hover:opacity-80 sm:text-[16px]';
-
-  if (!url) {
-    return <p className={className}>{name}</p>;
-  }
-
-  if (isExternalUrl(url)) {
-    return (
-      <a className={className} href={url} rel="noreferrer" target="_blank">
-        {name}
-      </a>
-    );
-  }
-
-  return (
-    <Link className={className} href={url}>
-      {name}
-    </Link>
-  );
-}
-
 export function ProjectHeroHeader({
   project,
   heroImage,
@@ -205,6 +197,12 @@ export function ProjectHeroHeader({
   heroPanel: ProjectHero;
 }) {
   const backgroundImageUrl = heroImage || project.logo;
+  const appActions = heroPanel.actions.filter(
+    (action) =>
+      action.kind === 'ios' ||
+      action.kind === 'android' ||
+      action.kind === 'qr',
+  );
   const animationStyles = `
     @keyframes shift-background {
       0% {
@@ -262,14 +260,12 @@ export function ProjectHeroHeader({
           } as CSSProperties
         }
         className={cn(
-          'relative flex h-[199px] items-center overflow-hidden text-(--systemPrimary-onDark) sm:h-71.5',
-          'border-b border-b-(--systemQuaternary-vibrant)',
-          'rounded-bl-[2px] rounded-br-[2px]',
+          'relative flex h-49.75 items-center overflow-hidden text-(--systemPrimary-onDark) sm:h-71.5',
           'bg-center bg-cover',
           '[background:linear-gradient(to_bottom,transparent_20%,rgba(0,0,0,.8)_100%),var(--background-image),var(--background-color,#000)]',
-          '[transform:translate(0)]',
+          'transform-[translate(0)]',
           'transition-[border-bottom-left-radius,border-bottom-right-radius]',
-          'duration-[210ms] ease-out',
+          'duration-210 ease-out',
         )}
       >
         <div
@@ -311,25 +307,58 @@ export function ProjectHeroHeader({
               />
             </div>
 
-            <div className="flex min-h-[128px] min-w-0 flex-1 flex-col justify-center gap-3 pt-1 sm:min-h-0 sm:gap-4 sm:pt-0">
+            <div className="flex min-h-32 min-w-0 flex-1 flex-col justify-center gap-3 pt-1 sm:min-h-0 sm:gap-4 sm:pt-0">
               <div className="flex flex-col gap-1">
                 <h1 className="title line-clamp-2 text-[22px] leading-[1.05] font-bold tracking-[-0.04em] text-white sm:text-[32px] lg:text-[36px]">
                   {project.name}
                 </h1>
-                <CompanyLink
-                  name={heroPanel.companyName}
-                  url={heroPanel.companyUrl}
-                />
+                {project.companyName &&
+                  (project.sourceUrls.official ? (
+                    isExternalUrl(project.sourceUrls.official) ? (
+                      <a
+                        className="block w-full max-w-full truncate text-[13px] leading-snug font-medium text-white/76 transition-opacity hover:opacity-85 sm:text-[15px]"
+                        href={project.sourceUrls.official}
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        {project.companyName}
+                      </a>
+                    ) : (
+                      <Link
+                        className="block w-full max-w-full truncate text-[13px] leading-snug font-medium text-white/76 transition-opacity hover:opacity-85 sm:text-[15px]"
+                        href={project.sourceUrls.official}
+                      >
+                        {project.companyName}
+                      </Link>
+                    )
+                  ) : (
+                    <p className="block w-full max-w-full truncate text-[13px] leading-snug font-medium text-white/76 sm:text-[15px]">
+                      {project.companyName}
+                    </p>
+                  ))}
                 {heroPanel.metaLine && (
                   <p className="text-[12px] leading-[1.4] text-white/72 sm:text-[14px]">
                     {heroPanel.metaLine}
                   </p>
                 )}
+                {project.listTags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {project.listTags.map((tag) => (
+                      <Badge
+                        className="border-white/14 bg-white/8 text-white/84 backdrop-blur-sm"
+                        key={tag}
+                        variant="outline"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {heroPanel.actions.length > 0 && (
+              {appActions.length > 0 && (
                 <div className="flex flex-wrap items-center gap-2.5 pt-1 sm:gap-3">
-                  {heroPanel.actions.map((action) => (
+                  {appActions.map((action) => (
                     <HeroActionButton
                       action={action}
                       key={`${action.kind}-${action.label}-${action.url || action.imageSrc || 'local'}`}

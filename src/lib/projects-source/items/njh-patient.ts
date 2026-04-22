@@ -15,6 +15,8 @@ export const doctorPatientProjectSource: ProjectSource = {
   companyName: '北京新里程叮铃科技有限公司',
   startDate: '2020-01',
   endDate: '2021-03',
+  ageRating: '17+',
+  category: '医疗',
   industry: '医疗',
   categories: ['患者端 H5', '微信 Web App'],
   platforms: ['微信 / H5'],
@@ -28,10 +30,10 @@ export const doctorPatientProjectSource: ProjectSource = {
     '项目整体以单页面应用方式构建，在保证咨询流程完整性的同时，尽量降低用户访问和使用门槛。',
   ],
   summary: [
-    '本产品延续了“叮铃医生”的统一品牌与服务入口定位，更适合作为患者服务 Web 端来理解。',
-    '它以微信 H5 形态承载线上咨询与问诊流程，相比原生 App 更强调即开即用和低门槛触达。',
-    '该项目使用 Vue 2.x 进行开发，是一个单页面应用。我基于 Axios 对 HTTP 客户端进行了封装，使用 SCSS + PostCSS 编写样式，并引入 Karma + Mocha 做单元测试。',
-    '在构建过程中，我使用 Webpack 进行打包，并使用 ESLint 统一代码风格；在架构层面，我通过 transition 组件实现路由切换动画，并利用 Webpack 的 Code Split 特性实现组件异步加载，以优化页面加载时间。',
+    '我把患者端设计成一个低门槛、即开即用的服务入口，所以这里最重要的不是功能堆叠，而是让线上咨询流程足够短、足够顺。相较医生端的复杂工作流，这一端更考验前端在微信场景里的触达效率和页面节奏控制。',
+    '项目整体使用 `Vue 2.x` 构建单页面应用，我基于 Axios 封装了 HTTP 客户端，并用 `SCSS + PostCSS` 维护样式体系。亮点不在于技术本身，而在于把患者最常用的访问流程压缩成足够轻量的 H5 体验。',
+    '为了保证页面在微信环境里打开更快、切换更顺，我用 `transition` 组件处理路由切换动画，并结合 Webpack 的 Code Split 做组件异步加载，尽量把首次访问成本压下来。',
+    '这类项目的难点往往不是页面有多复杂，而是用户耐心非常有限。对我来说，患者端真正的价值是把原本容易流失的咨询入口做成“点开就能用”的形态，让线上服务链路能更自然地跑起来。',
   ],
   techStack: [
     'Vue 2.x',

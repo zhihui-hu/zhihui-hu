@@ -1,5 +1,6 @@
 import { Providers } from '@/components/providers';
 import { StructuredData } from '@/components/structured-data';
+import { StyledJsxRegistry } from '@/components/styled-jsx-registry';
 import type { Metadata } from 'next';
 import { Geist } from 'next/font/google';
 import Script from 'next/script';
@@ -100,7 +101,9 @@ export default function RootLayout({
         </Script>
       </head>
       <body className={font.className} suppressHydrationWarning>
-        <Providers>{children}</Providers>
+        <StyledJsxRegistry>
+          <Providers>{children}</Providers>
+        </StyledJsxRegistry>
       </body>
     </html>
   );

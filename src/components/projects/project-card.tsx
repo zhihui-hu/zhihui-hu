@@ -1,5 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
 import type { Project } from '@/lib/projects';
-import Image from 'next/image';
 import Link from 'next/link';
 
 import { Badge } from '../ui/badge';
@@ -15,12 +15,10 @@ export function ProjectCard({ project }: ProjectCardProps) {
       <div className="flex items-center gap-4">
         {project.logo ? (
           <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-[22%] border border-border/60 bg-background shadow-sm">
-            <Image
+            <img
               alt={`${project.name} logo`}
-              className="size-full object-cover"
+              className="size-16 object-cover"
               src={project.logo}
-              width={64}
-              height={64}
             />
           </div>
         ) : (

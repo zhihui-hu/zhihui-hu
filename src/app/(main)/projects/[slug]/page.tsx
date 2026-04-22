@@ -34,7 +34,7 @@ export async function generateMetadata(
   }
 
   const canonicalUrl = `${pkg.seo.og.url}${project.route}`;
-  const image = resolveImageUrl(project.detail.logo || project.logo);
+  const image = resolveImageUrl(project.logo);
 
   return {
     title: `${project.name} | 作品`,

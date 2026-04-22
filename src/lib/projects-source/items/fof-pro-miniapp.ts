@@ -10,11 +10,13 @@ export const fofProMiniappProjectSource: ProjectSource = {
   tags: ['基金投研', '微信小程序', 'uni-app', '财富管理'],
   urls: {
     official: 'https://qutke.com/',
-    mp: 'https://c18e-1257416358.cos.accelerate.myqcloud.com/IMG_4486.JPG',
+    mp: 'https://img.huzhihui.com/uploads/2026/04/IMG_4486_dhynvy1hhqml.jpg',
   },
   companyName: '况客科技（北京）有限公司',
   startDate: '2020-01',
   ongoing: true,
+  ageRating: '18+',
+  category: '财务',
   industry: '金融科技',
   categories: ['投研工具', '微信小程序'],
   platforms: ['微信小程序'],
@@ -28,23 +30,27 @@ export const fofProMiniappProjectSource: ProjectSource = {
     '在工程落地上，小程序端同样采用 uni-app，以复用跨端交付经验和维护方式。',
   ],
   summary: [
-    '小程序端与 Web 平台、App 端共同构成 FOF PRO 的多端产品矩阵，让基金研究和财富管理相关信息能够在微信场景中更自然地被访问。',
-    '这一端更强调轻量访问和快速触达，因此我在功能取舍上会优先保证核心信息到达效率，而不是简单复制 Web 端结构。',
-    '小程序使用数字天堂 uni-app 进行开发。',
+    '小程序端最难的地方，不是把功能做出来，而是明确什么该放进微信场景、什么不该放进去。我在这里没有照搬 Web 端，而是主动做了功能裁剪，优先保证高频查看、分享和低门槛触达这些最适合微信环境的能力。',
+    '技术上我仍然使用 `uni-app` 维护这一端，但真正的工作重点在于多端协同后的边界设计。Web 端负责完整流程，App 端负责移动协同，小程序端则只承接最需要快速触达的核心信息，这样整套产品矩阵才不会互相重复和内耗。',
+    '这条线的亮点是“轻量入口”做得足够清晰：它不是缩水版工作台，而是更适合微信生态传播与访问习惯的产品形态。前端层面我做的是统一交付，产品层面我解决的是不同终端在同一体系里如何各司其职。',
   ],
   techStack: ['uni-app', '微信小程序'],
   screenshots: [
     {
-      image: 'https://c18e-1257416358.cos.accelerate.myqcloud.com/IMG_4487.PNG',
+      image:
+        'https://img.huzhihui.com/uploads/2026/04/IMG_4487_dhynw0r9lbil.png',
     },
     {
-      image: 'https://c18e-1257416358.cos.accelerate.myqcloud.com/IMG_4491.PNG',
+      image:
+        'https://img.huzhihui.com/uploads/2026/04/IMG_4491_dhynw42rma1z.png',
     },
     {
-      image: 'https://c18e-1257416358.cos.accelerate.myqcloud.com/IMG_4489.PNG',
+      image:
+        'https://img.huzhihui.com/uploads/2026/04/IMG_4489_dhynw7i99qwf.png',
     },
     {
-      image: 'https://c18e-1257416358.cos.accelerate.myqcloud.com/IMG_4488.PNG',
+      image:
+        'https://img.huzhihui.com/uploads/2026/04/IMG_4488_dhynwacucdy1.png',
     },
   ],
 };

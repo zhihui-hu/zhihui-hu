@@ -10,14 +10,16 @@ export const bigvProjectSource: ProjectSource = {
   tags: ['AI 投资', '微信小程序', '策略研究', '宏观研判'],
   urls: {
     official: 'http://www.shuyouyinli.com/',
-    mp: 'https://c18e-1257416358.cos.accelerate.myqcloud.com/IMG_4492.JPG',
+    mp: 'https://img.huzhihui.com/uploads/2026/04/IMG_4492_dhynv2i8brmo.jpg',
   },
   companyName: '成都数有引力科技有限公司',
   startDate: '2021-10',
   ongoing: true,
+  ageRating: '18+',
+  category: '财务',
   industry: '金融科技',
   categories: ['AI 投资工具', '微信小程序', 'WebView 工具'],
-  platforms: ['微信小程序', 'WebView'],
+  platforms: ['微信小程序'],
   langs: ['中文简体'],
   price: 0,
   headline:
@@ -28,12 +30,11 @@ export const bigvProjectSource: ProjectSource = {
     '我在项目落地过程中，也把它与基金大 V 合作场景结合起来，通过小程序与 WebView 工具形态承载投研内容与数据能力，提升内容分发效率和用户参与度。',
   ],
   summary: [
-    '本产品是一款 AI 投资工具，核心模块由机会大师、巨鲸一眼清、宏观一眼清和笨嘴Chat 组成。',
-    '机会大师强调“板块 + 策略秘籍 + 自选，一键交火”；巨鲸一眼清聚焦海外资金短时间大规模加减仓板块排行榜；宏观一眼清主打宏观看得懂、行业选得准；笨嘴Chat 提供 AI 辅助投资体验。',
-    '考虑到金融行业审核严格、流程较长，为了让业务侧能够灵活控制页面内容并保障用户体验，我为这个项目设计了“小程序壳 + WebView 工具页”的整体架构。',
-    '在小程序侧，我使用原生 API 支持用户授权相关功能；在页面内容侧，则通过 WebView 实现灵活发布、部署、更新和回滚。',
-    '我还将 WebView 模块拆分为单一工具微服务，并在页面开发中统一采用 Vue 3 + TypeScript + Pinia 的技术栈，通过 URL 参数与持久化存储完成数据通信。',
-    '按照这套模式，项目两个月内完成了 21 次迭代，小程序仅经历一次审核，同时接入了 20 多家大 V 合作伙伴，日收益峰值达到 10 万元，月收益达到 100 万元。',
+    '这个项目真正的难点，不是把四个功能模块塞进一个小程序里，而是要在金融审核严格、发布节奏受限的前提下，依然让业务侧保持高频迭代能力。我最后把它拆成“小程序壳 + WebView 工具页”的架构，把审核成本和页面更新节奏分离开。',
+    '我在小程序层只保留必须依赖原生能力的登录授权与容器逻辑，把高频变化的投研页面全部放到 WebView 中承载。这样业务内容可以独立发布、回滚和灰度，前端也不用每次改文案或策略页都重新走小程序审核。',
+    '为了让 WebView 这条链路不只是“嵌网页”，我把各个工具模块继续拆成独立服务，并统一用 `Vue 3 + TypeScript + Pinia` 组织状态、URL 参数和持久化通信逻辑，保证页面之间切换和数据透传足够稳定。',
+    '这个方案的亮点在于工程结构直接服务业务效率。两个月内完成 21 次迭代，小程序主体只经历一次审核，但产品侧依然能快速接入新模块、合作方内容和运营活动，前端交付节奏没有被平台限制卡死。',
+    '对我来说，这个项目最有价值的地方，是我用架构设计把“审核慢、改动快”这个天然矛盾拆开了，让 AI 投资工具既能保持金融场景要求的合规性，也能维持互联网产品所需要的快速迭代能力。',
   ],
   techStack: [
     '原生小程序 API',
@@ -47,19 +48,39 @@ export const bigvProjectSource: ProjectSource = {
   screenshots: [
     {
       image:
-        'https://objectstorage.eu-marseille-1.oraclecloud.com/n/axwlydfzmjel/b/onefile/o/uploads/2026/04/b6b6ad3e7afe3ba6d65d23d6b557ec44d77bf5a32e84c6160b78085e8abd8b32.png',
+        'https://img.huzhihui.com/uploads/2026/04/bigv-01_local1117bigv01.png',
     },
     {
       image:
-        'https://objectstorage.eu-marseille-1.oraclecloud.com/n/axwlydfzmjel/b/onefile/o/uploads/2026/04/bb54ba066ed1d2a0791ed4d26889b5412a5e1b0e681fa1028e385d1671cf5b84.png',
+        'https://img.huzhihui.com/uploads/2026/04/bigv-02_local1117bigv02.png',
     },
     {
       image:
-        'https://objectstorage.eu-marseille-1.oraclecloud.com/n/axwlydfzmjel/b/onefile/o/uploads/2026/04/46c1a20a7783901e79329ea91c0328b729e231589850e77a9af415b65f3b5123.png',
+        'https://img.huzhihui.com/uploads/2026/04/bigv-03_local1117bigv03.png',
     },
     {
       image:
-        'https://objectstorage.eu-marseille-1.oraclecloud.com/n/axwlydfzmjel/b/onefile/o/uploads/2026/04/0a6ba1ba37f5823fc47987e35e6b3ca218c30d9aed0d7769c22b1a79804ea760.png',
+        'https://img.huzhihui.com/uploads/2026/04/bigv-04_local1117bigv04.png',
+    },
+    {
+      image:
+        'https://img.huzhihui.com/uploads/2026/04/bigv-05_local1117bigv05.png',
+    },
+    {
+      image:
+        'https://img.huzhihui.com/uploads/2026/04/bigv-06_local1117bigv06.png',
+    },
+    {
+      image:
+        'https://img.huzhihui.com/uploads/2026/04/bigv-07_local1117bigv07.png',
+    },
+    {
+      image:
+        'https://img.huzhihui.com/uploads/2026/04/bigv-08_local1117bigv08.png',
+    },
+    {
+      image:
+        'https://img.huzhihui.com/uploads/2026/04/bigv-09_local1117bigv09.png',
     },
   ],
 };

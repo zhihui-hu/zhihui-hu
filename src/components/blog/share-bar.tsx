@@ -12,8 +12,15 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from '@/lib/utils';
-import { CopyCheckIcon, CopyIcon, Share2Icon } from 'lucide-react';
+import {
+  AtSignIcon,
+  CopyCheckIcon,
+  CopyIcon,
+  MessageCircleMoreIcon,
+  Share2Icon,
+} from 'lucide-react';
 import { motion } from 'motion/react';
+import { toDataURL } from 'qrcode';
 import {
   type ReactNode,
   useCallback,
@@ -31,8 +38,6 @@ function QrDialog({
   onOpenChange: (open: boolean) => void;
   url: string;
 }) {
-  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=12&data=${encodeURIComponent(url)}`;
-
   return (
     <ResponsiveDialog open={open} onOpenChange={onOpenChange}>
       <ResponsiveDialogContent
@@ -47,20 +52,52 @@ function QrDialog({
         </ResponsiveDialogHeader>
 
         <div className="mx-auto rounded-xl border border-border/70 bg-background p-3">
-          <QrCodePreview key={qrSrc} src={qrSrc} />
+          <QrCodePreview key={url} url={url} />
         </div>
       </ResponsiveDialogContent>
     </ResponsiveDialog>
   );
 }
 
-function QrCodePreview({ src }: { src: string }) {
+function QrCodePreview({ url }: { url: string }) {
   const [qrState, setQrState] = useState<'loading' | 'loaded' | 'error'>(
     'loading',
   );
+  const [qrSrc, setQrSrc] = useState('');
   const prefersReducedMotion = useMediaQuery(
     '(prefers-reduced-motion: reduce)',
   );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void toDataURL(url, {
+      errorCorrectionLevel: 'M',
+      margin: 1,
+      width: 200,
+      color: {
+        dark: '#111827',
+        light: '#FFFFFFFF',
+      },
+    })
+      .then((nextQrSrc) => {
+        if (cancelled) {
+          return;
+        }
+        setQrSrc(nextQrSrc);
+        setQrState('loaded');
+      })
+      .catch(() => {
+        if (cancelled) {
+          return;
+        }
+        setQrState('error');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
 
   return (
     <div className="relative size-[200px]">
@@ -72,22 +109,17 @@ function QrCodePreview({ src }: { src: string }) {
         <div className="flex size-full items-center justify-center rounded-md bg-muted px-4 text-center text-sm text-muted-foreground">
           二维码加载失败，请稍后重试。
         </div>
-      ) : (
+      ) : qrSrc ? (
         /* eslint-disable-next-line @next/next/no-img-element */
         <img
           alt="文章分享二维码"
-          className={cn(
-            'size-[200px] rounded-md transition-opacity duration-200',
-            qrState === 'loaded' ? 'opacity-100' : 'opacity-0',
-          )}
+          className="size-[200px] rounded-md"
           decoding="async"
           height={200}
-          onError={() => setQrState('error')}
-          onLoad={() => setQrState('loaded')}
-          src={src}
+          src={qrSrc}
           width={200}
         />
-      )}
+      ) : null}
     </div>
   );
 }
@@ -123,20 +155,22 @@ function QrCodeSkeleton({
   );
 }
 
-function BrandIcon({ alt, src }: { alt: string; src: string }) {
+function ShareActionIcon({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <span
       data-icon="inline-start"
-      className="flex size-4 shrink-0 items-center"
+      className={cn(
+        'flex size-4 shrink-0 items-center justify-center',
+        className,
+      )}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        alt={alt}
-        className="size-4 shrink-0"
-        height={16}
-        src={src}
-        width={16}
-      />
+      {children}
     </span>
   );
 }
@@ -238,7 +272,7 @@ export function ShareBar({ title, url }: ShareBarProps) {
     shareUrl.searchParams.set('title', title);
 
     openWarning(shareUrl.toString());
-  }, [openWarning, url, title]);
+  }, [openWarning, title, url]);
 
   // ── Native share ──────────────────────────────────────────────────────────
   const nativeShare = useCallback(async () => {
@@ -278,20 +312,18 @@ export function ShareBar({ title, url }: ShareBarProps) {
           />
           <ActionButton
             icon={
-              <BrandIcon
-                alt="微博"
-                src="https://cdn.simpleicons.org/sinaweibo/E6162D"
-              />
+              <ShareActionIcon className="text-[#E6162D]">
+                <AtSignIcon className="size-4" />
+              </ShareActionIcon>
             }
             label="微博"
             onClick={shareWeibo}
           />
           <ActionButton
             icon={
-              <BrandIcon
-                alt="微信"
-                src="https://cdn.simpleicons.org/wechat/07C160"
-              />
+              <ShareActionIcon className="text-[#07C160]">
+                <MessageCircleMoreIcon className="size-4" />
+              </ShareActionIcon>
             }
             label="微信"
             onClick={() => setShowQr(true)}
