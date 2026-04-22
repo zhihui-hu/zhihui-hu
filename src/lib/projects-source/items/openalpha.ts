@@ -1,6 +1,7 @@
 import type { ProjectSource } from '../types';
 
 export const openalphaProjectSource: ProjectSource = {
+  sortOrder: 7,
   slug: 'openalpha',
   name: 'OpenAlpha 开放平台',
   route: '/products/openalpha',

@@ -1,6 +1,7 @@
 import type { ProjectSource } from '../types';
 
 export const doctorDoctorProjectSource: ProjectSource = {
+  sortOrder: 1,
   slug: 'njh-doctor',
   name: '叮铃医生（医生端）',
   route: '/products/doctor',

@@ -50,12 +50,24 @@ export function BlogNavbar() {
   return (
     <header
       className={cn(
-        'sticky top-0 z-40 mb-4 border-b border-border/55 bg-background/62 shadow-sm shadow-black/5 backdrop-blur-xl supports-[backdrop-filter]:bg-background/38 sm:mb-8',
+        'sticky top-0 z-40 isolate mb-4 overflow-hidden  bg-background/80 backdrop-blur-2xl backdrop-saturate-150 supports-backdrop-filter:bg-background/42 sm:mb-8',
         isVisible ? 'translate-y-0' : '-translate-y-[120%]',
       )}
     >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-linear-to-b from-background/95 via-background/78 to-background/90 supports-backdrop-filter:from-background/72 supports-backdrop-filter:via-background/38 supports-backdrop-filter:to-background/58"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-border/45"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-6 top-0 h-px bg-linear-to-r from-transparent via-foreground/12 to-transparent"
+      />
       <nav
-        className="fade container mx-auto relative flex items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8"
+        className="fade container mx-auto relative z-10 flex items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8"
         id="blog-nav"
       >
         <div className="flex min-w-0 flex-1 flex-row gap-4 overflow-x-auto pr-2 sm:gap-6">

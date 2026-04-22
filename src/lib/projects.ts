@@ -106,9 +106,19 @@ export type Project = {
   development: ProjectDevelopment[];
 };
 
-function compareProjectByStartedAtDesc(left: Project, right: Project) {
-  const leftStart = left.publishedAt || '';
-  const rightStart = right.publishedAt || '';
+function compareProjectSourceBySortOrder(
+  left: ProjectSource,
+  right: ProjectSource,
+) {
+  const leftOrder = left.sortOrder ?? Number.MAX_SAFE_INTEGER;
+  const rightOrder = right.sortOrder ?? Number.MAX_SAFE_INTEGER;
+
+  if (leftOrder !== rightOrder) {
+    return leftOrder - rightOrder;
+  }
+
+  const leftStart = left.startDate || '';
+  const rightStart = right.startDate || '';
 
   const dateDiff = rightStart.localeCompare(leftStart);
 
@@ -202,7 +212,7 @@ function getProjectOverview(projectSource: ProjectSource) {
 }
 
 function readProjectSources(): ProjectSource[] {
-  return PROJECT_SOURCES;
+  return [...PROJECT_SOURCES].sort(compareProjectSourceBySortOrder);
 }
 
 function getFileName(filePath: string) {
@@ -383,14 +393,6 @@ function buildProjectHeroActions(urls: ProjectSourceUrls): ProjectHeroAction[] {
       kind: 'website',
       label: '在线体验',
       url: urls.web,
-    });
-  }
-
-  if (urls.official && urls.official !== urls.web) {
-    actions.push({
-      kind: 'website',
-      label: '官网',
-      url: urls.official,
     });
   }
 
@@ -684,9 +686,7 @@ function toProject(projectSource: ProjectSource): Project {
 }
 
 export const getProjects = cache((): Project[] => {
-  return readProjectSources()
-    .map(toProject)
-    .sort(compareProjectByStartedAtDesc);
+  return readProjectSources().map(toProject);
 });
 
 export const getProjectBySlug = cache((slug: string): Project | undefined => {

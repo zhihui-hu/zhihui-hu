@@ -23,6 +23,7 @@ export type ProjectSourceUrls = {
 };
 
 export type ProjectSource = {
+  sortOrder?: number;
   slug: string;
   name: string;
   route?: string;

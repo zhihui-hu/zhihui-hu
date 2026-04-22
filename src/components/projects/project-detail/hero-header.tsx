@@ -1,7 +1,6 @@
 'use client';
 
 /* eslint-disable @next/next/no-img-element -- this header uses duplicated icon layers for glow rendering */
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -197,11 +196,8 @@ export function ProjectHeroHeader({
   heroPanel: ProjectHero;
 }) {
   const backgroundImageUrl = heroImage || project.logo;
-  const appActions = heroPanel.actions.filter(
-    (action) =>
-      action.kind === 'ios' ||
-      action.kind === 'android' ||
-      action.kind === 'qr',
+  const heroActions = heroPanel.actions.filter(
+    (action) => action.url || action.imageSrc,
   );
   const animationStyles = `
     @keyframes shift-background {
@@ -246,7 +242,7 @@ export function ProjectHeroHeader({
   `;
 
   return (
-    <section className="relative mb-4">
+    <section className="relative mb-4 -mx-4 sm:mx-0">
       <style dangerouslySetInnerHTML={{ __html: animationStyles }} />
       <div
         style={
@@ -265,7 +261,7 @@ export function ProjectHeroHeader({
           '[background:linear-gradient(to_bottom,transparent_20%,rgba(0,0,0,.8)_100%),var(--background-image),var(--background-color,#000)]',
           'transform-[translate(0)]',
           'transition-[border-bottom-left-radius,border-bottom-right-radius]',
-          'duration-210 ease-out',
+          'duration-210 ease-out sm:rounded-[24px]',
         )}
       >
         <div
@@ -341,24 +337,11 @@ export function ProjectHeroHeader({
                     {heroPanel.metaLine}
                   </p>
                 )}
-                {project.listTags.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {project.listTags.map((tag) => (
-                      <Badge
-                        className="border-white/14 bg-white/8 text-white/84 backdrop-blur-sm"
-                        key={tag}
-                        variant="outline"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
               </div>
 
-              {appActions.length > 0 && (
+              {heroActions.length > 0 && (
                 <div className="flex flex-wrap items-center gap-2.5 pt-1 sm:gap-3">
-                  {appActions.map((action) => (
+                  {heroActions.map((action) => (
                     <HeroActionButton
                       action={action}
                       key={`${action.kind}-${action.label}-${action.url || action.imageSrc || 'local'}`}

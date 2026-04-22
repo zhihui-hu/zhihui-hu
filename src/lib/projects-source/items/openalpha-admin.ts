@@ -1,6 +1,7 @@
 import type { ProjectSource } from '../types';
 
 export const openalphaAdminProjectSource: ProjectSource = {
+  sortOrder: 8,
   slug: 'openalpha-admin',
   name: 'OpenAlpha 后台管理',
   route: '/products/openalpha-admin',

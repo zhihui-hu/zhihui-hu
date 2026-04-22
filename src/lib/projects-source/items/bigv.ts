@@ -1,6 +1,7 @@
 import type { ProjectSource } from '../types';
 
 export const bigvProjectSource: ProjectSource = {
+  sortOrder: 3,
   slug: 'bigv',
   name: '笨嘴神器',
   route: '/products/bigv',
