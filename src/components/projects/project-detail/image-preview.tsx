@@ -1,5 +1,6 @@
 'use client';
 
+/* eslint-disable @next/next/no-img-element */
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -25,8 +26,6 @@ import {
   useState,
 } from 'react';
 
-import { WatermarkedImage } from './watermarked-image';
-
 export type ProjectPreviewImage = {
   alt: string;
   caption?: string;
@@ -48,10 +47,7 @@ type ProjectImageGalleryProps = {
 };
 
 function getWrappedIndex(index: number, total: number) {
-  if (total <= 0) {
-    return 0;
-  }
-
+  if (total <= 0) return 0;
   return (index + total) % total;
 }
 
@@ -61,6 +57,8 @@ function prefersReducedMotion() {
     window.matchMedia('(prefers-reduced-motion: reduce)').matches
   );
 }
+
+// ─── Trigger Card ────────────────────────────────────────────────────────────
 
 function ProjectPreviewTriggerCard({
   alt,
@@ -84,27 +82,63 @@ function ProjectPreviewTriggerCard({
     <button
       aria-label={`查看大图：${alt}`}
       className={cn(
-        'group relative inline-flex w-auto shrink-0 cursor-zoom-in overflow-hidden rounded-[1.6rem] bg-transparent text-left focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none',
+        'group relative inline-flex w-auto shrink-0 cursor-zoom-in overflow-hidden rounded-[1.6rem] bg-transparent text-left',
+        'transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.98]',
+        'focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none',
         buttonClassName,
       )}
-      onClick={(event) => {
-        onOpen(event.currentTarget);
-      }}
+      onClick={(event) => onOpen(event.currentTarget)}
       type="button"
     >
-      <WatermarkedImage
+      <img
         alt={alt}
         className={cn(
-          'h-auto w-auto max-w-none rounded-[inherit] object-contain select-none',
+          'block select-none',
+          resolvedFit === 'cover' ? 'object-cover' : 'object-contain',
+          'rounded-[inherit]',
           imageClassName,
         )}
-        fit={resolvedFit}
+        decoding="async"
         loading="lazy"
         src={src}
       />
     </button>
   );
 }
+
+// ─── Dot Indicators ──────────────────────────────────────────────────────────
+
+function DotIndicators({
+  count,
+  activeIndex,
+  onSelect,
+}: {
+  count: number;
+  activeIndex: number;
+  onSelect: (index: number) => void;
+}) {
+  if (count <= 1) return null;
+  return (
+    <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5">
+      {Array.from({ length: count }).map((_, i) => (
+        <button
+          key={i}
+          aria-label={`切换到第 ${i + 1} 张`}
+          className={cn(
+            'h-1.5 rounded-full transition-all duration-300 ease-out',
+            i === activeIndex
+              ? 'w-5 bg-white'
+              : 'w-1.5 bg-white/40 hover:bg-white/70',
+          )}
+          onClick={() => onSelect(i)}
+          type="button"
+        />
+      ))}
+    </div>
+  );
+}
+
+// ─── Preview Dialog ───────────────────────────────────────────────────────────
 
 function ProjectPreviewDialog({
   activeIndex,
@@ -128,9 +162,9 @@ function ProjectPreviewDialog({
   const directionRef = useRef(1);
   const readyImageSrcRef = useRef('');
   const [readyTick, setReadyTick] = useState(0);
+
   const currentIndex = getWrappedIndex(activeIndex, images.length);
   const activeImage = images[currentIndex] ?? null;
-  const activeImageSrc = activeImage?.src ?? '';
   const hasMultiple = images.length > 1;
 
   const navigateTo = useCallback(
@@ -142,16 +176,13 @@ function ProjectPreviewDialog({
   );
 
   useEffect(() => {
-    if (!open || images.length < 2) {
-      return;
-    }
+    if (!open || images.length < 2) return;
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'ArrowLeft') {
         event.preventDefault();
         navigateTo(currentIndex - 1, -1);
       }
-
       if (event.key === 'ArrowRight') {
         event.preventDefault();
         navigateTo(currentIndex + 1, 1);
@@ -159,10 +190,7 @@ function ProjectPreviewDialog({
     }
 
     window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex, images.length, navigateTo, open]);
 
   useLayoutEffect(() => {
@@ -171,123 +199,108 @@ function ProjectPreviewDialog({
       return;
     }
 
-    if (readyImageSrcRef.current !== activeImageSrc) {
-      return;
-    }
+    const activeImageSrc = activeImage?.src ?? '';
+    if (readyImageSrcRef.current !== activeImageSrc) return;
 
     const panelElement = panelRef.current;
     const imageElement = imageSurfaceRef.current;
     const isJustOpened = !dialogOpenRef.current;
 
     dialogOpenRef.current = true;
+    gsap.killTweensOf([panelElement, imageElement]);
 
-    const runAnimation = () => {
-      gsap.killTweensOf([panelElement, imageElement]);
-
-      if (prefersReducedMotion()) {
-        gsap.set(panelElement, { autoAlpha: 1 });
-        gsap.set(imageElement, {
-          autoAlpha: 1,
-          clearProps: 'transform,borderRadius',
-        });
-        previousIndexRef.current = currentIndex;
-        return;
-      }
-
-      if (isJustOpened && originRect) {
-        const finalRect = imageElement.getBoundingClientRect();
-        const originCenterX = originRect.left + originRect.width / 2;
-        const originCenterY = originRect.top + originRect.height / 2;
-        const finalCenterX = finalRect.left + finalRect.width / 2;
-        const finalCenterY = finalRect.top + finalRect.height / 2;
-        const scaleX = originRect.width / Math.max(finalRect.width, 1);
-        const scaleY = originRect.height / Math.max(finalRect.height, 1);
-
-        gsap.fromTo(
-          panelElement,
-          { autoAlpha: 0 },
-          {
-            autoAlpha: 1,
-            duration: 0.22,
-            ease: 'power2.out',
-          },
-        );
-
-        gsap.fromTo(
-          imageElement,
-          {
-            autoAlpha: 0.78,
-            borderRadius: 24,
-            filter: 'blur(18px) brightness(0.9)',
-            scaleX,
-            scaleY,
-            x: originCenterX - finalCenterX,
-            y: originCenterY - finalCenterY,
-          },
-          {
-            autoAlpha: 1,
-            borderRadius: 18,
-            duration: 0.78,
-            ease: 'expo.out',
-            filter: 'blur(0px) brightness(1)',
-            scaleX: 1,
-            scaleY: 1,
-            x: 0,
-            y: 0,
-          },
-        );
-      } else if (previousIndexRef.current !== currentIndex) {
-        gsap.fromTo(
-          imageElement,
-          {
-            autoAlpha: 0.35,
-            x: directionRef.current * 120,
-            scale: 1.01,
-          },
-          {
-            autoAlpha: 1,
-            duration: 0.54,
-            ease: 'power3.out',
-            clearProps: 'filter',
-            scale: 1,
-            x: 0,
-          },
-        );
-      } else {
-        gsap.fromTo(
-          panelElement,
-          { autoAlpha: 0 },
-          {
-            autoAlpha: 1,
-            duration: 0.2,
-            ease: 'power2.out',
-          },
-        );
-      }
-
+    if (prefersReducedMotion()) {
+      gsap.set(panelElement, { autoAlpha: 1 });
+      gsap.set(imageElement, {
+        autoAlpha: 1,
+        clearProps: 'transform,filter,borderRadius',
+      });
       previousIndexRef.current = currentIndex;
-    };
+      return;
+    }
 
-    runAnimation();
-  }, [activeImageSrc, currentIndex, open, originRect, readyTick]);
+    if (isJustOpened && originRect) {
+      const finalRect = imageElement.getBoundingClientRect();
+      const scaleX = originRect.width / Math.max(finalRect.width, 1);
+      const scaleY = originRect.height / Math.max(finalRect.height, 1);
+      const x =
+        originRect.left +
+        originRect.width / 2 -
+        (finalRect.left + finalRect.width / 2);
+      const y =
+        originRect.top +
+        originRect.height / 2 -
+        (finalRect.top + finalRect.height / 2);
 
-  if (!activeImage) {
-    return null;
-  }
+      gsap.fromTo(
+        panelElement,
+        { autoAlpha: 0 },
+        { autoAlpha: 1, duration: 0.3, ease: 'power2.out' },
+      );
+      gsap.fromTo(
+        imageElement,
+        {
+          autoAlpha: 0,
+          borderRadius: 28,
+          filter: 'blur(12px) brightness(0.85)',
+          scaleX,
+          scaleY,
+          x,
+          y,
+        },
+        {
+          autoAlpha: 1,
+          borderRadius: 16,
+          duration: 0.65,
+          ease: 'expo.out',
+          filter: 'blur(0px) brightness(1)',
+          scaleX: 1,
+          scaleY: 1,
+          x: 0,
+          y: 0,
+        },
+      );
+    } else if (previousIndexRef.current !== currentIndex) {
+      gsap.fromTo(
+        imageElement,
+        {
+          autoAlpha: 0,
+          filter: 'blur(6px)',
+          scale: 0.94,
+          x: directionRef.current * 80,
+        },
+        {
+          autoAlpha: 1,
+          clearProps: 'filter',
+          duration: 0.42,
+          ease: 'expo.out',
+          scale: 1,
+          x: 0,
+        },
+      );
+    } else {
+      gsap.fromTo(
+        panelElement,
+        { autoAlpha: 0 },
+        { autoAlpha: 1, duration: 0.2, ease: 'power2.out' },
+      );
+    }
+
+    previousIndexRef.current = currentIndex;
+  }, [activeImage?.src, currentIndex, open, originRect, readyTick]);
+
+  if (!activeImage) return null;
 
   return (
     <Dialog
       open={open}
       onOpenChange={(nextOpen) => {
-        if (!nextOpen) {
-          readyImageSrcRef.current = '';
-        }
-
+        if (!nextOpen) readyImageSrcRef.current = '';
         onOpenChange(nextOpen);
       }}
     >
       <DialogContent
-        className="left-0 top-0 h-[100dvh] w-screen max-w-none translate-x-0 translate-y-0 gap-0 rounded-none border-0 bg-black/96 p-0 text-white ring-0 sm:max-w-none"
+        className="left-0 top-0 h-[100dvh] w-screen max-w-none translate-x-0 translate-y-0 gap-0 rounded-none border-0 bg-transparent p-0 text-white ring-0 sm:max-w-none"
         showCloseButton={false}
       >
         <DialogHeader className="sr-only">
@@ -297,17 +310,20 @@ function ProjectPreviewDialog({
           </DialogDescription>
         </DialogHeader>
 
+        <div className="absolute inset-0 bg-black/92 backdrop-blur-sm" />
+
         <div
           ref={panelRef}
-          className="relative flex h-full w-full items-center justify-center overflow-hidden bg-black"
+          className="relative flex h-full w-full items-center justify-center overflow-hidden"
         >
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-linear-to-b from-black/70 to-transparent" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-black/55 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-28 bg-gradient-to-b from-black/60 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-black/50 to-transparent" />
 
-          <div className="absolute top-4 right-4 z-20 flex items-center gap-2 sm:top-6 sm:right-6">
+          {/* 操作按钮 */}
+          <div className="absolute top-5 right-5 z-20 flex items-center gap-2">
             <Button
               asChild
-              className="border-white/12 bg-black/40 text-white hover:bg-black/65 hover:text-white"
+              className="border-white/10 bg-white/10 text-white backdrop-blur-md hover:bg-white/20 hover:text-white"
               size="icon"
               variant="outline"
             >
@@ -316,18 +332,17 @@ function ProjectPreviewDialog({
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                <ExternalLinkIcon />
+                <ExternalLinkIcon className="h-4 w-4" />
                 <span className="sr-only">新窗口打开</span>
               </a>
             </Button>
-
             <DialogClose asChild>
               <Button
-                className="border-white/12 bg-black/40 text-white hover:bg-black/65 hover:text-white"
+                className="border-white/10 bg-white/10 text-white backdrop-blur-md hover:bg-white/20 hover:text-white"
                 size="icon"
                 variant="outline"
               >
-                <XIcon />
+                <XIcon className="h-4 w-4" />
                 <span className="sr-only">关闭预览</span>
               </Button>
             </DialogClose>
@@ -335,7 +350,7 @@ function ProjectPreviewDialog({
 
           {hasMultiple ? (
             <Button
-              className="absolute left-4 z-20 rounded-full border-white/12 bg-black/40 text-white hover:bg-black/65 hover:text-white sm:left-6"
+              className="absolute left-4 z-20 rounded-full border-white/10 bg-white/10 text-white backdrop-blur-md hover:bg-white/20 hover:text-white sm:left-6"
               onClick={() => navigateTo(currentIndex - 1, -1)}
               size="icon-lg"
               type="button"
@@ -346,20 +361,21 @@ function ProjectPreviewDialog({
             </Button>
           ) : null}
 
-          <div className="flex h-full w-auto items-center justify-center p-4 sm:p-8 lg:p-12">
+          {/* 图片区域 */}
+          <div className="relative flex h-full w-full items-center justify-center p-16 sm:p-20 lg:p-24">
             <div
               ref={imageSurfaceRef}
-              className="relative flex h-full max-w-full items-center justify-center overflow-hidden rounded-[1.1rem]"
+              className="relative flex h-full max-h-full w-full max-w-5xl items-center justify-center overflow-hidden rounded-2xl"
             >
-              <WatermarkedImage
+              <img
                 key={activeImage.src}
                 alt={activeImage.alt}
-                className="max-h-full max-w-full object-contain select-none"
-                fit="contain"
+                className="block h-full w-full select-none object-contain"
+                decoding="async"
                 loading="eager"
-                onLoadComplete={(loadedSrc) => {
-                  readyImageSrcRef.current = loadedSrc;
-                  setReadyTick((tick) => tick + 1);
+                onLoad={() => {
+                  readyImageSrcRef.current = activeImage.src;
+                  setReadyTick((t) => t + 1);
                 }}
                 src={activeImage.src}
               />
@@ -368,7 +384,7 @@ function ProjectPreviewDialog({
 
           {hasMultiple ? (
             <Button
-              className="absolute right-4 z-20 rounded-full border-white/12 bg-black/40 text-white hover:bg-black/65 hover:text-white sm:right-6"
+              className="absolute right-4 z-20 rounded-full border-white/10 bg-white/10 text-white backdrop-blur-md hover:bg-white/20 hover:text-white sm:right-6"
               onClick={() => navigateTo(currentIndex + 1, 1)}
               size="icon-lg"
               type="button"
@@ -378,11 +394,38 @@ function ProjectPreviewDialog({
               <span className="sr-only">下一张</span>
             </Button>
           ) : null}
+
+          {activeImage.caption ? (
+            <div className="absolute bottom-12 left-1/2 z-20 -translate-x-1/2 text-center">
+              <p className="max-w-lg rounded-lg bg-black/40 px-4 py-2 text-sm text-white/80 backdrop-blur-sm">
+                {activeImage.caption}
+              </p>
+            </div>
+          ) : null}
+
+          <DotIndicators
+            activeIndex={currentIndex}
+            count={images.length}
+            onSelect={(i) => {
+              directionRef.current = i > currentIndex ? 1 : -1;
+              onSelect(i);
+            }}
+          />
+
+          {hasMultiple ? (
+            <div className="absolute top-5 left-5 z-20">
+              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/70 backdrop-blur-md">
+                {currentIndex + 1} / {images.length}
+              </span>
+            </div>
+          ) : null}
         </div>
       </DialogContent>
     </Dialog>
   );
 }
+
+// ─── Public Components ────────────────────────────────────────────────────────
 
 export function ProjectImagePreview({
   alt,
@@ -427,13 +470,11 @@ export function ProjectImageGallery({
   const [open, setOpen] = useState(false);
   const [originRect, setOriginRect] = useState<DOMRect | null>(null);
 
-  if (images.length === 0) {
-    return null;
-  }
+  if (images.length === 0) return null;
 
   return (
     <>
-      <div className="flex gap-5 justify-start snap-x snap-mandatory">
+      <div className="flex justify-start gap-5 snap-x snap-mandatory">
         {images.map((image, index) => (
           <ProjectPreviewTriggerCard
             alt={image.alt}

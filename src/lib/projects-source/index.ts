@@ -1,4 +1,6 @@
 import { bigvProjectSource } from './items/bigv';
+import { ePortfolioProjectSource } from './items/e-portfolio';
+import { ePortfolioAdminProjectSource } from './items/e-portfolio-admin';
 import { fofProAppProjectSource } from './items/fof-pro-app';
 import { fofProMiniappProjectSource } from './items/fof-pro-miniapp';
 import { fofProWebProjectSource } from './items/fof-pro-web';
@@ -11,6 +13,8 @@ export const PROJECT_SOURCES = [
   bigvProjectSource,
   doctorDoctorProjectSource,
   doctorPatientProjectSource,
+  ePortfolioProjectSource,
+  ePortfolioAdminProjectSource,
   fofProWebProjectSource,
   fofProAppProjectSource,
   fofProMiniappProjectSource,

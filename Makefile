@@ -55,3 +55,23 @@ dev:
 
 deploy:
 	@$(NPM) run deploy
+
+banner-prepare:
+	@test -n "$(SLUG)" || (echo "Usage: make banner-prepare SLUG=<slug> [ARGS='...']" && exit 1)
+	@bash scripts/post-banner.sh prepare "$(SLUG)" $(ARGS)
+
+banner-generate:
+	@test -n "$(SLUG)" || (echo "Usage: make banner-generate SLUG=<slug> [ARGS='...']" && exit 1)
+	@bash scripts/post-banner.sh generate "$(SLUG)" $(ARGS)
+
+banner-upload:
+	@test -n "$(SLUG)" || (echo "Usage: make banner-upload SLUG=<slug> [ARGS='...']" && exit 1)
+	@bash scripts/post-banner.sh upload "$(SLUG)" $(ARGS)
+
+banner-inject:
+	@test -n "$(SLUG)" || (echo "Usage: make banner-inject SLUG=<slug> [ARGS='...']" && exit 1)
+	@bash scripts/post-banner.sh inject "$(SLUG)" $(ARGS)
+
+banner:
+	@test -n "$(SLUG)" || (echo "Usage: make banner SLUG=<slug> [ARGS='...']" && exit 1)
+	@bash scripts/post-banner.sh run "$(SLUG)" $(ARGS)
