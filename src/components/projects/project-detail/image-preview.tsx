@@ -1,6 +1,5 @@
 'use client';
 
-/* eslint-disable @next/next/no-img-element -- project archives mix local and remote images */
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -26,6 +25,8 @@ import {
   useState,
 } from 'react';
 
+import { WatermarkedImage } from './watermarked-image';
+
 export type ProjectPreviewImage = {
   alt: string;
   caption?: string;
@@ -46,15 +47,6 @@ type ProjectImageGalleryProps = {
   images: ProjectPreviewImage[];
 };
 
-const WATERMARK_BACKGROUND = `url("data:image/svg+xml;utf8,${encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="180" viewBox="0 0 240 180">
-    <g transform="rotate(-24 120 90)">
-      <text x="34" y="94" fill="rgba(0,0,0,0.14)" font-size="20" font-family="Arial, sans-serif">huzhihui</text>
-      <text x="32" y="92" fill="rgba(255,255,255,0.20)" font-size="20" font-family="Arial, sans-serif">huzhihui</text>
-    </g>
-  </svg>`,
-)}")`;
-
 function getWrappedIndex(index: number, total: number) {
   if (total <= 0) {
     return 0;
@@ -70,35 +62,24 @@ function prefersReducedMotion() {
   );
 }
 
-function WatermarkOverlay({ className }: { className?: string }) {
-  return (
-    <div
-      aria-hidden="true"
-      className={cn(
-        'pointer-events-none absolute inset-0 bg-repeat opacity-90 mix-blend-soft-light',
-        className,
-      )}
-      style={{
-        backgroundImage: WATERMARK_BACKGROUND,
-        backgroundSize: '240px 180px',
-      }}
-    />
-  );
-}
-
 function ProjectPreviewTriggerCard({
   alt,
   buttonClassName,
+  fit,
   imageClassName,
   onOpen,
   src,
 }: {
   alt: string;
   buttonClassName?: string;
+  fit?: 'contain' | 'cover';
   imageClassName?: string;
   onOpen: (trigger: HTMLButtonElement) => void;
   src: string;
 }) {
+  const resolvedFit =
+    fit || (imageClassName?.includes('object-cover') ? 'cover' : 'contain');
+
   return (
     <button
       aria-label={`查看大图：${alt}`}
@@ -111,16 +92,16 @@ function ProjectPreviewTriggerCard({
       }}
       type="button"
     >
-      <img
+      <WatermarkedImage
         alt={alt}
         className={cn(
           'h-auto w-auto max-w-none rounded-[inherit] object-contain select-none',
           imageClassName,
         )}
+        fit={resolvedFit}
         loading="lazy"
         src={src}
       />
-      <WatermarkOverlay className="rounded-[inherit] opacity-65" />
     </button>
   );
 }
@@ -141,10 +122,12 @@ function ProjectPreviewDialog({
   originRect: DOMRect | null;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
+  const imageSurfaceRef = useRef<HTMLDivElement>(null);
   const dialogOpenRef = useRef(false);
   const previousIndexRef = useRef(activeIndex);
   const directionRef = useRef(1);
+  const readyImageSrcRef = useRef('');
+  const [readyTick, setReadyTick] = useState(0);
   const currentIndex = getWrappedIndex(activeIndex, images.length);
   const activeImage = images[currentIndex] ?? null;
   const activeImageSrc = activeImage?.src ?? '';
@@ -183,13 +166,17 @@ function ProjectPreviewDialog({
   }, [currentIndex, images.length, navigateTo, open]);
 
   useLayoutEffect(() => {
-    if (!open || !panelRef.current || !imageRef.current) {
+    if (!open || !panelRef.current || !imageSurfaceRef.current) {
       dialogOpenRef.current = false;
       return;
     }
 
+    if (readyImageSrcRef.current !== activeImageSrc) {
+      return;
+    }
+
     const panelElement = panelRef.current;
-    const imageElement = imageRef.current;
+    const imageElement = imageSurfaceRef.current;
     const isJustOpened = !dialogOpenRef.current;
 
     dialogOpenRef.current = true;
@@ -281,24 +268,24 @@ function ProjectPreviewDialog({
       previousIndexRef.current = currentIndex;
     };
 
-    if (imageElement.complete) {
-      runAnimation();
-      return;
-    }
-
-    imageElement.addEventListener('load', runAnimation, { once: true });
-
-    return () => {
-      imageElement.removeEventListener('load', runAnimation);
-    };
-  }, [activeImageSrc, currentIndex, open, originRect]);
+    runAnimation();
+  }, [activeImageSrc, currentIndex, open, originRect, readyTick]);
 
   if (!activeImage) {
     return null;
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          readyImageSrcRef.current = '';
+        }
+
+        onOpenChange(nextOpen);
+      }}
+    >
       <DialogContent
         className="left-0 top-0 h-[100dvh] w-screen max-w-none translate-x-0 translate-y-0 gap-0 rounded-none border-0 bg-black/96 p-0 text-white ring-0 sm:max-w-none"
         showCloseButton={false}
@@ -360,15 +347,22 @@ function ProjectPreviewDialog({
           ) : null}
 
           <div className="flex h-full w-auto items-center justify-center p-4 sm:p-8 lg:p-12">
-            <div className="relative flex h-full max-w-full items-center justify-center overflow-hidden rounded-[1.1rem]">
-              <img
+            <div
+              ref={imageSurfaceRef}
+              className="relative flex h-full max-w-full items-center justify-center overflow-hidden rounded-[1.1rem]"
+            >
+              <WatermarkedImage
                 key={activeImage.src}
-                ref={imageRef}
                 alt={activeImage.alt}
                 className="max-h-full max-w-full object-contain select-none"
+                fit="contain"
+                loading="eager"
+                onLoadComplete={(loadedSrc) => {
+                  readyImageSrcRef.current = loadedSrc;
+                  setReadyTick((tick) => tick + 1);
+                }}
                 src={activeImage.src}
               />
-              <WatermarkOverlay />
             </div>
           </div>
 

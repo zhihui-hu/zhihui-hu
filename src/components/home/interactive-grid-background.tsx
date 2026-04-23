@@ -1,6 +1,7 @@
 'use client';
 
 import { useActiveTheme } from '@/components/theme/use-active-theme';
+import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from '@/lib/utils';
 import { type CSSProperties, useEffect, useEffectEvent, useRef } from 'react';
 
@@ -12,7 +13,14 @@ export function InteractiveGridBackground({
   className,
 }: InteractiveGridBackgroundProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<number | null>(null);
   const theme = useActiveTheme();
+  const isMobile = useMediaQuery('(max-width: 767px)');
+  const isCoarsePointer = useMediaQuery('(pointer: coarse)');
+  const prefersReducedMotion = useMediaQuery(
+    '(prefers-reduced-motion: reduce)',
+  );
+  const shouldSimplify = isMobile || isCoarsePointer || prefersReducedMotion;
 
   const syncPointer = useEffectEvent((x: number, y: number) => {
     const node = rootRef.current;
@@ -25,18 +33,41 @@ export function InteractiveGridBackground({
     node.style.setProperty('--my', `${y.toFixed(2)}px`);
   });
 
+  const schedulePointerSync = useEffectEvent((x: number, y: number) => {
+    if (frameRef.current !== null) {
+      window.cancelAnimationFrame(frameRef.current);
+    }
+
+    frameRef.current = window.requestAnimationFrame(() => {
+      frameRef.current = null;
+      syncPointer(x, y);
+    });
+  });
+
   const centerPointer = useEffectEvent(() => {
-    syncPointer(window.innerWidth / 2, window.innerHeight / 2);
+    const anchorY = shouldSimplify
+      ? window.innerHeight * 0.28
+      : window.innerHeight / 2;
+
+    syncPointer(window.innerWidth / 2, anchorY);
   });
 
   const movePointer = useEffectEvent((clientX: number, clientY: number) => {
-    syncPointer(clientX, clientY);
+    if (shouldSimplify) {
+      return;
+    }
+
+    schedulePointerSync(clientX, clientY);
   });
 
   useEffect(() => {
     centerPointer();
 
     const handlePointerMove = (event: PointerEvent) => {
+      if (event.pointerType === 'touch') {
+        return;
+      }
+
       movePointer(event.clientX, event.clientY);
     };
     const handlePointerLeave = () => {
@@ -46,35 +77,74 @@ export function InteractiveGridBackground({
       centerPointer();
     };
 
-    window.addEventListener('pointermove', handlePointerMove, {
-      passive: true,
-    });
-    window.addEventListener('blur', handlePointerLeave);
     window.addEventListener('resize', handleResize);
+    window.addEventListener('blur', handlePointerLeave);
+
+    if (!shouldSimplify) {
+      window.addEventListener('pointermove', handlePointerMove, {
+        passive: true,
+      });
+    }
 
     return () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('blur', handlePointerLeave);
+      if (frameRef.current !== null) {
+        window.cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('blur', handlePointerLeave);
+
+      if (!shouldSimplify) {
+        window.removeEventListener('pointermove', handlePointerMove);
+      }
     };
-  }, []);
+  }, [shouldSimplify]);
 
   const style = (
     theme === 'dark'
-      ? {
-          '--grid-size': '10px',
-          '--dot-size': '0.62px',
-          '--mask-size': 'clamp(96px, 11vw, 164px)',
-          '--dot-base': 'rgba(145, 145, 145, 0.28)',
-          '--dot-active': 'rgba(255, 255, 255, 0.98)',
-        }
-      : {
-          '--grid-size': '10px',
-          '--dot-size': '0.62px',
-          '--mask-size': 'clamp(96px, 11vw, 164px)',
-          '--dot-base': 'rgba(24, 24, 27, 0.11)',
-          '--dot-active': 'rgba(24, 24, 27, 0.82)',
-        }
+      ? shouldSimplify
+        ? {
+            '--grid-size': '12px',
+            '--dot-size': '0.56px',
+            '--mask-size': 'clamp(80px, 24vw, 128px)',
+            '--dot-base': 'rgba(145, 145, 145, 0.2)',
+            '--dot-active': 'rgba(255, 255, 255, 0.8)',
+            '--base-opacity': '0.82',
+            '--active-opacity': '0.64',
+            '--mask-will-change': 'auto',
+          }
+        : {
+            '--grid-size': '10px',
+            '--dot-size': '0.62px',
+            '--mask-size': 'clamp(96px, 11vw, 164px)',
+            '--dot-base': 'rgba(145, 145, 145, 0.28)',
+            '--dot-active': 'rgba(255, 255, 255, 0.98)',
+            '--base-opacity': '1',
+            '--active-opacity': '1',
+            '--mask-will-change': 'mask-image',
+          }
+      : shouldSimplify
+        ? {
+            '--grid-size': '12px',
+            '--dot-size': '0.56px',
+            '--mask-size': 'clamp(80px, 24vw, 128px)',
+            '--dot-base': 'rgba(24, 24, 27, 0.08)',
+            '--dot-active': 'rgba(24, 24, 27, 0.64)',
+            '--base-opacity': '0.72',
+            '--active-opacity': '0.52',
+            '--mask-will-change': 'auto',
+          }
+        : {
+            '--grid-size': '10px',
+            '--dot-size': '0.62px',
+            '--mask-size': 'clamp(96px, 11vw, 164px)',
+            '--dot-base': 'rgba(24, 24, 27, 0.11)',
+            '--dot-active': 'rgba(24, 24, 27, 0.82)',
+            '--base-opacity': '1',
+            '--active-opacity': '1',
+            '--mask-will-change': 'mask-image',
+          }
   ) as CSSProperties;
 
   return (
@@ -106,7 +176,7 @@ export function InteractiveGridBackground({
           background-position: calc(var(--grid-size) / 2)
             calc(var(--grid-size) / 2);
           background-size: var(--grid-size) var(--grid-size);
-          will-change: mask-image;
+          will-change: var(--mask-will-change);
         }
 
         .base {
@@ -115,7 +185,7 @@ export function InteractiveGridBackground({
             var(--dot-base) 0 var(--dot-size),
             transparent calc(var(--dot-size) + 0.2px)
           );
-          opacity: 1;
+          opacity: var(--base-opacity);
         }
 
         .active {
@@ -124,7 +194,7 @@ export function InteractiveGridBackground({
             var(--dot-active) 0 var(--dot-size),
             transparent calc(var(--dot-size) + 0.2px)
           );
-          opacity: 1;
+          opacity: var(--active-opacity);
           -webkit-mask-image: radial-gradient(
             circle var(--mask-size) at var(--mx) var(--my),
             rgba(0, 0, 0, 1) 0%,
