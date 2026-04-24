@@ -1,9 +1,8 @@
 'use client';
 
-import { useActiveTheme } from '@/components/theme/use-active-theme';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from '@/lib/utils';
-import { type CSSProperties, useEffect, useEffectEvent, useRef } from 'react';
+import { useEffect, useEffectEvent, useRef } from 'react';
 
 type InteractiveGridBackgroundProps = {
   className?: string;
@@ -14,7 +13,6 @@ export function InteractiveGridBackground({
 }: InteractiveGridBackgroundProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number | null>(null);
-  const theme = useActiveTheme();
   const isMobile = useMediaQuery('(max-width: 767px)');
   const isCoarsePointer = useMediaQuery('(pointer: coarse)');
   const prefersReducedMotion = useMediaQuery(
@@ -101,61 +99,15 @@ export function InteractiveGridBackground({
     };
   }, [shouldSimplify]);
 
-  const style = (
-    theme === 'dark'
-      ? shouldSimplify
-        ? {
-            '--grid-size': '12px',
-            '--dot-size': '0.56px',
-            '--mask-size': 'clamp(80px, 24vw, 128px)',
-            '--dot-base': 'rgba(145, 145, 145, 0.2)',
-            '--dot-active': 'rgba(255, 255, 255, 0.8)',
-            '--base-opacity': '0.82',
-            '--active-opacity': '0.64',
-            '--mask-will-change': 'auto',
-          }
-        : {
-            '--grid-size': '10px',
-            '--dot-size': '0.62px',
-            '--mask-size': 'clamp(96px, 11vw, 164px)',
-            '--dot-base': 'rgba(145, 145, 145, 0.28)',
-            '--dot-active': 'rgba(255, 255, 255, 0.98)',
-            '--base-opacity': '1',
-            '--active-opacity': '1',
-            '--mask-will-change': 'mask-image',
-          }
-      : shouldSimplify
-        ? {
-            '--grid-size': '12px',
-            '--dot-size': '0.56px',
-            '--mask-size': 'clamp(80px, 24vw, 128px)',
-            '--dot-base': 'rgba(24, 24, 27, 0.08)',
-            '--dot-active': 'rgba(24, 24, 27, 0.64)',
-            '--base-opacity': '0.72',
-            '--active-opacity': '0.52',
-            '--mask-will-change': 'auto',
-          }
-        : {
-            '--grid-size': '10px',
-            '--dot-size': '0.62px',
-            '--mask-size': 'clamp(96px, 11vw, 164px)',
-            '--dot-base': 'rgba(24, 24, 27, 0.11)',
-            '--dot-active': 'rgba(24, 24, 27, 0.82)',
-            '--base-opacity': '1',
-            '--active-opacity': '1',
-            '--mask-will-change': 'mask-image',
-          }
-  ) as CSSProperties;
-
   return (
     <div
       aria-hidden="true"
       className={cn(
         'root pointer-events-none absolute inset-0 overflow-hidden',
+        shouldSimplify && 'simplified',
         className,
       )}
       ref={rootRef}
-      style={style}
     >
       <div className="layer base" />
       <div className="layer active" />
@@ -164,6 +116,37 @@ export function InteractiveGridBackground({
         .root {
           --mx: 50%;
           --my: 50%;
+          --grid-size: 10px;
+          --dot-size: 0.62px;
+          --mask-size: clamp(96px, 11vw, 164px);
+          --dot-base: rgba(24, 24, 27, 0.11);
+          --dot-active: rgba(24, 24, 27, 0.82);
+          --base-opacity: 1;
+          --active-opacity: 1;
+          --mask-will-change: mask-image;
+        }
+
+        .root.simplified {
+          --grid-size: 12px;
+          --dot-size: 0.56px;
+          --mask-size: clamp(80px, 24vw, 128px);
+          --dot-base: rgba(24, 24, 27, 0.08);
+          --dot-active: rgba(24, 24, 27, 0.64);
+          --base-opacity: 0.72;
+          --active-opacity: 0.52;
+          --mask-will-change: auto;
+        }
+
+        :global(html.dark) .root {
+          --dot-base: rgba(145, 145, 145, 0.28);
+          --dot-active: rgba(255, 255, 255, 0.98);
+        }
+
+        :global(html.dark) .root.simplified {
+          --dot-base: rgba(145, 145, 145, 0.2);
+          --dot-active: rgba(255, 255, 255, 0.8);
+          --base-opacity: 0.82;
+          --active-opacity: 0.64;
         }
 
         .layer {

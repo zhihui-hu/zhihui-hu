@@ -1,6 +1,6 @@
 {
   "name": "huzhihui",
-  "version": "26.422.1926",
+  "version": "26.424.2215",
   "private": true,
   "scripts": {
     "dev": "next dev -p 27506",
