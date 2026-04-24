@@ -1,7 +1,7 @@
 import type { ProjectSource } from '../types';
 
 export const ePortfolioProjectSource: ProjectSource = {
-  sortOrder: 9,
+  sortOrder: 3,
   slug: 'e-portfolio',
   name: 'E-Portfolio（App）',
   route: '/products/e-portfolio',

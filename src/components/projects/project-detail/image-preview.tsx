@@ -1,6 +1,4 @@
 'use client';
-
-/* eslint-disable @next/next/no-img-element */
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -25,6 +23,8 @@ import {
   useRef,
   useState,
 } from 'react';
+
+import { ProjectPreviewWatermarkedImage } from './project-preview-watermarked-image';
 
 export type ProjectPreviewImage = {
   alt: string;
@@ -58,8 +58,6 @@ function prefersReducedMotion() {
   );
 }
 
-// ─── Trigger Card ────────────────────────────────────────────────────────────
-
 function ProjectPreviewTriggerCard({
   alt,
   buttonClassName,
@@ -90,7 +88,7 @@ function ProjectPreviewTriggerCard({
       onClick={(event) => onOpen(event.currentTarget)}
       type="button"
     >
-      <img
+      <ProjectPreviewWatermarkedImage
         alt={alt}
         className={cn(
           'block select-none',
@@ -98,15 +96,11 @@ function ProjectPreviewTriggerCard({
           'rounded-[inherit]',
           imageClassName,
         )}
-        decoding="async"
-        loading="lazy"
         src={src}
       />
     </button>
   );
 }
-
-// ─── Dot Indicators ──────────────────────────────────────────────────────────
 
 function DotIndicators({
   count,
@@ -137,8 +131,6 @@ function DotIndicators({
     </div>
   );
 }
-
-// ─── Preview Dialog ───────────────────────────────────────────────────────────
 
 function ProjectPreviewDialog({
   activeIndex,
@@ -367,16 +359,16 @@ function ProjectPreviewDialog({
               ref={imageSurfaceRef}
               className="relative flex h-full max-h-full w-full max-w-5xl items-center justify-center overflow-hidden rounded-2xl"
             >
-              <img
+              <ProjectPreviewWatermarkedImage
                 key={activeImage.src}
                 alt={activeImage.alt}
                 className="block h-full w-full select-none object-contain"
-                decoding="async"
                 loading="eager"
                 onLoad={() => {
                   readyImageSrcRef.current = activeImage.src;
                   setReadyTick((t) => t + 1);
                 }}
+                showStatus
                 src={activeImage.src}
               />
             </div>
@@ -424,8 +416,6 @@ function ProjectPreviewDialog({
     </Dialog>
   );
 }
-
-// ─── Public Components ────────────────────────────────────────────────────────
 
 export function ProjectImagePreview({
   alt,
