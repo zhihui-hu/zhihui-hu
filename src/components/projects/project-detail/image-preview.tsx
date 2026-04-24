@@ -308,8 +308,8 @@ function ProjectPreviewDialog({
           ref={panelRef}
           className="relative flex h-full w-full items-center justify-center overflow-hidden"
         >
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-28 bg-gradient-to-b from-black/60 to-transparent" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-black/50 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-28 bg-gradient-to-b from-black/60 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-28 bg-gradient-to-t from-black/50 to-transparent" />
 
           {/* 操作按钮 */}
           <div className="absolute top-5 right-5 z-20 flex items-center gap-2">
@@ -354,7 +354,7 @@ function ProjectPreviewDialog({
           ) : null}
 
           {/* 图片区域 */}
-          <div className="relative flex h-full w-full items-center justify-center p-16 sm:p-20 lg:p-24">
+          <div className="relative z-10 flex h-full w-full items-center justify-center p-4 py-16 sm:p-16 lg:p-20">
             <div
               ref={imageSurfaceRef}
               className="relative flex h-full max-h-full w-full max-w-5xl items-center justify-center overflow-hidden rounded-2xl"

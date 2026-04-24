@@ -10,6 +10,16 @@ VERSION := $(shell node -e "\
 ")
 # 默认提交消息
 DEFAULT_MSG := "bump version to v$(VERSION)"
+POST_BANNER_COMMANDS := banner banner-prepare banner-generate banner-upload banner-inject banner-gemini img img-prepare img-generate img-upload img-inject img-gemini
+
+ifeq ($(filter $(firstword $(MAKECMDGOALS)),$(POST_BANNER_COMMANDS)),$(firstword $(MAKECMDGOALS)))
+POST_BANNER_GOAL_INPUT := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+.PHONY: $(POST_BANNER_GOAL_INPUT)
+$(foreach goal,$(POST_BANNER_GOAL_INPUT),$(eval $(goal):;@:))
+endif
+
+POST_BANNER_INPUT := $(strip $(or $(FILE),$(POST),$(SLUG),$(POST_BANNER_GOAL_INPUT)))
+POST_BANNER_PROVIDER_ARG := $(strip $(if $(PROVIDER),--provider $(PROVIDER)))
 
 
 # 检查 npm 是否安装
@@ -57,21 +67,49 @@ deploy:
 	@$(NPM) run deploy
 
 banner-prepare:
-	@test -n "$(SLUG)" || (echo "Usage: make banner-prepare SLUG=<slug> [ARGS='...']" && exit 1)
-	@bash scripts/post-banner.sh prepare "$(SLUG)" $(ARGS)
+	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make banner-prepare <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
+	@bash scripts/post-banner.sh prepare "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
 
 banner-generate:
-	@test -n "$(SLUG)" || (echo "Usage: make banner-generate SLUG=<slug> [ARGS='...']" && exit 1)
-	@bash scripts/post-banner.sh generate "$(SLUG)" $(ARGS)
+	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make banner-generate <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
+	@bash scripts/post-banner.sh generate "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
 
 banner-upload:
-	@test -n "$(SLUG)" || (echo "Usage: make banner-upload SLUG=<slug> [ARGS='...']" && exit 1)
-	@bash scripts/post-banner.sh upload "$(SLUG)" $(ARGS)
+	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make banner-upload <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
+	@bash scripts/post-banner.sh upload "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
 
 banner-inject:
-	@test -n "$(SLUG)" || (echo "Usage: make banner-inject SLUG=<slug> [ARGS='...']" && exit 1)
-	@bash scripts/post-banner.sh inject "$(SLUG)" $(ARGS)
+	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make banner-inject <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
+	@bash scripts/post-banner.sh inject "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
 
 banner:
-	@test -n "$(SLUG)" || (echo "Usage: make banner SLUG=<slug> [ARGS='...']" && exit 1)
-	@bash scripts/post-banner.sh run "$(SLUG)" $(ARGS)
+	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make banner <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
+	@bash scripts/post-banner.sh "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+
+banner-gemini:
+	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make banner-gemini <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
+	@bash scripts/post-banner.sh "$(POST_BANNER_INPUT)" --provider gemini $(ARGS)
+
+img:
+	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make img <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
+	@bash scripts/post-banner.sh "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+
+img-prepare:
+	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make img-prepare <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
+	@bash scripts/post-banner.sh prepare "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+
+img-generate:
+	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make img-generate <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
+	@bash scripts/post-banner.sh generate "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+
+img-upload:
+	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make img-upload <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
+	@bash scripts/post-banner.sh upload "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+
+img-inject:
+	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make img-inject <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
+	@bash scripts/post-banner.sh inject "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+
+img-gemini:
+	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make img-gemini <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
+	@bash scripts/post-banner.sh "$(POST_BANNER_INPUT)" --provider gemini $(ARGS)
