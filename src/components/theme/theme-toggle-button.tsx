@@ -26,6 +26,40 @@ type ThemeToggleButtonProps = {
   label?: string;
 };
 
+const THEME_TOGGLE_VIEW_TRANSITION_CSS = `
+  @supports (view-transition-name: none) {
+    :root {
+      view-transition-name: root;
+    }
+
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+      mix-blend-mode: normal;
+    }
+
+    ::view-transition-old(root) {
+      z-index: 1;
+    }
+
+    ::view-transition-new(root) {
+      z-index: 9999;
+    }
+
+    [data-theme-switching='dark']::view-transition-old(root) {
+      z-index: 9999;
+    }
+
+    [data-theme-switching='dark']::view-transition-new(root) {
+      z-index: 1;
+    }
+  }
+`;
+
+function ThemeToggleViewTransitionStyles() {
+  return <style>{THEME_TOGGLE_VIEW_TRANSITION_CSS}</style>;
+}
+
 export function ThemeToggleButton({
   className,
   label = '切换主题',
@@ -99,16 +133,19 @@ export function ThemeToggleButton({
   }
 
   return (
-    <Button
-      aria-label={label}
-      className={cn('shrink-0', className)}
-      onClick={handleToggle}
-      size="icon-sm"
-      title={label}
-      variant="outline"
-    >
-      <MoonStarIcon aria-hidden="true" className="dark:hidden" />
-      <SunMediumIcon aria-hidden="true" className="hidden dark:block" />
-    </Button>
+    <>
+      <ThemeToggleViewTransitionStyles />
+      <Button
+        aria-label={label}
+        className={cn('shrink-0', className)}
+        onClick={handleToggle}
+        size="icon-sm"
+        title={label}
+        variant="outline"
+      >
+        <MoonStarIcon aria-hidden="true" className="dark:hidden" />
+        <SunMediumIcon aria-hidden="true" className="hidden dark:block" />
+      </Button>
+    </>
   );
 }

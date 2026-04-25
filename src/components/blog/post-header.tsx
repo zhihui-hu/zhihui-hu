@@ -1,4 +1,7 @@
-import { BlogTitleTransition } from '@/components/blog/view-transitions';
+import {
+  SharedElementTransition,
+  getSharedTitleTransitionName,
+} from '@/components/route-view-transitions';
 import { Badge } from '@/components/ui/badge';
 import {
   type BlogPost,
@@ -21,11 +24,13 @@ export function PostHeader({ post }: PostHeaderProps) {
 
   return (
     <header className="mb-8 border-b border-border/60 pb-6">
-      <BlogTitleTransition slug={post.slug}>
+      <SharedElementTransition
+        name={getSharedTitleTransitionName('blog', post.slug)}
+      >
         <h1 className="title text-[clamp(2rem,5vw,2.9rem)] font-bold leading-tight tracking-[-0.04em] text-foreground">
           {post.metadata.title}
         </h1>
-      </BlogTitleTransition>
+      </SharedElementTransition>
 
       <div className="mt-5 flex flex-col gap-3">
         <div className="flex flex-col gap-2 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">

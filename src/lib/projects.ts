@@ -6,6 +6,7 @@ import { PROJECT_SOURCES } from './projects-source';
 import type {
   ProjectSource,
   ProjectSourceAsset,
+  ProjectSourceFamily,
   ProjectSourceResource,
   ProjectSourceScreenshot,
   ProjectSourceUrls,
@@ -63,6 +64,15 @@ export type ProjectPeriod = {
   text: string;
 };
 
+export type ProjectFamilyMeta = {
+  key: string;
+  title: string;
+  description?: string;
+  sortOrder?: number;
+  variantLabel?: string;
+  variantOrder?: number;
+};
+
 export type ProjectDevelopment = {
   name: string;
   period?: ProjectPeriod;
@@ -79,6 +89,7 @@ export type Project = {
   slug: string;
   name: string;
   route: string;
+  sortOrder: number;
   sourceRoute?: string;
   logo?: string;
   description: string;
@@ -90,6 +101,7 @@ export type Project = {
   ageRating?: string;
   category?: string;
   industry?: string;
+  family?: ProjectFamilyMeta;
   categories: string[];
   platforms: string[];
   langs: string[];
@@ -104,6 +116,15 @@ export type Project = {
   screenshots: ProjectScreenshot[];
   introduction: string[];
   development: ProjectDevelopment[];
+};
+
+export type ProjectGroup = {
+  key: string;
+  title: string;
+  description?: string;
+  latestPublishedAt?: string;
+  sortOrder: number;
+  projects: Project[];
 };
 
 function compareProjectSourceBySortOrder(
@@ -283,6 +304,26 @@ function normalizeText(value?: string | null) {
 
 function normalizeStringList(values?: readonly string[]) {
   return (values || []).map(normalizeText).filter(isNonEmptyString);
+}
+
+function normalizeProjectFamily(
+  family?: ProjectSourceFamily,
+): ProjectFamilyMeta | undefined {
+  const key = normalizeText(family?.key);
+  const title = normalizeText(family?.title);
+
+  if (!key || !title) {
+    return undefined;
+  }
+
+  return {
+    key,
+    title,
+    description: normalizeText(family?.description),
+    sortOrder: family?.sortOrder,
+    variantLabel: normalizeText(family?.variantLabel),
+    variantOrder: family?.variantOrder,
+  };
 }
 
 function normalizeSourceUrls(projectSource: ProjectSource): ProjectSourceUrls {
@@ -642,6 +683,7 @@ function toProject(projectSource: ProjectSource): Project {
   const priceLabel = normalizePriceLabel(projectSource.price);
   const development = buildProjectDevelopment(projectSource);
   const categories = normalizeStringList(projectSource.categories);
+  const family = normalizeProjectFamily(projectSource.family);
   const platforms = normalizeStringList(projectSource.platforms);
   const langs = normalizeStringList(projectSource.langs);
   const timeline = buildPeriod(projectSource);
@@ -653,6 +695,7 @@ function toProject(projectSource: ProjectSource): Project {
     slug: projectSource.slug,
     name: projectSource.name,
     route: `/projects/${projectSource.slug}`,
+    sortOrder: projectSource.sortOrder ?? Number.MAX_SAFE_INTEGER,
     sourceRoute: projectSource.route,
     logo: normalizeLogoPath(projectSource.logo),
     description: overview,
@@ -664,6 +707,7 @@ function toProject(projectSource: ProjectSource): Project {
     ageRating: normalizeText(projectSource.ageRating),
     category: normalizeText(projectSource.category),
     industry: projectSource.industry,
+    family,
     categories,
     platforms,
     langs,
@@ -687,6 +731,87 @@ function toProject(projectSource: ProjectSource): Project {
 
 export const getProjects = cache((): Project[] => {
   return readProjectSources().map(toProject);
+});
+
+function compareProjectsInGroup(left: Project, right: Project) {
+  const dateDiff = (right.publishedAt || '').localeCompare(
+    left.publishedAt || '',
+  );
+
+  if (dateDiff !== 0) {
+    return dateDiff;
+  }
+
+  const leftOrder = left.family?.variantOrder ?? left.sortOrder;
+  const rightOrder = right.family?.variantOrder ?? right.sortOrder;
+
+  if (leftOrder !== rightOrder) {
+    return leftOrder - rightOrder;
+  }
+
+  if (left.sortOrder !== right.sortOrder) {
+    return left.sortOrder - right.sortOrder;
+  }
+
+  return left.name.localeCompare(right.name, 'zh-CN');
+}
+
+function compareProjectGroups(left: ProjectGroup, right: ProjectGroup) {
+  const dateDiff = (right.latestPublishedAt || '').localeCompare(
+    left.latestPublishedAt || '',
+  );
+
+  if (dateDiff !== 0) {
+    return dateDiff;
+  }
+
+  if (left.sortOrder !== right.sortOrder) {
+    return left.sortOrder - right.sortOrder;
+  }
+
+  return left.title.localeCompare(right.title, 'zh-CN');
+}
+
+export const getProjectGroups = cache((): ProjectGroup[] => {
+  const groups = new Map<string, ProjectGroup>();
+
+  for (const project of getProjects()) {
+    const family = project.family;
+    const key = family?.key ?? project.slug;
+    const sortOrder = family?.sortOrder ?? project.sortOrder;
+    const group = groups.get(key);
+
+    if (group) {
+      group.projects.push(project);
+      group.latestPublishedAt = [group.latestPublishedAt, project.publishedAt]
+        .filter(isNonEmptyString)
+        .sort()
+        .at(-1);
+      group.sortOrder = Math.min(group.sortOrder, sortOrder);
+
+      if (!group.description && family?.description) {
+        group.description = family.description;
+      }
+
+      continue;
+    }
+
+    groups.set(key, {
+      key,
+      title: family?.title ?? project.name,
+      description: family?.description,
+      latestPublishedAt: project.publishedAt,
+      sortOrder,
+      projects: [project],
+    });
+  }
+
+  return Array.from(groups.values())
+    .map((group) => ({
+      ...group,
+      projects: [...group.projects].sort(compareProjectsInGroup),
+    }))
+    .sort(compareProjectGroups);
 });
 
 export const getProjectBySlug = cache((slug: string): Project | undefined => {

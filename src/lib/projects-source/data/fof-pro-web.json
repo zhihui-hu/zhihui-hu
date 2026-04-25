@@ -1,0 +1,75 @@
+{
+  "sortOrder": 4,
+  "slug": "fof-pro-web",
+  "name": "FOF PRO（Web 端）",
+  "route": "/products/fof-pro",
+  "logo": "https://img.huzhihui.com/uploads/2026/04/fof-pro-logo_dhxzck5wom6g.png",
+  "overview": "FOF PRO Web 端是面向专业金融机构的旗舰级投研平台。它以海量金融数据库为基石，横向贯穿公募、私募、保险、养老等多维资产组合管理，并深度集成了复杂数据可视化、研报协同引擎与大模型 AI Agent，打造全链路的数字化投研工作流。",
+  "tags": ["基金数据库", "组合诊断", "资配投研", "Web 平台"],
+  "urls": {
+    "official": "https://qutke.com/",
+    "web": "https://pro.fofinvesting.com/"
+  },
+  "companyName": "况客科技（北京）有限公司",
+  "startDate": "2021-06-12",
+  "ongoing": true,
+  "ageRating": "18+",
+  "category": "财务",
+  "industry": "金融科技",
+  "family": {
+    "key": "fof-pro",
+    "title": "FOF PRO",
+    "description": "同一套金融投研产品矩阵下的 App、Web 与微信小程序形态。",
+    "sortOrder": 2,
+    "variantLabel": "Web",
+    "variantOrder": 2
+  },
+  "categories": ["基金投研投顾平台", "基金数据库", "Web 平台"],
+  "platforms": ["Web 平台"],
+  "langs": ["中文简体", "英语"],
+  "price": "商业化服务",
+  "headline": "超越单点的数据检索工具，构建从“全市场数据穿透、归因回测、投研模板协作”到“AI 智能投顾”的一站式机构级投研基础设施。",
+  "introduction": [
+    "在主导 FOF PRO Web 端架构时，我的核心立意是打造一个真正的「沉浸式投研工作台」，而非简单的数据看板。真正的研究工作不仅需要看数据，更需要深度的归因分析、组合回测与知识协作。",
+    "随着业务的急剧扩张，系统从最初的公募数据库，野蛮生长至涵盖 ETF、私募、保险资管、养老专户等多类资产，并衍生出基准研究、投研模板、基金圈社交与 AI Agent。这要求系统不仅能“海纳百川”，还必须在业务逻辑上形成高度互通的闭环。",
+    "作为整个产品矩阵的绝对主轴，Web 端承载了最密集的复杂交互与重度计算。它是专业投研人员每天长达 8 小时沉浸使用的核心生产力工具，这也是其对前端工程化与性能要求极度严苛的原因。"
+  ],
+  "summary": [
+    "面对极具爆炸性的业务扩张，这套 Web 端的首要挑战是“如何对抗系统的不可维护性”。我选用了 `@umijs/max` 企业级框架作为基座，配合 `TypeScript` 和 `Ant Design Pro` 建立严苛的类型与视觉约束。通过深度利用 Umi 的内置流转（如权限管理、全局模型、路由级拆分预留），我成功压制住了数十个高耦合业务域同时开发的混乱，确保了系统基建的绝对稳定。",
+    "业务侧最棘手的难点，是“极端密集的数据吞吐与渲染”。金融分析页面（如组合诊断、资产配置、相关性分析）往往需要在一屏内渲染数十张图表与万行级别的数据网格。为此，我融合了 `ECharts` 复杂定制、`Handsontable`（类 Excel 交互）与 `react-data-grid`（高性能虚拟列表），彻底打通了从底层接口到前端渲染的性能瓶颈。",
+    "在复杂交互体验上，投研人员对界面的自由度要求极高。我通过深度集成 `@dnd-kit` 和 `react-beautiful-dnd`，实现了重度面板的自定义拖拽与动态布局；为了让前端不仅是展示层，我还引入了 `compute-kurtosis` 等统计引擎，将部分偏度、峰度指标的计算前置到浏览器，以毫秒级响应用户的微调测算。",
+    "系统架构的另一大飞跃，是向“AIGC 投研”的平滑演进。为了无缝接入大模型 AI Agent（投研助手、研报写手），我引入了 `@microsoft/fetch-event-source` 支撑底层的流式 SSE 交互，并结合 `markdown-it`、`Mermaid` 与 `KaTeX`，在前端构建了强大的富文本与公式解析管线，让冰冷的生肉数据真正转化为高可读的智能投研报告。",
+    "回顾整个历程，FOF PRO Web 端早已跳出了“买方信息终端”的范畴。从提供标准化数据，到抽象出研究方法论（投研模板），再到沉淀机构内部知识库（基金圈）。我最自豪的是，凭借扎实且极具前瞻性的前端架构设计，我亲手将一堆发散的复杂需求，浇筑成了国内顶尖金融机构每天都在高频依赖的投研底座。"
+  ],
+  "techStack": [
+    "React & TypeScript",
+    "@umijs/max 框架",
+    "Ant Design Pro",
+    "ECharts & Handsontable",
+    "react-data-grid (高性能虚拟表格)",
+    "@dnd-kit (复杂交互拖拽)",
+    "SSE (流式请求)",
+    "Markdown & KaTeX & Mermaid",
+    "前端统计分析引擎 (如偏度计算)",
+    "xlsx & react-to-print",
+    "Tailwind CSS"
+  ],
+  "resources": [
+    {
+      "label": "官方文档",
+      "url": "https://docs.fofinvesting.com/"
+    },
+    {
+      "label": "iOS App",
+      "url": "https://apps.apple.com/cn/app/fof-pro/id1633056491"
+    },
+    {
+      "label": "投研模板文档",
+      "url": "https://docs.qq.com/doc/DQWRqWUpXZ2xUbnFs"
+    },
+    {
+      "label": "微信关注",
+      "text": "FOF PRO"
+    }
+  ]
+}

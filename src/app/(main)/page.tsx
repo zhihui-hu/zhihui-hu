@@ -1,6 +1,7 @@
 import { BlogPosts } from '@/components/blog/posts';
 import { SectionHeader } from '@/components/home/section-header';
 import { ProjectGrid } from '@/components/projects/project-card';
+import { ROUTE_LIST_NAVIGATION_TRANSITION } from '@/components/route-view-transitions';
 import { Button } from '@/components/ui/button';
 import { formatBlogRelativeDate, getBlogPosts } from '@/lib/blog';
 import { getProjects } from '@/lib/projects';
@@ -62,16 +63,24 @@ export default function Page() {
       {/* ── Latest Posts ──────────────────────────────────── */}
       <section className="container mx-auto w-full px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
         <div className="flex flex-col gap-6">
-          <SectionHeader href="/blog" title="最新文章" />
-          <BlogPosts limit={5} posts={posts} />
+          <SectionHeader
+            href="/blog"
+            title="最新文章"
+            transitionTypes={[ROUTE_LIST_NAVIGATION_TRANSITION]}
+          />
+          <BlogPosts enableNativeTransition limit={5} posts={posts} />
         </div>
       </section>
 
       {/* ── Latest Projects ──────────────────────────────── */}
       <section className="container mx-auto w-full px-4 pb-16 pt-4 sm:px-6 sm:pb-20 lg:px-8">
         <div className="flex flex-col gap-6">
-          <SectionHeader href="/projects" title="最新作品" />
-          <ProjectGrid projects={projects} />
+          <SectionHeader
+            href="/projects"
+            title="最新作品"
+            transitionTypes={[ROUTE_LIST_NAVIGATION_TRANSITION]}
+          />
+          <ProjectGrid enableNativeTransition projects={projects} />
         </div>
       </section>
     </>

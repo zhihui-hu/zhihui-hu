@@ -2,7 +2,6 @@
 
 import { BlogLink } from '@/components/blog/blog-link';
 import { BlogThemeToggle } from '@/components/blog/theme-toggle';
-import { BLOG_NAV_BACK_TRANSITION } from '@/components/blog/view-transitions';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 
@@ -19,7 +18,6 @@ const navItems: Array<{
   {
     href: '/blog',
     name: '博客',
-    transitionTypes: [BLOG_NAV_BACK_TRANSITION],
   },
   {
     href: '/projects',

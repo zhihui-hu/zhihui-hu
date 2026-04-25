@@ -1,24 +1,45 @@
 'use client';
 
+import { gsap } from 'gsap';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
-const COMPLETE_ANIMATION_MS = 320;
-const RESET_DELAY_MS = 140;
 const LOADING_MAX_PROGRESS = 0.96;
+
+const NAVIGATION_PROGRESS_CSS = `
+  [data-navigation-progress='container'] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 99999;
+    height: 2.5px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-1px);
+  }
+
+  [data-navigation-progress='bar'] {
+    height: 100%;
+    width: 100%;
+    background: var(--foreground);
+    transform-origin: left center;
+    transform: scaleX(0) translateZ(0);
+    border-radius: 0 999px 999px 0;
+    box-shadow: 0 0 8px color-mix(in oklab, var(--foreground) 30%, transparent);
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+`;
 
 type ProgressState = 'idle' | 'loading' | 'complete';
 
-function easeOutCubic(value: number) {
-  return 1 - (1 - value) ** 3;
+function NavigationProgressStyles() {
+  return <style>{NAVIGATION_PROGRESS_CSS}</style>;
 }
 
-function easeOutQuart(value: number) {
-  return 1 - (1 - value) ** 4;
-}
-
-function lerp(from: number, to: number, progress: number) {
-  return from + (to - from) * progress;
+function prefersReducedMotion() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
 /**
@@ -31,68 +52,74 @@ function lerp(from: number, to: number, progress: number) {
 export function NavigationProgress() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [state, setState] = useState<ProgressState>('idle');
+  const containerRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef(0);
   const stateRef = useRef<ProgressState>('idle');
-  const loadingFrameRef = useRef<number | undefined>(undefined);
-  const loadingStartTimeRef = useRef<number | undefined>(undefined);
-  const loadingFromRef = useRef(0);
-  const completeRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined,
-  );
-  const resetRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const loadingTimelineRef = useRef<
+    ReturnType<typeof gsap.timeline> | undefined
+  >(undefined);
+  const completionTimelineRef = useRef<
+    ReturnType<typeof gsap.timeline> | undefined
+  >(undefined);
   const search = searchParams.toString();
   const routeKey = search ? `${pathname}?${search}` : pathname;
   const prevRouteRef = useRef(routeKey);
 
   const commitState = useCallback((nextState: ProgressState) => {
     stateRef.current = nextState;
-    setState(nextState);
+    containerRef.current?.setAttribute('data-state', nextState);
   }, []);
 
-  const writeProgress = useCallback((nextProgress: number) => {
-    progressRef.current = nextProgress;
-    barRef.current?.style.setProperty(
-      'transform',
-      `scaleX(${nextProgress.toFixed(4)})`,
-    );
-  }, []);
+  const syncProgressFromBar = useCallback(() => {
+    const bar = barRef.current;
 
-  const commitProgress = useCallback(
-    (nextProgress: number | ((currentProgress: number) => number)) => {
-      const resolvedProgress = Math.max(
-        0,
-        Math.min(
-          1,
-          typeof nextProgress === 'function'
-            ? nextProgress(progressRef.current)
-            : nextProgress,
-        ),
-      );
-
-      writeProgress(resolvedProgress);
-    },
-    [writeProgress],
-  );
-
-  const clearProgressAnimation = useCallback(() => {
-    if (loadingFrameRef.current !== undefined) {
-      cancelAnimationFrame(loadingFrameRef.current);
+    if (!bar) {
+      return;
     }
 
-    loadingFrameRef.current = undefined;
-    loadingStartTimeRef.current = undefined;
-    loadingFromRef.current = progressRef.current;
+    const scaleX = Number(gsap.getProperty(bar, 'scaleX'));
+
+    if (Number.isFinite(scaleX)) {
+      progressRef.current = Math.max(0, Math.min(1, scaleX));
+    }
   }, []);
 
-  const clearCompletionTimers = useCallback(() => {
-    clearTimeout(completeRef.current);
-    clearTimeout(resetRef.current);
+  const commitProgress = useCallback((nextProgress: number) => {
+    const resolvedProgress = Math.max(0, Math.min(1, nextProgress));
+
+    progressRef.current = resolvedProgress;
+    gsap.set(barRef.current, {
+      force3D: true,
+      scaleX: resolvedProgress,
+    });
   }, []);
+
+  const clearProgressAnimation = useCallback(() => {
+    syncProgressFromBar();
+    loadingTimelineRef.current?.kill();
+    completionTimelineRef.current?.kill();
+
+    loadingTimelineRef.current = undefined;
+    completionTimelineRef.current = undefined;
+
+    const targets = [containerRef.current, barRef.current].filter(
+      (target): target is HTMLDivElement => Boolean(target),
+    );
+
+    if (targets.length > 0) {
+      gsap.killTweensOf(targets);
+    }
+  }, [syncProgressFromBar]);
 
   const start = useCallback(() => {
-    clearCompletionTimers();
+    const container = containerRef.current;
+    const bar = barRef.current;
+
+    if (!container || !bar) {
+      return;
+    }
+
     clearProgressAnimation();
 
     const shouldRestart =
@@ -102,71 +129,125 @@ export function NavigationProgress() {
       commitProgress(0);
     }
 
-    loadingFromRef.current = progressRef.current;
     commitState('loading');
+    gsap.set(container, {
+      autoAlpha: 1,
+      y: 0,
+    });
+    gsap.set(bar, {
+      force3D: true,
+      transformOrigin: 'left center',
+    });
 
-    function animateLoadingFrame(timestamp: number) {
-      if (stateRef.current !== 'loading') {
-        clearProgressAnimation();
-        return;
-      }
-
-      const startTime = loadingStartTimeRef.current ?? timestamp;
-
-      loadingStartTimeRef.current = startTime;
-      const elapsed = timestamp - startTime;
-      const from = loadingFromRef.current;
-
-      let nextProgress: number;
-
-      if (elapsed < 180) {
-        nextProgress = lerp(from, 0.2, easeOutQuart(elapsed / 180));
-      } else if (elapsed < 760) {
-        nextProgress = lerp(0.2, 0.72, easeOutCubic((elapsed - 180) / 580));
-      } else if (elapsed < 1500) {
-        nextProgress = lerp(0.72, 0.88, easeOutCubic((elapsed - 760) / 740));
-      } else {
-        const tailElapsed = elapsed - 1500;
-        nextProgress =
-          0.88 + 0.08 * (1 - Math.exp(-Math.max(0, tailElapsed) / 1600));
-      }
-
-      commitProgress((currentProgress) =>
-        Math.max(currentProgress, Math.min(LOADING_MAX_PROGRESS, nextProgress)),
-      );
-
-      loadingFrameRef.current = requestAnimationFrame(animateLoadingFrame);
+    if (prefersReducedMotion()) {
+      commitProgress(Math.max(progressRef.current, 0.72));
+      return;
     }
 
-    loadingFrameRef.current = requestAnimationFrame(animateLoadingFrame);
+    const kickTarget = Math.min(
+      LOADING_MAX_PROGRESS,
+      Math.max(0.28, progressRef.current + 0.18),
+    );
+    const settleTarget = Math.min(
+      LOADING_MAX_PROGRESS,
+      Math.max(0.72, kickTarget),
+    );
+
+    loadingTimelineRef.current = gsap
+      .timeline({
+        defaults: {
+          overwrite: 'auto',
+        },
+        onUpdate: syncProgressFromBar,
+      })
+      .to(bar, {
+        duration: 0.18,
+        ease: 'power4.out',
+        scaleX: kickTarget,
+      })
+      .to(bar, {
+        duration: 0.58,
+        ease: 'power3.out',
+        scaleX: settleTarget,
+      })
+      .to(bar, {
+        duration: 8,
+        ease: 'power1.out',
+        scaleX: LOADING_MAX_PROGRESS,
+      });
   }, [
-    clearCompletionTimers,
     clearProgressAnimation,
     commitProgress,
     commitState,
+    syncProgressFromBar,
   ]);
 
   const done = useCallback(() => {
+    const container = containerRef.current;
+    const bar = barRef.current;
+
+    if (!container || !bar) {
+      return;
+    }
+
     if (stateRef.current === 'idle' && progressRef.current === 0) {
       return;
     }
 
     clearProgressAnimation();
-    clearCompletionTimers();
     commitState('complete');
-    commitProgress(1);
+    gsap.set(container, {
+      autoAlpha: 1,
+      y: 0,
+    });
 
-    completeRef.current = setTimeout(() => {
+    if (prefersReducedMotion()) {
+      commitProgress(1);
       commitState('idle');
-      resetRef.current = setTimeout(() => {
-        commitProgress(0);
-      }, RESET_DELAY_MS);
-    }, COMPLETE_ANIMATION_MS);
+      commitProgress(0);
+      gsap.set(container, {
+        autoAlpha: 0,
+        y: -1,
+      });
+      return;
+    }
+
+    completionTimelineRef.current = gsap
+      .timeline({
+        defaults: {
+          overwrite: 'auto',
+        },
+        onComplete: () => {
+          commitState('idle');
+          commitProgress(0);
+          gsap.set(container, {
+            autoAlpha: 0,
+            y: -1,
+          });
+          completionTimelineRef.current = undefined;
+        },
+        onUpdate: syncProgressFromBar,
+      })
+      .to(bar, {
+        duration: 0.26,
+        ease: 'power3.out',
+        scaleX: 1,
+      })
+      .to(
+        container,
+        {
+          autoAlpha: 0,
+          duration: 0.18,
+          ease: 'power2.out',
+          y: -1,
+        },
+        '>-0.04',
+      );
   }, [
-    clearCompletionTimers,
     clearProgressAnimation,
     commitProgress,
     commitState,
+    syncProgressFromBar,
   ]);
 
   // Complete progress when the current route changes.
@@ -241,23 +322,36 @@ export function NavigationProgress() {
   }, [start]);
 
   useEffect(() => {
+    gsap.set(containerRef.current, {
+      autoAlpha: 0,
+      y: -1,
+    });
+    gsap.set(barRef.current, {
+      force3D: true,
+      scaleX: 0,
+      transformOrigin: 'left center',
+    });
+
     return () => {
       clearProgressAnimation();
-      clearCompletionTimers();
     };
-  }, [clearCompletionTimers, clearProgressAnimation]);
+  }, [clearProgressAnimation]);
 
   return (
-    <div
-      aria-hidden="true"
-      className="nav-progress-container"
-      data-state={state}
-    >
+    <>
+      <NavigationProgressStyles />
       <div
-        ref={barRef}
-        className="nav-progress-bar"
-        style={{ transform: 'scaleX(0)' }}
-      />
-    </div>
+        aria-hidden="true"
+        ref={containerRef}
+        data-navigation-progress="container"
+        data-state="idle"
+      >
+        <div
+          ref={barRef}
+          data-navigation-progress="bar"
+          style={{ transform: 'scaleX(0)' }}
+        />
+      </div>
+    </>
   );
 }

@@ -6,7 +6,6 @@ import { BlogRenderIssue } from '@/components/blog/render-issue';
 import { ShareBar } from '@/components/blog/share-bar';
 import { TableOfContents } from '@/components/blog/table-of-contents';
 import { parseToc } from '@/components/blog/toc';
-import { BlogPageTransition } from '@/components/blog/view-transitions';
 import { StructuredData } from '@/components/structured-data';
 import { getBlogPostBySlug, getBlogPosts } from '@/lib/blog';
 import { cn } from '@/lib/utils';
@@ -116,39 +115,34 @@ export default async function BlogPostPage(props: PageProps<'/blog/[slug]'>) {
   };
 
   return (
-    <BlogPageTransition>
-      <section className="container mx-auto w-full px-4 sm:px-6 lg:px-8">
-        <StructuredData data={jsonLd} id={`blog-post-jsonld-${post.slug}`} />
-        <div
-          className={cn(
-            hasToc &&
-              'flex flex-col gap-8 xl:grid xl:grid-cols-[minmax(0,1fr)_18rem] xl:gap-12',
-          )}
-        >
-          {hasToc && (
-            <aside className="order-1 hidden xl:order-2 xl:block">
-              <div className="xl:sticky xl:top-(--blog-sticky-offset) xl:max-h-(--blog-sticky-max-height) xl:overflow-y-auto xl:pb-8">
-                <TableOfContents
-                  content={post.content}
-                  initialItems={tocItems}
-                />
-              </div>
-            </aside>
-          )}
+    <section className="container mx-auto w-full px-4 sm:px-6 lg:px-8">
+      <StructuredData data={jsonLd} id={`blog-post-jsonld-${post.slug}`} />
+      <div
+        className={cn(
+          hasToc &&
+            'flex flex-col gap-8 xl:grid xl:grid-cols-[minmax(0,1fr)_18rem] xl:gap-12',
+        )}
+      >
+        {hasToc && (
+          <aside className="order-1 hidden xl:order-2 xl:block">
+            <div className="xl:sticky xl:top-(--blog-sticky-offset) xl:max-h-(--blog-sticky-max-height) xl:overflow-y-auto xl:pb-8">
+              <TableOfContents content={post.content} initialItems={tocItems} />
+            </div>
+          </aside>
+        )}
 
-          <div className={cn('min-w-0 w-full', hasToc && 'order-2 xl:order-1')}>
-            <PostHeader post={post} />
-            <MarkdownBody>
-              {renderedPost.issue ? (
-                <BlogRenderIssue issue={renderedPost.issue} />
-              ) : (
-                renderedPost.content
-              )}
-            </MarkdownBody>
-            <ShareBar title={post.metadata.title} url={articleUrl} />
-          </div>
+        <div className={cn('min-w-0 w-full', hasToc && 'order-2 xl:order-1')}>
+          <PostHeader post={post} />
+          <MarkdownBody>
+            {renderedPost.issue ? (
+              <BlogRenderIssue issue={renderedPost.issue} />
+            ) : (
+              renderedPost.content
+            )}
+          </MarkdownBody>
+          <ShareBar title={post.metadata.title} url={articleUrl} />
         </div>
-      </section>
-    </BlogPageTransition>
+      </div>
+    </section>
   );
 }

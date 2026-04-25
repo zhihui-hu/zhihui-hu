@@ -1,0 +1,112 @@
+{
+  "sortOrder": 5,
+  "slug": "table-au-fe",
+  "name": "FOF PRO（投研模版）",
+  "route": "/products/table-au-fe",
+  "logo": "https://img.huzhihui.com/uploads/2026/04/400x400ia-75_dhynvn5kvzsx.jpg",
+  "overview": "FOF PRO（投研模版）是面向金融机构投研场景的图表与表格模版库。项目基于 `Vue 3 + Vite + TypeScript` 搭建，将公募基金、基金经理、基金公司、公募市场、宏观经济与私募市场等研究主题抽象成 200 多个可配置模版，并集成 AI 图表总结能力：每个模版都沉淀图表说明、参数结构、接口编码和提示词语料，为后续直接对接 AI 生成图表打下基础。",
+  "tags": ["投研模版", "AI 图表总结", "金融数据可视化", "ECharts"],
+  "urls": {
+    "official": "https://qutke.com/"
+  },
+  "companyName": "况客科技（北京）有限公司",
+  "startDate": "2022-11-04",
+  "ongoing": true,
+  "ageRating": "18+",
+  "category": "财务",
+  "industry": "金融科技",
+  "family": {
+    "key": "fof-pro",
+    "title": "FOF PRO",
+    "description": "同一套金融投研产品矩阵下的 App、Web、微信小程序与投研模版系统。",
+    "sortOrder": 2,
+    "variantLabel": "投研模版",
+    "variantOrder": 4
+  },
+  "categories": ["金融投研工具", "数据可视化模版库", "Web 系统"],
+  "platforms": ["Web 平台", "iframe 嵌入"],
+  "langs": ["中文简体", "英语"],
+  "price": "内部系统",
+  "headline": "把基金、基金经理、基金公司、市场与宏观研究中的高频图表沉淀为模版库，并给每个模版补齐可被 AI 理解的说明、参数、接口和提示词语料，让投研人员今天能一键生成图表与总结，后续也能自然演进到 AI 直接生成图表。",
+  "introduction": [
+    "这个项目本质上是在把投研团队常用的研究方法产品化。系统不是只展示几个固定图表，而是把基金业绩、回撤、排名、资产配置、持仓分析、基金经理画像、基金公司研究、宏观经济和私募市场等内容拆成模版目录，再由前端根据模版元数据动态注入路由和页面。",
+    "项目难点在于它同时是数据工具、图表编辑器、投研说明文档库和 AI 语料库。每个模版都有自己的数据参数、图表参数、接口编码、图表说明、导出逻辑和状态缓存，数量一多以后，真正要解决的是“如何让 200 多个模版持续新增但不失控”。",
+    "对研究员来说，核心体验是“选择模版 -> 配置数据参数 -> 调整图表样式 -> 查看图表说明 -> AI 总结图表 -> 复制图片或导出数据”。所以这个系统既要像数据工具一样稳定，又要像图表编辑器一样灵活，还要能嵌入到其他业务系统里被调用。",
+    "项目从 2022 年开始持续迭代，模版规模已经扩展到 200 多个叶子模版。它支撑的不只是单基金分析，还包括基金经理、基金公司、公募市场、宏观经济、私募市场等多条研究线，属于 FOF PRO 体系中很核心的投研生产力模块。"
+  ],
+  "summary": [
+    "工程底座采用 `Vue 3 + TypeScript + Vite + Pinia + Element Plus`。我把模版系统拆成三层：左侧模版树负责检索和导航，中间模版渲染区负责按当前组件加载图表或表格，右侧配置面板负责动态挂载 `data-config` 与 `chart-config`，让每个模版都能独立维护数据参数、图表参数和状态。",
+    "第一个难点是模版规模和可维护性。模版路由不是硬编码出来的，启动时系统先拉取 `/fas/dict/template/tree`，再遍历叶子节点，根据 `componentName` 动态注册路由并懒加载 `src/views/templates/<template>/index.vue`。开发环境则读取 `bin/output/template-dev.json`，保证本地调试和线上模版树可以保持同一套结构。",
+    "第二个难点是参数和接口体系的统一。每个模版从后台元数据中拿到相关 `apiInfoCode`，再通过 `/tableau/apiInfoCode/<code>/v1/` 请求绘图数据；基金、基金经理、基金类型、基金公司和日期等通用参数集中在 Pinia store 中初始化和缓存，避免模版之间重复拉取基础数据，也让模版切换时可以继承通用查询上下文。",
+    "第三个难点是“配置足够自由，但实现不能散”。图表侧基于 ECharts 建了一套基础组件体系，包括折线图、柱状图、饼图、雷达图、散点图、箱线图、热力图、关系图和仪表盘等。模版还配有标题、背景、水印、字体、线条、表格样式、横纵轴和颜色配置组件，能覆盖投研报告里常见的可视化微调需求。",
+    "导出链路是这个项目里很实用的一块。我在模版操作栏里做了重置、复制数据、复制图片、下载 CSV / JSON / Excel、下载 PNG / SVG / JPEG 等动作，并通过 `dom-to-image`、`xlsx`、`file-saver`、`html2pdf.js` 等能力，把页面图表真正变成可以进入研报和汇报材料的资产。",
+    "AI 总结功能是后续迭代中的关键升级。我接入了基于 `@microsoft/fetch-event-source` 的 SSE 流式解读链路，前端会把当前图表截图、用户选择的提示词、模版自身补充的 prompt 和必要的数据语料一起提交给 AI，总结结果再以流式内容回填到页面，让研究员可以直接拿到图表解读初稿。",
+    "更重要的是，每个模版都在给 AI 做语料沉淀：图表说明、指标口径、参数结构、接口编码、返回数据、标题配置和 prompt 都逐步结构化。这样系统不只是“用 AI 总结已有图表”，而是在为下一阶段“用户说需求 -> AI 选择模版 -> 自动组装参数 -> 生成图表和解读”准备上下文。",
+    "后续迭代中系统还加入了 `iframe` 模式、模版参数从 URL 注入、sessionStorage 按日期缓存模版状态、版本轮询更新提示、说明文档 PDF 下载和视频说明弹窗。对我来说，这个项目的价值在于它把零散的金融图表开发沉淀成了可扩展的模版生产线，同时也把投研知识逐步沉淀成可被 AI 调用的结构化资产。"
+  ],
+  "techStack": [
+    "Vue 3",
+    "TypeScript",
+    "Vite",
+    "Pinia",
+    "Element Plus",
+    "Vue Router 4",
+    "Vue I18n",
+    "ECharts",
+    "Tailwind CSS",
+    "Axios / Fetch",
+    "@microsoft/fetch-event-source",
+    "dom-to-image",
+    "xlsx",
+    "file-saver",
+    "html2pdf.js",
+    "markdown-it",
+    "AI 图表总结",
+    "Prompt 语料沉淀",
+    "version-polling",
+    "动态路由与模版懒加载",
+    "iframe 参数注入"
+  ],
+  "resources": [
+    {
+      "label": "模版规模",
+      "text": "213 个图表/表格模版"
+    },
+    {
+      "label": "AI 能力",
+      "text": "图表截图 + 模版语料 + 提示词 + SSE 流式总结"
+    },
+    {
+      "label": "后续方向",
+      "text": "基于模版语料直接对接 AI 生成图表"
+    },
+    {
+      "label": "模版文档",
+      "url": "https://docs.qq.com/doc/DQWRqWUpXZ2xUbnFs"
+    },
+    {
+      "label": "主要模版域",
+      "text": "公募基金、基金经理、基金公司、公募市场、宏观经济、私募市场"
+    }
+  ],
+  "screenshots": [
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/04/image_1yovmeenpnio1.png"
+    },
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/04/image_t5u8bos28ab1.png"
+    },
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/04/image_2ani80uiaxxdy.png"
+    },
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/04/image_14dzefplruefw.png"
+    },
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/04/image_7azgotxyndlt.png"
+    },
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/04/image_38292y1106fbm.png"
+    }
+  ]
+}

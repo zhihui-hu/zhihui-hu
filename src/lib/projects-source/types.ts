@@ -22,6 +22,15 @@ export type ProjectSourceUrls = {
   mp?: string;
 };
 
+export type ProjectSourceFamily = {
+  key: string;
+  title: string;
+  description?: string;
+  sortOrder?: number;
+  variantLabel?: string;
+  variantOrder?: number;
+};
+
 export type ProjectSource = {
   sortOrder?: number;
   slug: string;
@@ -40,6 +49,7 @@ export type ProjectSource = {
   ageRating?: string;
   category?: string;
   industry?: string;
+  family?: ProjectSourceFamily;
   categories?: string[];
   platforms?: string[];
   langs?: string[];

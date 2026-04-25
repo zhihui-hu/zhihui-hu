@@ -1,0 +1,89 @@
+{
+  "sortOrder": 11,
+  "slug": "nsd-ai-miniapp",
+  "name": "企业家 AI 启航（小程序 + H5 平台）",
+  "route": "/products/nsd-ai-miniapp",
+  "logo": "https://img.huzhihui.com/uploads/2026/04/1024x1024_2oz9pzy3fpkfg.png",
+  "overview": "企业家 AI 启航是为清华大学国发院培训项目搭建的微信小程序与 H5 学习平台。小程序端基于 `uni-app + Vue 3`，负责开屏引导、微信登录、Token 注入、手机号授权和协议页承载；`web-view` 内部接入 `React + TypeScript + Vite` 平台，覆盖首页、课程、活动、社区、消息群聊、个人中心和报名注册等培训全流程。",
+  "tags": ["微信小程序", "React", "高校培训", "WebView"],
+  "urls": {
+    "official": "https://nsd.shuyouyinli.cn",
+    "mp": " https://img.huzhihui.com/uploads/2026/04/gh_27a7ac8cf828_1280_1k90enpqc9jqn.jpg"
+  },
+  "companyName": "清华大学国发院（培训项目）",
+  "startDate": "2025-07",
+  "endDate": "2025-08",
+  "ageRating": "4+",
+  "category": "教育",
+  "industry": "教育科技 / 高校培训",
+  "family": {
+    "key": "nsd-ai-plan",
+    "title": "国发院 AI 计划",
+    "description": "面向企业家 AI 培训场景的小程序入口、H5 学习平台与社群互动系统。",
+    "sortOrder": 6,
+    "variantLabel": "微信小程序",
+    "variantOrder": 1
+  },
+  "categories": ["高校培训平台", "微信小程序", "H5 学习平台"],
+  "platforms": ["微信小程序", "H5", "移动 Web"],
+  "langs": ["中文简体"],
+  "price": "内部培训项目",
+  "headline": "为国发院企业家 AI 培训搭建一套微信内完整学习入口：小程序负责登录授权和 WebView 桥接，React H5 平台负责课程、活动、社区、IM、个人中心与报名注册，让培训运营可以在微信生态里闭环。",
+  "introduction": [
+    "这个项目实际由两部分组成：外层是企业家 AI 启航微信小程序，内层是被 `web-view` 承载的培训 H5 平台。小程序负责微信生态的入口能力，H5 则承担真正的官网展示、课程学习、活动运营和社群互动。",
+    "我没有把课程体系、报名页、社区、消息和个人中心全部写死在小程序里，而是采用“小程序壳 + React H5 平台”的方式拆开。这样小程序可以保持轻量，培训内容和运营页面也能通过 Web 侧快速调整。",
+    "对培训项目来说，这个拆法更贴近实际运营：学员从微信进入，先看到品牌化开屏页，再完成微信登录和授权，然后进入 H5 平台浏览课程、查看活动、参与社区和消息互动。入口像小程序，内容迭代像 Web。"
+  ],
+  "summary": [
+    "小程序工程采用 `uni-app + Vue 3`，配合 Vite、Pinia 和 UnoCSS 搭建。页面边界很明确：`splash` 做品牌开屏与上滑进入，`index` 做微信登录和主 H5 承载，`login` 负责手机号授权，`view` 专门承载隐私政策和用户协议。",
+    "登录链路是小程序和 H5 能打通的关键。我在首页通过 `uni.login` 获取微信 code，再调用 `/user/api/auth/wechat-login` 换取业务 Token，并写入本地存储。随后把 Token 拼到 `VITE_APP_WEB_URL`，让 WebView 内的 H5 平台拿到同一套登录上下文，避免用户在微信和 Web 之间重复登录。",
+    "手机号授权单独放在 `pages/login/index.vue` 中处理，通过微信 `getPhoneNumber` 能力获取授权 code，再调用 `/user/api/info/phone` 完成绑定。这里还补了协议勾选、跳过授权、授权失败提示和重新进入首页等状态，让培训类项目常见的合规入口不显得生硬。",
+    "WebView 内部的 H5 平台使用 `React 18 + TypeScript + Vite` 开发，路由通过 `react-router-dom` 统一配置，页面覆盖首页、新闻、AI Agent 大赛、课程中心、课程详情、活动、社区、私信消息、班级通知、个人中心、教师/学生/校友档案、报名和注册等模块。它不是一个静态官网，而是完整的移动学习平台。",
+    "H5 侧的数据和状态管理拆得比较清楚：`@tanstack/react-query` 负责服务端数据请求与缓存，`Zustand` 管理认证、用户与 IM 状态，统一 request 层处理 Bearer Token、401 清理登录态和业务错误提示。课程、活动、个人档案、报名材料上传这类页面都可以接 API 独立迭代。",
+    "社群互动是 H5 平台里比较重的一块。我接入了腾讯云 IM SDK，处理会话列表、单聊/群聊、班级群、系统通知、课程卡片分享、教师名片分享、图片/语音/视频消息和发送状态提示。对培训项目来说，这让“上课前报名、上课中互动、上课后社群沉淀”能留在同一个入口里。",
+    "开屏页是这个项目里比较有记忆点的一段交互。我做了全屏背景、粒子效果、上滑进度、触觉反馈和退出动画，把“进入培训项目”的动作处理得更像一个正式活动入口，而不是普通 H5 跳转页。",
+    "最终这套系统不是一个单薄的 WebView 套壳。小程序负责微信授权、更新检测、协议页、品牌开场和容器桥接；H5 平台负责课程内容、报名转化、学习管理和社群运营。两边分工清楚，既能满足微信入口的稳定性，也保留了培训项目后续快速运营的空间。"
+  ],
+  "techStack": [
+    "uni-app",
+    "Vue 3",
+    "Vite",
+    "Pinia",
+    "UnoCSS",
+    "@uni-helper/uni-network",
+    "React 18",
+    "TypeScript",
+    "React Router",
+    "@tanstack/react-query",
+    "Zustand",
+    "Tailwind CSS",
+    "Radix UI / shadcn-style components",
+    "Tencent Cloud Chat SDK",
+    "微信小程序登录 (uni.login)",
+    "手机号授权 (getPhoneNumber)",
+    "web-view H5 容器",
+    "Token 注入与请求拦截",
+    "小程序更新管理",
+    "协议页 WebView 承载"
+  ],
+  "screenshots": [
+    {
+      "image": " https://img.huzhihui.com/uploads/2026/04/IMG_0760_2ipaonv5397u.png"
+    },
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/04/IMG_0754_di23az4hi4u6.png"
+    },
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/04/IMG_0755_227gxvyl1cdpu.png"
+    },
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/04/IMG_0757_2xaz5qoch94rp.png"
+    },
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/04/IMG_0760_2ipaonv5397u.png"
+    },
+    {
+      "image": " https://img.huzhihui.com/uploads/2026/04/IMG_0761_2i78ps9tnndtu.png"
+    }
+  ]
+}

@@ -1,6 +1,5 @@
 import pkg from '@/../package.json';
 import { BlogPosts } from '@/components/blog/posts';
-import { BlogPageTransition } from '@/components/blog/view-transitions';
 import { formatBlogRelativeDate, getBlogPosts } from '@/lib/blog';
 import type { Metadata } from 'next';
 
@@ -36,13 +35,13 @@ export default function BlogPage() {
   }));
 
   return (
-    <BlogPageTransition>
+    <>
       {/* <h1 className="text-3xl font-semibold tracking-tight text-foreground mb-2">
         博客
       </h1> */}
       <section className="container mx-auto px-4 py-2 sm:px-6 lg:px-8">
-        <BlogPosts posts={posts} />
+        <BlogPosts enableNativeTransition posts={posts} />
       </section>
-    </BlogPageTransition>
+    </>
   );
 }

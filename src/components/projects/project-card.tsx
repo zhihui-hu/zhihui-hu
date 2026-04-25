@@ -1,5 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
-import type { Project } from '@/lib/projects';
+import {
+  SharedElementTransition,
+  getSharedMediaTransitionName,
+  getSharedTitleTransitionName,
+} from '@/components/route-view-transitions';
+import type { Project, ProjectGroup } from '@/lib/projects';
 import Link from 'next/link';
 
 import { Badge } from '../ui/badge';
@@ -7,24 +12,41 @@ import { ProjectCardDescription } from './project-card-description';
 
 type ProjectCardProps = {
   project: Project;
+  enableNativeTransition?: boolean;
 };
 
-export function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({
+  project,
+  enableNativeTransition = false,
+}: ProjectCardProps) {
+  const variantLabel = project.family?.variantLabel;
+  const logo = project.logo ? (
+    <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-[22%] border border-border/60 bg-background shadow-sm">
+      <img
+        alt={`${project.name} logo`}
+        className="size-16 object-cover"
+        src={project.logo}
+      />
+    </div>
+  ) : (
+    <div className="flex size-14 shrink-0 items-center justify-center rounded-[22%] border border-border/60 bg-muted text-base font-semibold text-foreground shadow-sm">
+      {project.name.slice(0, 1).toUpperCase()}
+    </div>
+  );
+  const title = <span className="underline-hover">{project.name}</span>;
+
   return (
     <div className="group relative flex flex-col gap-4 rounded-[1.4rem]  bg-card/50 p-5 transition-all duration-200 hover:bg-card/80">
       <div className="flex items-center gap-4">
-        {project.logo ? (
-          <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-[22%] border border-border/60 bg-background shadow-sm">
-            <img
-              alt={`${project.name} logo`}
-              className="size-16 object-cover"
-              src={project.logo}
-            />
-          </div>
+        {enableNativeTransition ? (
+          <SharedElementTransition
+            name={getSharedMediaTransitionName('project', project.slug)}
+            share="route-shared-media"
+          >
+            {logo}
+          </SharedElementTransition>
         ) : (
-          <div className="flex size-14 shrink-0 items-center justify-center rounded-[22%] border border-border/60 bg-muted text-base font-semibold text-foreground shadow-sm">
-            {project.name.slice(0, 1).toUpperCase()}
-          </div>
+          logo
         )}
 
         <div className="min-w-0 flex-1">
@@ -33,12 +55,27 @@ export function ProjectCard({ project }: ProjectCardProps) {
               className="min-w-0 flex-1 text-lg font-bold leading-tight tracking-[-0.02em] text-foreground transition-colors hover:text-primary"
               href={project.route}
             >
-              <span className="underline-hover">{project.name}</span>
+              {enableNativeTransition ? (
+                <SharedElementTransition
+                  name={getSharedTitleTransitionName('project', project.slug)}
+                >
+                  {title}
+                </SharedElementTransition>
+              ) : (
+                title
+              )}
             </Link>
-            {project.timeLabel && (
-              <span className="text-[0.72rem] leading-5 text-muted-foreground sm:shrink-0 sm:pt-0.5">
-                {project.timeLabel}
-              </span>
+            {(variantLabel || project.timeLabel) && (
+              <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end sm:pt-0.5">
+                {variantLabel && (
+                  <Badge variant="secondary">{variantLabel}</Badge>
+                )}
+                {project.timeLabel && (
+                  <span className="text-[0.72rem] leading-5 text-muted-foreground">
+                    {project.timeLabel}
+                  </span>
+                )}
+              </div>
             )}
           </div>
           {project.companyName && (
@@ -65,14 +102,70 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
 type ProjectGridProps = {
   projects: Project[];
+  enableNativeTransition?: boolean;
 };
 
-export function ProjectGrid({ projects }: ProjectGridProps) {
+export function ProjectGrid({
+  projects,
+  enableNativeTransition = false,
+}: ProjectGridProps) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {projects.map((project) => (
-        <ProjectCard key={project.slug} project={project} />
+        <ProjectCard
+          enableNativeTransition={enableNativeTransition}
+          key={project.slug}
+          project={project}
+        />
       ))}
+    </div>
+  );
+}
+
+type ProjectGroupListProps = {
+  groups: ProjectGroup[];
+  enableNativeTransition?: boolean;
+};
+
+export function ProjectGroupList({
+  groups,
+  enableNativeTransition = false,
+}: ProjectGroupListProps) {
+  return (
+    <div className="flex flex-col gap-9 sm:gap-11">
+      {groups.map((group) => {
+        const headingId = `project-group-${group.key}`;
+
+        return (
+          <section
+            aria-labelledby={headingId}
+            className="flex flex-col gap-4"
+            key={group.key}
+          >
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div className="flex flex-col gap-1.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2
+                    className="font-heading text-2xl font-semibold tracking-tight text-foreground"
+                    id={headingId}
+                  >
+                    {group.title}
+                  </h2>
+                </div>
+                {group.description && (
+                  <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
+                    {group.description}
+                  </p>
+                )}
+              </div>
+            </div>
+            <ProjectGrid
+              enableNativeTransition={enableNativeTransition}
+              projects={group.projects}
+            />
+          </section>
+        );
+      })}
     </div>
   );
 }

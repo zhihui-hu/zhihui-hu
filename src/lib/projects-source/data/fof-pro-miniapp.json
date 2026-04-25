@@ -1,0 +1,75 @@
+{
+  "sortOrder": 6,
+  "slug": "fof-pro-miniapp",
+  "name": "FOF PRO（小程序端）",
+  "route": "/products/fof-pro",
+  "logo": "https://img.huzhihui.com/uploads/2026/04/fof-pro-logo_dhxzck5wom6g.png",
+  "overview": "FOF PRO 微信小程序端基于 `uni-app + Vue 2 + Vuex` 搭建，承接基金、组合、基金圈与 Copilot/ETF 投顾等移动投研场景。相比 App，它更强调微信内的轻量触达：通过多子包、组件按需加载、分享态恢复和 `web-view` 混合承载，把重度金融能力拆成可快速打开、可转发沉淀的投研卡片与工具页。",
+  "tags": ["微信小程序", "uni-app", "分包优化", "基金圈分享"],
+  "urls": {
+    "official": "https://qutke.com/",
+    "mp": "https://img.huzhihui.com/uploads/2026/04/IMG_4486_dhynvy1hhqml.jpg"
+  },
+  "companyName": "况客科技（北京）有限公司",
+  "startDate": "2020-01-14",
+  "ongoing": true,
+  "ageRating": "18+",
+  "category": "财务",
+  "industry": "金融科技",
+  "family": {
+    "key": "fof-pro",
+    "title": "FOF PRO",
+    "description": "同一套金融投研产品矩阵下的 App、Web 与微信小程序形态。",
+    "sortOrder": 2,
+    "variantLabel": "小程序",
+    "variantOrder": 3
+  },
+  "categories": ["投研工具", "微信小程序"],
+  "platforms": ["微信小程序"],
+  "langs": ["中文简体"],
+  "price": 0,
+  "headline": "在微信小程序包体与入口限制下，用 `uni-app` 单工程承载基金圈分享、组合/基金诊断、Copilot 与 ETF 投顾，让专业投研能力以轻量卡片和工具页的方式在微信内流转。",
+  "introduction": [
+    "FOF PRO 小程序端不是把 App 或 Web 简单缩小。它被放在微信场景里重新定义：用户可能从基金圈卡片、二维码、模板消息或 Copilot 分享进入，第一目标是快速打开内容、完成授权、继续浏览或转发，而不是在小屏里复刻完整桌面投研。",
+    "工程上，我继续沿用 `uni-app` 单工程基座，用 `Vue 2 + Vuex` 组织业务状态，并通过 `pages.json` 的多子包把基金、组合、自选、宏观、基金圈与用户体系拆开。`manifest.json` 中的小程序分包优化和 `lazyCodeLoading: requiredComponents` 则负责控制首包压力，让核心入口保持轻量。",
+    "体验设计的重点放在“分享之后还能顺畅走完”。我围绕 `shareKey/shareInfo` 打通卡片生成、点击回流、授权兜底、朋友圈单页模式和外部 H5 承载，让基金圈资源、Copilot/ETF 投顾报告、运营活动都能接上微信原生分享链路。"
+  ],
+  "summary": [
+    "小程序端的第一层挑战是包体与路由组织。我将首页、基金圈、我的、登录校验等核心入口留在主包，把基金公司/经理、基金详情与 PK、组合诊断与智能调仓、自选与相似基金、宏观与基金池、用户与分享等模块拆进 6 个 `subPackages`，让业务复杂度和启动成本分开处理。",
+    "微信端性能优化没有靠玄学堆参数，而是落在几个具体位置：`mp-weixin.optimization.subPackages` 打开分包优化，`lazyCodeLoading: requiredComponents` 延后组件注入，`easycom` 统一 uView 组件解析，再配合页面级分包把厚重投研功能从首包移出去。主包更像导航骨架，重业务按入口加载。",
+    "分享闭环是小程序最关键的一段。我在 Vuex 中维护 `shareKey/shareInfo`，分享时按资源生成 `shareKey`，回流时兼容普通路径参数、二维码 `q` 参数、模板消息参数和朋友圈 `scene=1154` 单页模式；同时通过 `shareClick` 和 `getShareInfoFromkey` 恢复资源上下文，处理分享取消、机构圈权限和未登录重定向。",
+    "`pages/login/check.vue` 承担了版本态登录网关的角色：通过 `/pro/app/upgrade/version` 读取当前小程序版本状态，已发布版本直接进入授权或首页，审核中的版本则展示账号密码与图形验证码登录。这样既不污染正式用户路径，也让审核、测试、兜底登录有清晰边界。",
+    "Copilot、ETF 投顾、尽职调查、运营海报等外部能力没有硬塞成原生页面，而是统一放进 `web-view` 容器。小程序侧负责 token、userId、safeAreaInsets、shareKey 等上下文拼装，H5 侧负责复杂交互和报告展示；原生层继续承接导航、登录、分享与朋友圈适配。",
+    "在基础工程层面，我统一封装了 HTTP 拦截器、Bearer Token 注入、403 重新登录、接口聚合与异常提示，并结合 `qiun-data-charts`、`z-paging`、`HM-dragSorts`、`uQRCode` 等 `uni_modules` 支撑图表、长列表、拖拽排序和二维码场景。最终的小程序不是 Web 端附属入口，而是微信生态里的轻量投研分发层。"
+  ],
+  "techStack": [
+    "uni-app (mp-weixin/App/H5)",
+    "Vue 2 & Vuex",
+    "uView UI",
+    "微信小程序 subPackages 分包",
+    "lazyCodeLoading: requiredComponents",
+    "Vuex 分享态管理 (shareKey/shareInfo)",
+    "微信分享/朋友圈单页模式适配",
+    "web-view 混合承载 Copilot/ETF 投顾",
+    "版本态登录网关",
+    "HTTP 拦截器与 Token 鉴权",
+    "qiun-data-charts",
+    "z-paging",
+    "HM-dragSorts",
+    "uQRCode"
+  ],
+  "screenshots": [
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/04/IMG_4487_dhynw0r9lbil.png"
+    },
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/04/IMG_4491_dhynw42rma1z.png"
+    },
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/04/IMG_4489_dhynw7i99qwf.png"
+    },
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/04/IMG_4488_dhynwacucdy1.png"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
-import { ProjectGrid } from '@/components/projects/project-card';
-import { getProjects } from '@/lib/projects';
+import { ProjectGroupList } from '@/components/projects/project-card';
+import { getProjectGroups } from '@/lib/projects';
 import type { Metadata } from 'next';
 
 import pkg from '../../../../package.json';
@@ -27,11 +27,11 @@ export const metadata: Metadata = {
 };
 
 export default function ProjectsPage() {
-  const projects = getProjects();
+  const projectGroups = getProjectGroups();
 
   return (
     <section className="container mx-auto px-4 sm:px-6 lg:px-8">
-      <ProjectGrid projects={projects} />
+      <ProjectGroupList enableNativeTransition groups={projectGroups} />
     </section>
   );
 }

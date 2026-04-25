@@ -1,0 +1,61 @@
+{
+  "sortOrder": 8,
+  "slug": "openalpha-admin",
+  "name": "OpenAlpha（后台管理）",
+  "route": "/products/openalpha-admin",
+  "logo": "https://img.huzhihui.com/uploads/2026/04/openalpha-logo_dhxzcl4tuftc.png",
+  "overview": "OpenAlpha（后台管理）是配套数据开放平台使用的运营与系统管理后台，围绕连接器、客户、订单、发票、解决方案、统计分析与权限体系支撑整个平台的日常运营。",
+  "tags": ["后台管理", "Vue 2", "Element UI", "数据运营"],
+  "urls": {
+    "official": "https://datumwealth.com/"
+  },
+  "companyName": "西筹科技 / DatumWealth",
+  "startDate": "2021-09-12",
+  "endDate": "2022-08-13",
+  "ageRating": "18+",
+  "category": "财务",
+  "industry": "金融科技",
+  "family": {
+    "key": "openalpha",
+    "title": "OpenAlpha",
+    "description": "基金数据开放平台及其配套运营后台。",
+    "sortOrder": 5,
+    "variantLabel": "后台管理",
+    "variantOrder": 2
+  },
+  "categories": ["运营后台", "系统管理后台", "数据运营平台"],
+  "platforms": ["Web 后台"],
+  "langs": ["中文简体"],
+  "price": "内部系统",
+  "headline": "这套后台承担了 OpenAlpha 平台的配置、运营、订单与客户管理职责，是前台开放平台背后的核心运营工作台。",
+  "introduction": [
+    "如果说 OpenAlpha 前台解决的是“如何把数据能力卖出去、展示清楚、让客户可用”，那这套后台更多解决的是“如何把平台运营起来”。",
+    "项目覆盖连接器管理、客户与订单、发票、解决方案、运营统计、系统配置与权限控制等模块，是支撑开放平台日常运营和内部协作的核心后台系统。"
+  ],
+  "summary": [
+    "这套后台对我来说不是“再做一个管理系统”，而是要把 OpenAlpha 前台背后的运营链路真正支撑起来。连接器、客户、订单、发票、统计和系统配置这些模块放在一起后，难点在于后台必须既能控权限，又能让运营同学高频操作时不觉得笨重。",
+    "前端技术栈采用 `Vue 2 + Vue Router 3 + Vuex 3 + Element UI`，并基于 `vue-cli-service` 组织工程。我沿用典型后台架构，但重点放在 `layout + permission + store modules` 这套组织方式上，让菜单、标签页、动态路由和角色权限都可以稳定扩展。",
+    "权限体系这块我比较看重可控性。项目通过全局路由守卫、登录态校验、角色信息拉取和动态 `addRoutes` 完成页面访问控制，同时在指令层补了 `hasPermi / hasRole / copy / highlight` 等能力，让后台里的权限与运营动作真正落到页面细节上。",
+    "后台内置了连接器、客户、订单、发票、统计、解决方案等业务模块，并配套图表组件、JSON / CodeMirror 编辑器、富文本、图片上传、图标选择、拖拽弹窗与代码生成工具。对我来说，这类项目的亮点就在于把“配置、录入、分析、运维”几种完全不同的操作习惯揉进一套统一后台体验里。",
+    "工程侧我还接入了 `NProgress` 路由反馈、Axios 请求封装、文件下载、`screenfull` 全屏、`echarts` 图表、`monaco-editor` 与 `codemirror` 编辑能力，以及 `tailwind.css` 与 Element UI 的样式协作。真正的难点不是单一模块实现，而是保证后台在长期迭代下依然不乱、不碎、可持续维护。"
+  ],
+  "techStack": [
+    "Vue 2",
+    "Vue Router 3",
+    "Vuex 3",
+    "Vue CLI",
+    "Element UI",
+    "Axios",
+    "NProgress",
+    "ECharts",
+    "Monaco Editor",
+    "CodeMirror",
+    "vue-codemirror",
+    "vue-meta",
+    "Tailwind CSS",
+    "SortableJS",
+    "vuedraggable",
+    "ImageUpload",
+    "Editor"
+  ]
+}

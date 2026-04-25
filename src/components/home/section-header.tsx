@@ -5,12 +5,14 @@ type SectionHeaderProps = {
   title: string;
   href: string;
   linkText?: string;
+  transitionTypes?: string[];
 };
 
 export function SectionHeader({
   title,
   href,
   linkText = '查看更多',
+  transitionTypes,
 }: SectionHeaderProps) {
   return (
     <div className="flex items-center justify-between">
@@ -20,6 +22,7 @@ export function SectionHeader({
       <Link
         className="group inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         href={href}
+        transitionTypes={transitionTypes}
       >
         {linkText}
         <ArrowRightIcon

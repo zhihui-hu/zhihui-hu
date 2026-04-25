@@ -1,6 +1,11 @@
 'use client';
 
 /* eslint-disable @next/next/no-img-element -- this header uses duplicated icon layers for glow rendering */
+import {
+  SharedElementTransition,
+  getSharedMediaTransitionName,
+  getSharedTitleTransitionName,
+} from '@/components/route-view-transitions';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -296,18 +301,27 @@ export function ProjectHeroHeader({
         <div className="relative z-10 flex h-full w-full items-center px-4 py-5 sm:px-8 sm:py-7 lg:px-10">
           <div className="flex w-full items-center gap-5 sm:gap-6 lg:gap-8">
             <div className="self-center">
-              <ProjectHeroIcon
-                compact={Boolean(heroPanel.compact)}
-                imageSrc={backgroundImageUrl}
-                project={project}
-              />
+              <SharedElementTransition
+                name={getSharedMediaTransitionName('project', project.slug)}
+                share="route-shared-media"
+              >
+                <ProjectHeroIcon
+                  compact={Boolean(heroPanel.compact)}
+                  imageSrc={backgroundImageUrl}
+                  project={project}
+                />
+              </SharedElementTransition>
             </div>
 
             <div className="flex min-h-32 min-w-0 flex-1 flex-col justify-center gap-3 pt-1 sm:min-h-0 sm:gap-4 sm:pt-0">
               <div className="flex flex-col gap-1">
-                <h1 className="title line-clamp-2 text-[22px] leading-[1.05] font-bold tracking-[-0.04em] text-white sm:text-[32px] lg:text-[36px]">
-                  {project.name}
-                </h1>
+                <SharedElementTransition
+                  name={getSharedTitleTransitionName('project', project.slug)}
+                >
+                  <h1 className="title line-clamp-2 text-[22px] leading-[1.05] font-bold tracking-[-0.04em] text-white sm:text-[32px] lg:text-[36px]">
+                    {project.name}
+                  </h1>
+                </SharedElementTransition>
                 {project.companyName &&
                   (project.sourceUrls.official ? (
                     isExternalUrl(project.sourceUrls.official) ? (

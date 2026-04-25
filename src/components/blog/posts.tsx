@@ -1,8 +1,8 @@
 import { BlogLink } from '@/components/blog/blog-link';
 import {
-  BLOG_NAV_FORWARD_TRANSITION,
-  BlogTitleTransition,
-} from '@/components/blog/view-transitions';
+  SharedElementTransition,
+  getSharedTitleTransitionName,
+} from '@/components/route-view-transitions';
 import {
   Empty,
   EmptyDescription,
@@ -20,9 +20,14 @@ export type BlogPostListItem = BlogPost & {
 type BlogPostsProps = {
   posts: BlogPostListItem[];
   limit?: number;
+  enableNativeTransition?: boolean;
 };
 
-export function BlogPosts({ posts, limit }: BlogPostsProps) {
+export function BlogPosts({
+  posts,
+  limit,
+  enableNativeTransition = false,
+}: BlogPostsProps) {
   const visiblePosts =
     typeof limit === 'number' ? posts.slice(0, limit) : posts;
 
@@ -49,17 +54,27 @@ export function BlogPosts({ posts, limit }: BlogPostsProps) {
           key={post.slug}
           className="mb-4 flex flex-col gap-1"
           href={`/blog/${post.slug}`}
-          transitionTypes={[BLOG_NAV_FORWARD_TRANSITION]}
         >
           <div className="flex w-full flex-col gap-1 md:flex-row md:gap-2">
             <p className="w-[100px] shrink-0 whitespace-nowrap tabular-nums text-muted-foreground">
               {post.formattedPublishedAt}
             </p>
-            <BlogTitleTransition slug={post.slug}>
+            {enableNativeTransition ? (
+              <SharedElementTransition
+                name={getSharedTitleTransitionName('blog', post.slug)}
+              >
+                <p className="min-w-0 tracking-tight text-foreground line-clamp-1">
+                  <span className="underline-hover">
+                    {' '}
+                    {post.metadata.title}
+                  </span>
+                </p>
+              </SharedElementTransition>
+            ) : (
               <p className="min-w-0 tracking-tight text-foreground line-clamp-1">
                 <span className="underline-hover"> {post.metadata.title}</span>
               </p>
-            </BlogTitleTransition>
+            )}
           </div>
         </BlogLink>
       ))}
