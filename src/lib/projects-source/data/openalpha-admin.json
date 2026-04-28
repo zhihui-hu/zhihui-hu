@@ -7,7 +7,8 @@
   "overview": "OpenAlpha（后台管理）是配套数据开放平台使用的运营与系统管理后台，围绕连接器、客户、订单、发票、解决方案、统计分析与权限体系支撑整个平台的日常运营。",
   "tags": ["后台管理", "Vue 2", "Element UI", "数据运营"],
   "urls": {
-    "official": "https://datumwealth.com/"
+    "official": "https://datumwealth.com/",
+    "web": "https://openalpha.cn/open-admin/"
   },
   "companyName": "西筹科技 / DatumWealth",
   "startDate": "2021-09-12",

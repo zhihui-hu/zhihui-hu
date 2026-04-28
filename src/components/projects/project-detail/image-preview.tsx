@@ -16,15 +16,15 @@ import {
   ExternalLinkIcon,
   XIcon,
 } from 'lucide-react';
+import Image from 'next/image';
 import {
+  type ReactEventHandler,
   useCallback,
   useEffect,
   useLayoutEffect,
   useRef,
   useState,
 } from 'react';
-
-import { ProjectPreviewWatermarkedImage } from './project-preview-watermarked-image';
 
 export type ProjectPreviewImage = {
   alt: string;
@@ -58,6 +58,82 @@ function prefersReducedMotion() {
   );
 }
 
+function ProjectPreviewOriginalImage({
+  alt,
+  className,
+  fit,
+  loading = 'lazy',
+  onError,
+  onLoad,
+  sizes,
+  src,
+}: {
+  alt: string;
+  className?: string;
+  fit: 'contain' | 'cover';
+  loading?: 'eager' | 'lazy';
+  onError?: ReactEventHandler<HTMLImageElement>;
+  onLoad?: ReactEventHandler<HTMLImageElement>;
+  sizes: string;
+  src: string;
+}) {
+  const [imageState, setImageState] = useState<{
+    hasError?: boolean;
+    naturalRatio?: number;
+    src: string;
+  }>({ src });
+  const hasError = imageState.src === src && imageState.hasError;
+  const naturalRatio =
+    imageState.src === src ? imageState.naturalRatio : undefined;
+  const shouldUseNaturalRatio = fit === 'contain';
+  const aspectRatio = shouldUseNaturalRatio
+    ? (naturalRatio ?? 16 / 10)
+    : undefined;
+
+  return (
+    <div
+      className={cn('relative overflow-hidden rounded-[inherit]', className)}
+      style={aspectRatio ? { aspectRatio } : undefined}
+    >
+      <Image
+        alt={alt}
+        className={cn(
+          'select-none',
+          fit === 'cover' ? 'object-cover' : 'object-contain',
+        )}
+        draggable={false}
+        fill
+        loading={loading}
+        onError={(event) => {
+          setImageState({ hasError: true, src });
+          onError?.(event);
+        }}
+        onLoad={(event) => {
+          const image = event.currentTarget;
+          const nextNaturalRatio =
+            shouldUseNaturalRatio && image.naturalHeight > 0
+              ? image.naturalWidth / image.naturalHeight
+              : undefined;
+
+          setImageState({
+            naturalRatio: nextNaturalRatio,
+            src,
+          });
+          onLoad?.(event);
+        }}
+        sizes={sizes}
+        src={src}
+      />
+
+      {hasError ? (
+        <div className="absolute inset-0 flex items-center justify-center rounded-[inherit] bg-muted/70 px-4 text-center text-xs text-muted-foreground">
+          图片加载失败
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function ProjectPreviewTriggerCard({
   alt,
   buttonClassName,
@@ -88,14 +164,15 @@ function ProjectPreviewTriggerCard({
       onClick={(event) => onOpen(event.currentTarget)}
       type="button"
     >
-      <ProjectPreviewWatermarkedImage
+      <ProjectPreviewOriginalImage
         alt={alt}
-        className={cn(
-          'block select-none',
-          resolvedFit === 'cover' ? 'object-cover' : 'object-contain',
-          'rounded-[inherit]',
-          imageClassName,
-        )}
+        className={cn('block select-none', 'rounded-[inherit]', imageClassName)}
+        fit={resolvedFit}
+        sizes={
+          resolvedFit === 'cover'
+            ? '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 320px'
+            : '(max-width: 640px) 90vw, (max-width: 1024px) 70vw, 960px'
+        }
         src={src}
       />
     </button>
@@ -359,16 +436,21 @@ function ProjectPreviewDialog({
               ref={imageSurfaceRef}
               className="relative flex h-full max-h-full w-full max-w-5xl items-center justify-center overflow-hidden rounded-2xl"
             >
-              <ProjectPreviewWatermarkedImage
+              <ProjectPreviewOriginalImage
                 key={activeImage.src}
                 alt={activeImage.alt}
                 className="block h-full w-full select-none object-contain"
+                fit="contain"
                 loading="eager"
+                onError={() => {
+                  readyImageSrcRef.current = activeImage.src;
+                  setReadyTick((t) => t + 1);
+                }}
                 onLoad={() => {
                   readyImageSrcRef.current = activeImage.src;
                   setReadyTick((t) => t + 1);
                 }}
-                showStatus
+                sizes="(max-width: 1024px) 100vw, 1024px"
                 src={activeImage.src}
               />
             </div>

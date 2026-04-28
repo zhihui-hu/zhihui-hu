@@ -32,7 +32,8 @@ switch (process.env.NODE_ENV) {
     nextConfig.output = 'export';
     nextConfig.images = {
       ...nextConfig.images,
-      unoptimized: true,
+      loader: 'custom',
+      loaderFile: './src/lib/cloudflare-image-loader.ts',
     };
     break;
   case 'development':
