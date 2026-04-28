@@ -29,6 +29,7 @@ import {
 export type ProjectPreviewImage = {
   alt: string;
   caption?: string;
+  previewKind?: 'desktop' | 'mobile';
   src: string;
 };
 
@@ -58,6 +59,31 @@ function prefersReducedMotion() {
   );
 }
 
+function blurPlaceholder(width: number, height: number) {
+  return `
+<svg width="${width}" height="${height}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <filter id="b" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="18" />
+    </filter>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#242424" offset="0%" />
+      <stop stop-color="#3a3a3a" offset="45%" />
+      <stop stop-color="#1f1f1f" offset="100%" />
+    </linearGradient>
+  </defs>
+  <rect width="${width}" height="${height}" fill="url(#g)" filter="url(#b)" />
+</svg>`;
+}
+
+function blurDataUrl(width: number, height: number): `data:image/${string}` {
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
+    blurPlaceholder(width, height),
+  )}` as `data:image/${string}`;
+}
+
+const PROJECT_IMAGE_BLUR_DATA_URL = blurDataUrl(12, 26);
+
 function ProjectPreviewOriginalImage({
   alt,
   className,
@@ -79,13 +105,16 @@ function ProjectPreviewOriginalImage({
 }) {
   const [imageState, setImageState] = useState<{
     hasError?: boolean;
+    loaded?: boolean;
     naturalRatio?: number;
     src: string;
   }>({ src });
   const hasError = imageState.src === src && imageState.hasError;
+  const isLoaded = imageState.src === src && imageState.loaded;
   const naturalRatio =
     imageState.src === src ? imageState.naturalRatio : undefined;
-  const shouldUseNaturalRatio = fit === 'contain';
+  const hasFixedAspectRatio = className?.includes('aspect-');
+  const shouldUseNaturalRatio = fit === 'contain' && !hasFixedAspectRatio;
   const aspectRatio = shouldUseNaturalRatio
     ? (naturalRatio ?? 16 / 10)
     : undefined;
@@ -105,7 +134,7 @@ function ProjectPreviewOriginalImage({
         fill
         loading={loading}
         onError={(event) => {
-          setImageState({ hasError: true, src });
+          setImageState({ hasError: true, loaded: true, src });
           onError?.(event);
         }}
         onLoad={(event) => {
@@ -116,14 +145,26 @@ function ProjectPreviewOriginalImage({
               : undefined;
 
           setImageState({
+            loaded: true,
             naturalRatio: nextNaturalRatio,
             src,
           });
           onLoad?.(event);
         }}
+        blurDataURL={PROJECT_IMAGE_BLUR_DATA_URL}
+        placeholder="blur"
         sizes={sizes}
         src={src}
+        unoptimized
       />
+
+      {!isLoaded && !hasError ? (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 scale-110 bg-cover bg-center blur-xl transition-opacity duration-500"
+          style={{ backgroundImage: `url("${PROJECT_IMAGE_BLUR_DATA_URL}")` }}
+        />
+      ) : null}
 
       {hasError ? (
         <div className="absolute inset-0 flex items-center justify-center rounded-[inherit] bg-muted/70 px-4 text-center text-xs text-muted-foreground">
@@ -235,6 +276,7 @@ function ProjectPreviewDialog({
   const currentIndex = getWrappedIndex(activeIndex, images.length);
   const activeImage = images[currentIndex] ?? null;
   const hasMultiple = images.length > 1;
+  const activePreviewKind = activeImage?.previewKind ?? 'mobile';
 
   const navigateTo = useCallback(
     (index: number, direction: -1 | 1) => {
@@ -439,7 +481,12 @@ function ProjectPreviewDialog({
               <ProjectPreviewOriginalImage
                 key={activeImage.src}
                 alt={activeImage.alt}
-                className="block h-full w-full select-none object-contain"
+                className={cn(
+                  'block max-h-full max-w-full select-none object-contain',
+                  activePreviewKind === 'desktop'
+                    ? 'aspect-[16/10] h-auto w-full'
+                    : 'aspect-[6/13] h-full w-auto',
+                )}
                 fit="contain"
                 loading="eager"
                 onError={() => {

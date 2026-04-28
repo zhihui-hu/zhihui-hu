@@ -7,6 +7,24 @@ import { Badge } from '../../ui/badge';
 import { ProjectImageGallery, ProjectImagePreview } from './image-preview';
 import { isExternalUrl } from './shared';
 
+function getProjectPreviewKind(project: Project) {
+  const platformText = project.platforms.join(' ').toLowerCase();
+  const categoryText = project.categories.join(' ').toLowerCase();
+  const targetText = `${platformText} ${categoryText}`;
+
+  if (
+    targetText.includes('iphone') ||
+    targetText.includes('android') ||
+    targetText.includes('小程序') ||
+    targetText.includes('移动端') ||
+    targetText.includes('h5')
+  ) {
+    return 'mobile' as const;
+  }
+
+  return 'desktop' as const;
+}
+
 export function DevelopmentCard({ item }: { item: ProjectDevelopment }) {
   return (
     <div className="flex flex-col gap-5 py-1">
@@ -114,8 +132,10 @@ export function ScreenshotShelf({
   const previewImages = screenshots.map((screenshot, index) => ({
     alt: `${project.name} 界面预览 ${index + 1}`,
     caption: `${project.name} 的第 ${index + 1} 张界面截图`,
+    previewKind: getProjectPreviewKind(project),
     src: screenshot.image,
   }));
+  const previewKind = getProjectPreviewKind(project);
 
   return (
     <div className="flex flex-col gap-3 mt-4">
@@ -133,9 +153,14 @@ export function ScreenshotShelf({
             screenshots.length === 1 && 'max-w-full',
           )}
           imageClassName={cn(
-            'h-[360px] w-auto max-w-none bg-transparent sm:h-[420px] lg:h-[480px]',
+            'max-w-none bg-transparent',
+            previewKind === 'desktop'
+              ? 'aspect-[16/10] h-[210px] w-[336px] sm:h-[260px] sm:w-[416px] lg:h-[340px] lg:w-[544px]'
+              : 'aspect-[6/13] h-[360px] w-[166px] sm:h-[420px] sm:w-[194px] lg:h-[600px] lg:w-[277px]',
             screenshots.length === 1 &&
-              'h-[460px] max-w-full sm:h-[560px] lg:h-[70vh]',
+              (previewKind === 'desktop'
+                ? 'h-[240px] w-[384px] max-w-full sm:h-[360px] sm:w-[576px] lg:h-[520px] lg:w-[832px]'
+                : 'h-[460px] w-[212px] max-w-full sm:h-[560px] sm:w-[258px] lg:h-[76vh] lg:w-[35.1vh]'),
           )}
           images={previewImages}
         />
