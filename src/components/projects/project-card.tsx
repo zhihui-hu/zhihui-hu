@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import { ProgressiveImage } from '@/components/progressive-image';
 import {
   SharedElementTransition,
   getSharedMediaTransitionName,
@@ -21,13 +21,13 @@ export function ProjectCard({
 }: ProjectCardProps) {
   const variantLabel = project.family?.variantLabel;
   const logo = project.logo ? (
-    <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-[22%] border border-border/60 bg-background shadow-sm">
-      <img
-        alt={`${project.name} logo`}
-        className="size-16 object-cover"
-        src={project.logo}
-      />
-    </div>
+    <ProgressiveImage
+      alt={`${project.name} logo`}
+      className="size-16 shrink-0 rounded-[22%] border border-border/60 bg-background shadow-sm"
+      fit="cover"
+      sizes="64px"
+      src={project.logo}
+    />
   ) : (
     <div className="flex size-14 shrink-0 items-center justify-center rounded-[22%] border border-border/60 bg-muted text-base font-semibold text-foreground shadow-sm">
       {project.name.slice(0, 1).toUpperCase()}

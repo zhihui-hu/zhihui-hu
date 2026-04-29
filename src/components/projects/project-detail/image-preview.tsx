@@ -1,4 +1,5 @@
 'use client';
+import { ProgressiveImage } from '@/components/progressive-image';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -16,9 +17,7 @@ import {
   ExternalLinkIcon,
   XIcon,
 } from 'lucide-react';
-import Image from 'next/image';
 import {
-  type ReactEventHandler,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -59,122 +58,6 @@ function prefersReducedMotion() {
   );
 }
 
-function blurPlaceholder(width: number, height: number) {
-  return `
-<svg width="${width}" height="${height}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <defs>
-    <filter id="b" color-interpolation-filters="sRGB">
-      <feGaussianBlur stdDeviation="18" />
-    </filter>
-    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-      <stop stop-color="#242424" offset="0%" />
-      <stop stop-color="#3a3a3a" offset="45%" />
-      <stop stop-color="#1f1f1f" offset="100%" />
-    </linearGradient>
-  </defs>
-  <rect width="${width}" height="${height}" fill="url(#g)" filter="url(#b)" />
-</svg>`;
-}
-
-function blurDataUrl(width: number, height: number): `data:image/${string}` {
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
-    blurPlaceholder(width, height),
-  )}` as `data:image/${string}`;
-}
-
-const PROJECT_IMAGE_BLUR_DATA_URL = blurDataUrl(12, 26);
-
-function ProjectPreviewOriginalImage({
-  alt,
-  className,
-  fit,
-  loading = 'lazy',
-  onError,
-  onLoad,
-  sizes,
-  src,
-}: {
-  alt: string;
-  className?: string;
-  fit: 'contain' | 'cover';
-  loading?: 'eager' | 'lazy';
-  onError?: ReactEventHandler<HTMLImageElement>;
-  onLoad?: ReactEventHandler<HTMLImageElement>;
-  sizes: string;
-  src: string;
-}) {
-  const [imageState, setImageState] = useState<{
-    hasError?: boolean;
-    loaded?: boolean;
-    naturalRatio?: number;
-    src: string;
-  }>({ src });
-  const hasError = imageState.src === src && imageState.hasError;
-  const isLoaded = imageState.src === src && imageState.loaded;
-  const naturalRatio =
-    imageState.src === src ? imageState.naturalRatio : undefined;
-  const hasFixedAspectRatio = className?.includes('aspect-');
-  const shouldUseNaturalRatio = fit === 'contain' && !hasFixedAspectRatio;
-  const aspectRatio = shouldUseNaturalRatio
-    ? (naturalRatio ?? 16 / 10)
-    : undefined;
-
-  return (
-    <div
-      className={cn('relative overflow-hidden rounded-[inherit]', className)}
-      style={aspectRatio ? { aspectRatio } : undefined}
-    >
-      <Image
-        alt={alt}
-        className={cn(
-          'select-none',
-          fit === 'cover' ? 'object-cover' : 'object-contain',
-        )}
-        draggable={false}
-        fill
-        loading={loading}
-        onError={(event) => {
-          setImageState({ hasError: true, loaded: true, src });
-          onError?.(event);
-        }}
-        onLoad={(event) => {
-          const image = event.currentTarget;
-          const nextNaturalRatio =
-            shouldUseNaturalRatio && image.naturalHeight > 0
-              ? image.naturalWidth / image.naturalHeight
-              : undefined;
-
-          setImageState({
-            loaded: true,
-            naturalRatio: nextNaturalRatio,
-            src,
-          });
-          onLoad?.(event);
-        }}
-        blurDataURL={PROJECT_IMAGE_BLUR_DATA_URL}
-        placeholder="blur"
-        sizes={sizes}
-        src={src}
-        unoptimized
-      />
-
-      {!isLoaded && !hasError ? (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 scale-110 bg-cover bg-center blur-xl transition-opacity duration-500"
-          style={{ backgroundImage: `url("${PROJECT_IMAGE_BLUR_DATA_URL}")` }}
-        />
-      ) : null}
-
-      {hasError ? (
-        <div className="absolute inset-0 flex items-center justify-center rounded-[inherit] bg-muted/70 px-4 text-center text-xs text-muted-foreground">
-          图片加载失败
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
 function ProjectPreviewTriggerCard({
   alt,
   buttonClassName,
@@ -205,7 +88,7 @@ function ProjectPreviewTriggerCard({
       onClick={(event) => onOpen(event.currentTarget)}
       type="button"
     >
-      <ProjectPreviewOriginalImage
+      <ProgressiveImage
         alt={alt}
         className={cn('block select-none', 'rounded-[inherit]', imageClassName)}
         fit={resolvedFit}
@@ -478,7 +361,7 @@ function ProjectPreviewDialog({
               ref={imageSurfaceRef}
               className="relative flex h-full max-h-full w-full max-w-5xl items-center justify-center overflow-hidden rounded-2xl"
             >
-              <ProjectPreviewOriginalImage
+              <ProgressiveImage
                 key={activeImage.src}
                 alt={activeImage.alt}
                 className={cn(

@@ -1,6 +1,6 @@
 'use client';
 
-/* eslint-disable @next/next/no-img-element -- this header uses duplicated icon layers for glow rendering */
+import { ProgressiveImage } from '@/components/progressive-image';
 import {
   SharedElementTransition,
   getSharedMediaTransitionName,
@@ -53,13 +53,15 @@ export function ProjectHeroIcon({
         style={{ backgroundColor: 'var(--project-hero-icon-glow)' }}
       />
       <div className="absolute inset-0 translate-y-2 scale-[0.94] opacity-40 blur-3xl">
-        <img
+        <ProgressiveImage
           alt=""
-          aria-hidden="true"
-          className={cn(
-            iconSizeClass,
-            'rounded-[22.5%] object-cover grayscale saturate-50 contrast-125',
-          )}
+          aria-hidden={true}
+          className={cn(iconSizeClass, 'rounded-[22.5%]')}
+          fit="cover"
+          imageClassName="grayscale saturate-50 contrast-125"
+          loading="eager"
+          showError={false}
+          sizes="(max-width: 640px) 128px, 162px"
           src={logoSrc}
         />
       </div>
@@ -71,12 +73,12 @@ export function ProjectHeroIcon({
           boxShadow: '0 24px 60px var(--project-hero-shadow)',
         }}
       >
-        <img
+        <ProgressiveImage
           alt={`${project.name} logo`}
-          className={cn(
-            iconSizeClass,
-            'rounded-[22%] bg-background object-cover',
-          )}
+          className={cn(iconSizeClass, 'rounded-[22%] bg-background')}
+          fit="cover"
+          loading="eager"
+          sizes="(max-width: 640px) 128px, 162px"
           src={logoSrc}
         />
         <div className="pointer-events-none absolute inset-0 rounded-[22.5%] ring-1 ring-inset ring-white/10" />
@@ -159,6 +161,7 @@ function HeroQrAction({
             {!isImageLoaded && (
               <Skeleton className="absolute inset-0 rounded-lg bg-muted" />
             )}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               alt={`${projectName} 二维码`}
               className={cn(

@@ -2,6 +2,7 @@ import { BlogLink } from '@/components/blog/blog-link';
 import { CodeCopyButton } from '@/components/blog/code-copy-button';
 import { isSensitiveCodeSample } from '@/components/blog/code-safety';
 import { MermaidDiagram } from '@/components/blog/mermaid';
+import { ProgressiveImage } from '@/components/progressive-image';
 import { cn } from '@/lib/utils';
 import { type MDXRemoteProps, compileMDX } from 'next-mdx-remote/rsc';
 import React from 'react';
@@ -242,23 +243,36 @@ function MarkdownInput({
   );
 }
 
+function MarkdownImage({
+  alt = '',
+  className,
+  src,
+  title,
+}: React.ComponentProps<'img'>) {
+  if (typeof src !== 'string' || src.length === 0) {
+    return null;
+  }
+
+  return (
+    <ProgressiveImage
+      alt={alt}
+      className={cn('my-6 w-full bg-muted/20 ', className)}
+      fit="contain"
+      loading="lazy"
+      sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc(100vw - 4rem), 832px"
+      src={src}
+      title={title}
+    />
+  );
+}
+
 const components = {
   a: CustomLink,
   code: Code,
   figure: PrettyCodeFigure,
   table: Table,
   input: MarkdownInput,
-  img: (props: React.ComponentProps<'img'>) => (
-    // Markdown images do not consistently provide dimensions, so we keep
-    // them as plain img tags in article content.
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      alt={props.alt || ''}
-      className={cn('h-auto max-w-full', props.className)}
-      loading="lazy"
-      {...props}
-    />
-  ),
+  img: MarkdownImage,
 };
 
 export type BlogMdxIssue = {
