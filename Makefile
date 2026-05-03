@@ -18,8 +18,9 @@ POST_BANNER_GOAL_INPUT := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 $(foreach goal,$(POST_BANNER_GOAL_INPUT),$(eval $(goal):;@:))
 endif
 
-POST_BANNER_INPUT := $(strip $(or $(FILE),$(POST),$(SLUG),$(POST_BANNER_GOAL_INPUT)))
+POST_BANNER_INPUT_EXPR := $${POST_BANNER_INPUT:-$${FILE:-$${POST:-$${SLUG:-$(POST_BANNER_GOAL_INPUT)}}}}
 POST_BANNER_PROVIDER_ARG := $(strip $(if $(PROVIDER),--provider $(PROVIDER)))
+POST_BANNER_PATH_HINT := For non-ASCII paths, use: make $(firstword $(MAKECMDGOALS)) FILE='posts/article.md'
 
 
 # 检查 npm 是否安装
@@ -67,49 +68,49 @@ deploy:
 	@$(NPM) run deploy
 
 banner-prepare:
-	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make banner-prepare <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
-	@bash scripts/post-banner.sh prepare "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make banner-prepare <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh prepare "$$input_ref" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
 
 banner-generate:
-	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make banner-generate <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
-	@bash scripts/post-banner.sh generate "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make banner-generate <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh generate "$$input_ref" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
 
 banner-upload:
-	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make banner-upload <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
-	@bash scripts/post-banner.sh upload "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make banner-upload <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh upload "$$input_ref" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
 
 banner-inject:
-	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make banner-inject <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
-	@bash scripts/post-banner.sh inject "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make banner-inject <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh inject "$$input_ref" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
 
 banner:
-	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make banner <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
-	@bash scripts/post-banner.sh "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make banner <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh "$$input_ref" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
 
 banner-gemini:
-	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make banner-gemini <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
-	@bash scripts/post-banner.sh "$(POST_BANNER_INPUT)" --provider gemini $(ARGS)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make banner-gemini <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh "$$input_ref" --provider gemini $(ARGS)
 
 img:
-	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make img <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
-	@bash scripts/post-banner.sh "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make img <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh "$$input_ref" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
 
 img-prepare:
-	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make img-prepare <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
-	@bash scripts/post-banner.sh prepare "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make img-prepare <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh prepare "$$input_ref" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
 
 img-generate:
-	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make img-generate <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
-	@bash scripts/post-banner.sh generate "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make img-generate <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh generate "$$input_ref" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
 
 img-upload:
-	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make img-upload <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
-	@bash scripts/post-banner.sh upload "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make img-upload <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh upload "$$input_ref" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
 
 img-inject:
-	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make img-inject <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
-	@bash scripts/post-banner.sh inject "$(POST_BANNER_INPUT)" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make img-inject <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh inject "$$input_ref" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
 
 img-gemini:
-	@test -n "$(POST_BANNER_INPUT)" || (echo "Usage: make img-gemini <文章地址|slug|文章文件> [ARGS='...']" && exit 1)
-	@bash scripts/post-banner.sh "$(POST_BANNER_INPUT)" --provider gemini $(ARGS)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make img-gemini <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh "$$input_ref" --provider gemini $(ARGS)
