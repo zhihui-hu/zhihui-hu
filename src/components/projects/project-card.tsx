@@ -67,9 +67,9 @@ export function ProjectCard({
             </Link>
             {(variantLabel || project.timeLabel) && (
               <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end sm:pt-0.5">
-                {variantLabel && (
+                {/* {variantLabel && (
                   <Badge variant="secondary">{variantLabel}</Badge>
-                )}
+                )} */}
                 {project.timeLabel && (
                   <span className="text-[0.72rem] leading-5 text-muted-foreground">
                     {project.timeLabel}

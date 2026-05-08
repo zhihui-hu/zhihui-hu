@@ -127,6 +127,15 @@ export type ProjectGroup = {
   projects: Project[];
 };
 
+type ProjectSourceDefaults = {
+  family?: ProjectFamilyMeta;
+};
+
+type ProjectSourceTransformOptions = {
+  defaultFamily?: ProjectFamilyMeta;
+  routeBase?: `/${string}`;
+};
+
 function compareProjectSourceBySortOrder(
   left: ProjectSource,
   right: ProjectSource,
@@ -426,7 +435,10 @@ function buildPeriod(projectSource: ProjectSource): ProjectPeriod | undefined {
   };
 }
 
-function buildProjectHeroActions(urls: ProjectSourceUrls): ProjectHeroAction[] {
+function buildProjectHeroActions(
+  urls: ProjectSourceUrls,
+  projectSource: ProjectSource,
+): ProjectHeroAction[] {
   const actions: ProjectHeroAction[] = [];
 
   if (urls.web) {
@@ -458,6 +470,14 @@ function buildProjectHeroActions(urls: ProjectSourceUrls): ProjectHeroAction[] {
       kind: 'qr',
       label: '小程序二维码',
       imageSrc: urls.mp,
+    });
+  }
+
+  if (projectSource.repo && projectSource.repo !== urls.web) {
+    actions.push({
+      kind: 'website',
+      label: '查看源码',
+      url: projectSource.repo,
     });
   }
 
@@ -678,23 +698,36 @@ function buildHeroMetaLine(projectSource: ProjectSource) {
   return parts.join(' · ');
 }
 
-function toProject(projectSource: ProjectSource): Project {
+function resolveProjectFamily(
+  projectSource: ProjectSource,
+  defaults: ProjectSourceDefaults,
+) {
+  return normalizeProjectFamily(projectSource.family) || defaults.family;
+}
+
+function toProject(
+  projectSource: ProjectSource,
+  options: ProjectSourceTransformOptions = {},
+): Project {
   const sourceUrls = normalizeSourceUrls(projectSource);
   const priceLabel = normalizePriceLabel(projectSource.price);
   const development = buildProjectDevelopment(projectSource);
   const categories = normalizeStringList(projectSource.categories);
-  const family = normalizeProjectFamily(projectSource.family);
+  const family = resolveProjectFamily(projectSource, {
+    family: options.defaultFamily,
+  });
   const platforms = normalizeStringList(projectSource.platforms);
   const langs = normalizeStringList(projectSource.langs);
   const timeline = buildPeriod(projectSource);
   const screenshots = normalizeScreenshots(projectSource.screenshots);
   const introduction = normalizeStringList(projectSource.introduction);
   const overview = getProjectOverview(projectSource);
+  const routeBase = options.routeBase || '/projects';
 
   return {
     slug: projectSource.slug,
     name: projectSource.name,
-    route: `/projects/${projectSource.slug}`,
+    route: `${routeBase}/${projectSource.slug}`,
     sortOrder: projectSource.sortOrder ?? Number.MAX_SAFE_INTEGER,
     sourceRoute: projectSource.route,
     logo: normalizeLogoPath(projectSource.logo),
@@ -719,7 +752,7 @@ function toProject(projectSource: ProjectSource): Project {
     attributes: buildProjectAttributes(projectSource, sourceUrls, priceLabel),
     hero: {
       metaLine: buildHeroMetaLine(projectSource),
-      actions: buildProjectHeroActions(sourceUrls),
+      actions: buildProjectHeroActions(sourceUrls, projectSource),
       compact: Boolean(sourceUrls.ios || sourceUrls.android || sourceUrls.mp),
     },
     metrics: buildProjectMetrics(projectSource, sourceUrls, priceLabel),
@@ -729,8 +762,17 @@ function toProject(projectSource: ProjectSource): Project {
   };
 }
 
+export function getItemsFromSources(
+  sources: ProjectSource[],
+  options: ProjectSourceTransformOptions = {},
+) {
+  return [...sources]
+    .sort(compareProjectSourceBySortOrder)
+    .map((source) => toProject(source, options));
+}
+
 export const getProjects = cache((): Project[] => {
-  return readProjectSources().map(toProject);
+  return getItemsFromSources(readProjectSources());
 });
 
 function compareProjectsInGroup(left: Project, right: Project) {
@@ -772,10 +814,10 @@ function compareProjectGroups(left: ProjectGroup, right: ProjectGroup) {
   return left.title.localeCompare(right.title, 'zh-CN');
 }
 
-export const getProjectGroups = cache((): ProjectGroup[] => {
+export function getItemGroups(projects: Project[]): ProjectGroup[] {
   const groups = new Map<string, ProjectGroup>();
 
-  for (const project of getProjects()) {
+  for (const project of projects) {
     const family = project.family;
     const key = family?.key ?? project.slug;
     const sortOrder = family?.sortOrder ?? project.sortOrder;
@@ -812,12 +854,24 @@ export const getProjectGroups = cache((): ProjectGroup[] => {
       projects: [...group.projects].sort(compareProjectsInGroup),
     }))
     .sort(compareProjectGroups);
+}
+
+export const getProjectGroups = cache((): ProjectGroup[] => {
+  return getItemGroups(getProjects());
 });
+
+export function getItemBySlug(items: Project[], slug: string) {
+  return items.find((item) => item.slug === slug);
+}
 
 export const getProjectBySlug = cache((slug: string): Project | undefined => {
-  return getProjects().find((project) => project.slug === slug);
+  return getItemBySlug(getProjects(), slug);
 });
 
+export function getItemSlugs(items: Project[]) {
+  return items.map((item) => item.slug);
+}
+
 export const getProjectSlugs = cache((): string[] => {
-  return getProjects().map((project) => project.slug);
+  return getItemSlugs(getProjects());
 });

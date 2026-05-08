@@ -1,0 +1,91 @@
+{
+  "sortOrder": 1,
+  "slug": "onefile",
+  "name": "OneFile",
+  "repo": "https://github.com/zhihui-hu/onefile",
+  "logo": "https://img.huzhihui.com/uploads/2026/05/pwa-512x512.png",
+  "overview": "OneFile 是一个面向多对象存储、多账号、多 bucket 场景的统一上传后台，支持 S3、R2、B2、OCI、阿里云 OSS、腾讯云 COS，也可以顺手拿来做自建图床和文件投递入口。",
+  "tags": ["开源图床", "对象存储", "大文件分片上传", "SQLite", "Next.js"],
+  "urls": {
+    "official": "https://github.com/zhihui-hu/onefile"
+  },
+  "companyName": "zhihui-hu",
+  "startDate": "2026-05-03",
+  "ongoing": true,
+  "category": "Developer Tools",
+  "industry": "开源工具",
+  "family": {
+    "key": "open-source-tools",
+    "title": "开源工具",
+    "description": "围绕日常开发、部署、内容管理和效率提升沉淀出来的开源项目。",
+    "sortOrder": 1,
+    "variantLabel": "对象存储",
+    "variantOrder": 1
+  },
+  "categories": ["自建图床", "上传管理后台", "对象存储聚合"],
+  "platforms": ["Web 应用", "Docker", "RESTful API"],
+  "langs": ["中文简体"],
+  "price": "开源免费",
+  "headline": "一个单容器、单 SQLite 的多对象存储上传入口，把多云、多账号、多 bucket 管理，以及网页上传、大文件分片上传、文件夹上传、API Key、公开上传链接和图片压缩收进同一个后台。",
+  "introduction": [
+    "OneFile 的起点很简单：我在整理公司对象存储上传流程时发现，真正麻烦的不是上传文件，而是阿里云 OSS、腾讯云 COS、S3 兼容服务各有账号、bucket、endpoint、密钥和公开域名。多套账号混在一起后，外部工具每接一次都要重新适配。",
+    "所以这个项目没有往重型网盘方向走，而是把重点放在“多对象存储统一上传口”上。浏览器、Markdown 编辑器、脚本、CI 或第三方系统只和 OneFile 通信，后面文件落到哪一个账号、哪一个 bucket、哪一家对象存储，由服务端配置和调度决定。网页端也能直接选择文件夹，适合一次性丢素材目录、构建产物目录或者归档附件。",
+    "它默认只需要一个 SQLite 数据库文件，不依赖 MySQL、PostgreSQL、Redis。单机 Docker 跑起来后，用户、对象存储账号、bucket、API Key、上传状态和备份迁移都围绕这个轻量模型展开。"
+  ],
+  "summary": [
+    "OneFile 支持 AWS S3、Cloudflare R2、Backblaze B2、Oracle Object Storage、阿里云 OSS 和腾讯云 COS。S3、R2、B2 走 S3 兼容 API；OCI、OSS、COS 则通过各自的适配器接入。一个后台可以挂多套对象存储账号和多组 bucket，外部工具不用关心 SDK 差异，只需要调用 OneFile 暴露出来的统一上传 API。",
+    "上传链路分成 Direct Upload 和 Multipart Upload。小文件和图片可以直接走 `/api/uploads/direct`，服务端完成认证、object key 生成、冲突规避、bucket key prefix 处理和对象存储写入；大文件走 multipart 分片上传，可以创建上传会话，再逐片上传、完成或中止。网页端支持选择文件夹批量上传，不需要一个文件一个文件点。",
+    "API Key 是给外部系统接入的关键。网页登录后创建 API Key，图床项目、Markdown 编辑器、脚本和 CI 只需要在请求头里带 `Authorization: Bearer ...`。如果 API Key 没有固定 bucket，服务端会从当前用户可用 bucket 里自动选择一个，把文件分散到不同对象存储账号或 bucket 里。",
+    "项目里也保留了公开上传链接。后台生成 UUID 上传入口和二维码后，别人不需要登录，也看不到 raw API key，打开网页就能投递文件。这个场景很适合临时收素材、收附件、收论坛或博客图片。",
+    "图片上传可以开启 WebP 压缩，底层用 sharp 处理。这样 Markdown 图片流、论坛图片和博客素材不用在客户端单独压一遍，上传后直接拿更轻的公开链接。",
+    "管理后台不是摆设。上传后的文件可以继续浏览、搜索、复制链接、删除对象；存储账号可以添加、同步 bucket、配置公开访问地址；管理员还能导出 SQL 备份，在新环境导入，迁移服务器或重建容器时不用重新录一遍凭证。"
+  ],
+  "techStack": [
+    "Next.js 16",
+    "React 19",
+    "TypeScript",
+    "Tailwind CSS 4",
+    "shadcn/ui",
+    "TanStack Query v5",
+    "TanStack Table v8",
+    "Drizzle ORM",
+    "better-sqlite3",
+    "AWS SDK S3",
+    "ali-oss",
+    "cos-nodejs-sdk-v5",
+    "sharp",
+    "Docker"
+  ],
+  "resources": [
+    {
+      "label": "GitHub 仓库",
+      "url": "https://github.com/zhihui-hu/onefile",
+      "kind": "repository"
+    },
+    {
+      "label": "Docker 镜像",
+      "url": "https://github.com/zhihui-hu/onefile/pkgs/container/onefile",
+      "kind": "container"
+    }
+  ],
+  "screenshots": [
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/05/onefile-1.png"
+    },
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/05/onefile-2.png"
+    },
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/05/onefile-3.png"
+    },
+    {
+      "image": "https://img.huzhihui.com/uploads/2026/05/onefile-4.png"
+    }
+  ],
+  "assets": [
+    {
+      "label": "OneFile Logo",
+      "image": "https://img.huzhihui.com/uploads/2026/05/pwa-512x512.png"
+    }
+  ]
+}

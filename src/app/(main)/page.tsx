@@ -4,6 +4,7 @@ import { ProjectGrid } from '@/components/projects/project-card';
 import { ROUTE_LIST_NAVIGATION_TRANSITION } from '@/components/route-view-transitions';
 import { Button } from '@/components/ui/button';
 import { formatBlogRelativeDate, getBlogPosts } from '@/lib/blog';
+import { getOpenSourceProjects } from '@/lib/open-source';
 import { getProjects } from '@/lib/projects';
 import { MailIcon } from 'lucide-react';
 
@@ -16,6 +17,7 @@ export default function Page() {
     }));
 
   const projects = getProjects().slice(0, 4);
+  const openSourceProjects = getOpenSourceProjects().slice(0, 4);
 
   return (
     <>
@@ -81,6 +83,18 @@ export default function Page() {
             transitionTypes={[ROUTE_LIST_NAVIGATION_TRANSITION]}
           />
           <ProjectGrid enableNativeTransition projects={projects} />
+        </div>
+      </section>
+
+      {/* ── Open Source Projects ─────────────────────────── */}
+      <section className="container mx-auto w-full px-4 pb-16 pt-0 sm:px-6 sm:pb-20 lg:px-8">
+        <div className="flex flex-col gap-6">
+          <SectionHeader
+            href="/open-source"
+            title="开源项目"
+            transitionTypes={[ROUTE_LIST_NAVIGATION_TRANSITION]}
+          />
+          <ProjectGrid enableNativeTransition projects={openSourceProjects} />
         </div>
       </section>
     </>

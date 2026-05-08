@@ -23,6 +23,10 @@ const navItems: Array<{
     href: '/projects',
     name: '项目',
   },
+  {
+    href: '/open-source',
+    name: '开源',
+  },
 ];
 
 export function BlogNavbar() {
