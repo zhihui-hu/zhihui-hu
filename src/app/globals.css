@@ -84,17 +84,9 @@
     @apply border-border outline-ring/50;
   }
 
-  a[href],
-  button:not(:disabled),
-  [role='button']:not([aria-disabled='true']):not([data-disabled='true']),
-  summary {
+  button:not([disabled]),
+  [role='button']:not([disabled]) {
     cursor: pointer;
-  }
-
-  button:disabled,
-  [role='button'][aria-disabled='true'],
-  [role='button'][data-disabled='true'] {
-    cursor: not-allowed;
   }
 
   body {

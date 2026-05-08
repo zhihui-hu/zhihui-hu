@@ -10,24 +10,25 @@ import {
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from '@/lib/utils';
-import {
-  AtSignIcon,
-  CopyCheckIcon,
-  CopyIcon,
-  MessageCircleMoreIcon,
-  Share2Icon,
-} from 'lucide-react';
+import { CopyCheckIcon, CopyIcon, MailIcon, Share2Icon } from 'lucide-react';
 import { motion } from 'motion/react';
 import { toDataURL } from 'qrcode';
 import {
+  type ComponentProps,
   type ReactNode,
   useCallback,
   useEffect,
   useRef,
   useState,
 } from 'react';
+import { type SimpleIcon, siSinaweibo, siWechat } from 'simple-icons';
 
 function QrDialog({
   open,
@@ -100,7 +101,7 @@ function QrCodePreview({ url }: { url: string }) {
   }, [url]);
 
   return (
-    <div className="relative size-[200px]">
+    <div className="relative size-50">
       {qrState === 'loading' && (
         <QrCodeSkeleton prefersReducedMotion={prefersReducedMotion} />
       )}
@@ -113,7 +114,7 @@ function QrCodePreview({ url }: { url: string }) {
         /* eslint-disable-next-line @next/next/no-img-element */
         <img
           alt="文章分享二维码"
-          className="size-[200px] rounded-md"
+          className="size-50 rounded-md"
           decoding="async"
           height={200}
           src={qrSrc}
@@ -155,53 +156,70 @@ function QrCodeSkeleton({
   );
 }
 
-function ShareActionIcon({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
+function BrandIcon({
+  icon,
+  ...props
+}: ComponentProps<'svg'> & {
+  icon: SimpleIcon;
 }) {
   return (
-    <span
-      data-icon="inline-start"
-      className={cn(
-        'flex size-4 shrink-0 items-center justify-center',
-        className,
-      )}
+    <svg
+      aria-hidden="true"
+      fill="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
-      {children}
-    </span>
+      <path d={icon.path} />
+    </svg>
   );
 }
 
 function ActionButton({
   active = false,
+  className,
   icon,
+  iconOnly = false,
   label,
   onClick,
 }: {
   active?: boolean;
+  className?: string;
   icon: ReactNode;
+  iconOnly?: boolean;
   label: string;
   onClick: () => void;
 }) {
-  return (
+  const button = (
     <Button
       aria-label={label}
       className={cn(
         'rounded-full text-muted-foreground shadow-none',
+        className,
         active && 'border-border/90 bg-muted text-foreground',
       )}
       onClick={onClick}
       title={label}
       type="button"
       variant="outline"
-      size="sm"
+      size={iconOnly ? 'icon-sm' : 'sm'}
     >
       {icon}
-      {label}
+      {!iconOnly && label}
     </Button>
+  );
+
+  if (!iconOnly) {
+    return button;
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{button}</TooltipTrigger>
+      <TooltipContent side="top" sideOffset={8}>
+        {label}
+      </TooltipContent>
+    </Tooltip>
   );
 }
 
@@ -210,11 +228,18 @@ function ActionButton({
 // ---------------------------------------------------------------------------
 
 interface ShareBarProps {
+  className?: string;
   title: string;
   url: string;
+  variant?: 'article' | 'sidebar';
 }
 
-export function ShareBar({ title, url }: ShareBarProps) {
+export function ShareBar({
+  className,
+  title,
+  url,
+  variant = 'article',
+}: ShareBarProps) {
   const { dialog: externalLinkDialog, openWarning } =
     useBlogExternalLinkWarning();
   const [copied, setCopied] = useState(false);
@@ -274,6 +299,14 @@ export function ShareBar({ title, url }: ShareBarProps) {
     openWarning(shareUrl.toString());
   }, [openWarning, title, url]);
 
+  // ── Email ────────────────────────────────────────────────────────────────
+  const shareEmail = useCallback(() => {
+    const subject = encodeURIComponent(title);
+    const body = encodeURIComponent(`${title}\n\n${url}`);
+
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  }, [title, url]);
+
   // ── Native share ──────────────────────────────────────────────────────────
   const nativeShare = useCallback(async () => {
     if (!navigator.share) {
@@ -287,19 +320,25 @@ export function ShareBar({ title, url }: ShareBarProps) {
     }
   }, [title, url]);
 
+  const isSidebar = variant === 'sidebar';
+  const actionButtonClassName = isSidebar ? 'shrink-0' : undefined;
+
   return (
     <>
       {externalLinkDialog}
       <QrDialog open={showQr} onOpenChange={setShowQr} url={url} />
 
-      <div className="share-bar mt-12 border-t border-border/70 pt-8">
-        <p className="mb-3 text-[0.7rem] font-semibold tracking-[0.08em] text-muted-foreground/70 uppercase">
-          分享这篇文章
-        </p>
-
+      <div
+        className={cn(
+          'share-bar border-t border-border/70',
+          isSidebar ? 'pt-5' : 'mt-12 pt-8',
+          className,
+        )}
+      >
         <div className="flex flex-wrap gap-2">
           <ActionButton
             active={copied}
+            className={actionButtonClassName}
             icon={
               copied ? (
                 <CopyCheckIcon data-icon="inline-start" />
@@ -307,33 +346,40 @@ export function ShareBar({ title, url }: ShareBarProps) {
                 <CopyIcon data-icon="inline-start" />
               )
             }
+            iconOnly={isSidebar}
             label={copied ? '已复制' : '复制链接'}
             onClick={copyUrl}
           />
           <ActionButton
-            icon={
-              <ShareActionIcon className="text-[#E6162D]">
-                <AtSignIcon className="size-4" />
-              </ShareActionIcon>
-            }
+            className={actionButtonClassName}
+            icon={<BrandIcon data-icon="inline-start" icon={siSinaweibo} />}
+            iconOnly={isSidebar}
             label="微博"
             onClick={shareWeibo}
           />
           <ActionButton
-            icon={
-              <ShareActionIcon className="text-[#07C160]">
-                <MessageCircleMoreIcon className="size-4" />
-              </ShareActionIcon>
-            }
+            className={actionButtonClassName}
+            icon={<BrandIcon data-icon="inline-start" icon={siWechat} />}
+            iconOnly={isSidebar}
             label="微信"
             onClick={() => setShowQr(true)}
           />
-          {hasNativeShare && (
+          {isSidebar ? (
             <ActionButton
-              icon={<Share2Icon data-icon="inline-start" />}
-              label="其他方式"
-              onClick={nativeShare}
+              className={actionButtonClassName}
+              icon={<MailIcon data-icon="inline-start" />}
+              iconOnly
+              label="邮件"
+              onClick={shareEmail}
             />
+          ) : (
+            hasNativeShare && (
+              <ActionButton
+                icon={<Share2Icon data-icon="inline-start" />}
+                label="其他方式"
+                onClick={nativeShare}
+              />
+            )
           )}
         </div>
       </div>

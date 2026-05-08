@@ -81,7 +81,7 @@ function ProjectPreviewTriggerCard({
       aria-label={`查看大图：${alt}`}
       className={cn(
         'group relative inline-flex w-auto shrink-0 cursor-zoom-in overflow-hidden rounded-[1.6rem] bg-transparent text-left',
-        'transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.98]',
+        'transition-transform duration-200 ease-out  active:scale-[0.98]',
         'focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none',
         buttonClassName,
       )}

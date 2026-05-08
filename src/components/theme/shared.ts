@@ -11,7 +11,9 @@ export function resolveThemeName(theme?: string | null): ThemeName | null {
 }
 
 export function getDomTheme(): ThemeName {
-  return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+  return document.documentElement.classList.contains('light')
+    ? 'light'
+    : 'dark';
 }
 
 export function applyThemeToRoot(theme: ThemeName) {

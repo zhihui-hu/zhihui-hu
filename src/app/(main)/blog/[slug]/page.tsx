@@ -125,8 +125,19 @@ export default async function BlogPostPage(props: PageProps<'/blog/[slug]'>) {
       >
         {hasToc && (
           <aside className="order-1 hidden xl:order-2 xl:block">
-            <div className="xl:sticky xl:top-(--blog-sticky-offset) xl:max-h-(--blog-sticky-max-height) xl:overflow-y-auto xl:pb-8">
-              <TableOfContents content={post.content} initialItems={tocItems} />
+            <div className="xl:sticky xl:top-(--blog-sticky-offset) xl:flex xl:max-h-(--blog-sticky-max-height) xl:flex-col xl:pb-8">
+              <div className="min-h-0 overflow-y-auto">
+                <TableOfContents
+                  content={post.content}
+                  initialItems={tocItems}
+                />
+              </div>
+              <ShareBar
+                className="mt-5 shrink-0"
+                title={post.metadata.title}
+                url={articleUrl}
+                variant="sidebar"
+              />
             </div>
           </aside>
         )}

@@ -63,6 +63,20 @@ function cssSize(value: CSSProperties['maxWidth']) {
   return value;
 }
 
+function ProgressiveImageLoading() {
+  return (
+    <span
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 rounded-[inherit] bg-muted motion-safe:animate-pulse"
+    >
+      <span
+        className="absolute inset-0 rounded-[inherit] bg-cover bg-center opacity-45 blur-xl"
+        style={{ backgroundImage: `url("${IMAGE_BLUR_DATA_URL}")` }}
+      />
+    </span>
+  );
+}
+
 export function ProgressiveImage({
   alt,
   className,
@@ -167,13 +181,7 @@ export function ProgressiveImage({
         unoptimized={unoptimized}
       />
 
-      {!isLoaded && !hasError ? (
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 scale-110 bg-cover bg-center blur-xl transition-opacity duration-500"
-          style={{ backgroundImage: `url("${IMAGE_BLUR_DATA_URL}")` }}
-        />
-      ) : null}
+      {!isLoaded && !hasError ? <ProgressiveImageLoading /> : null}
 
       {hasError && showError ? (
         <span className="absolute inset-0 flex items-center justify-center rounded-[inherit] bg-muted/70 px-4 text-center text-xs text-muted-foreground">

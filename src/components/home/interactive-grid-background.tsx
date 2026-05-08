@@ -119,10 +119,10 @@ export function InteractiveGridBackground({
           --grid-size: 10px;
           --dot-size: 0.62px;
           --mask-size: clamp(96px, 11vw, 164px);
-          --dot-base: rgba(24, 24, 27, 0.11);
-          --dot-active: rgba(24, 24, 27, 0.82);
-          --base-opacity: 1;
-          --active-opacity: 1;
+          --dot-base: rgba(24, 24, 27, 0.07);
+          --dot-active: rgba(24, 24, 27, 0.46);
+          --base-opacity: 0.82;
+          --active-opacity: 0.68;
           --mask-will-change: mask-image;
         }
 
@@ -130,23 +130,23 @@ export function InteractiveGridBackground({
           --grid-size: 12px;
           --dot-size: 0.56px;
           --mask-size: clamp(80px, 24vw, 128px);
-          --dot-base: rgba(24, 24, 27, 0.08);
-          --dot-active: rgba(24, 24, 27, 0.64);
-          --base-opacity: 0.72;
-          --active-opacity: 0.52;
+          --dot-base: rgba(24, 24, 27, 0.05);
+          --dot-active: rgba(24, 24, 27, 0.34);
+          --base-opacity: 0.58;
+          --active-opacity: 0.4;
           --mask-will-change: auto;
         }
 
         :global(html.dark) .root {
-          --dot-base: rgba(145, 145, 145, 0.28);
-          --dot-active: rgba(255, 255, 255, 0.98);
+          --dot-base: rgba(145, 145, 145, 0.16);
+          --dot-active: rgba(255, 255, 255, 0.62);
         }
 
         :global(html.dark) .root.simplified {
-          --dot-base: rgba(145, 145, 145, 0.2);
-          --dot-active: rgba(255, 255, 255, 0.8);
-          --base-opacity: 0.82;
-          --active-opacity: 0.64;
+          --dot-base: rgba(145, 145, 145, 0.12);
+          --dot-active: rgba(255, 255, 255, 0.5);
+          --base-opacity: 0.62;
+          --active-opacity: 0.46;
         }
 
         .layer {

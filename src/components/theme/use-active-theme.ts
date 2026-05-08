@@ -8,7 +8,7 @@ export function useActiveTheme() {
   const { resolvedTheme } = useTheme();
   const theme: ThemeName =
     resolveThemeName(resolvedTheme) ||
-    (typeof document === 'undefined' ? 'light' : getDomTheme());
+    (typeof document === 'undefined' ? 'dark' : getDomTheme());
 
   return theme;
 }
