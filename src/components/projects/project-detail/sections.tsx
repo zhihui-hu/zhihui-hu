@@ -89,7 +89,7 @@ export function DevelopmentCard({ item }: { item: ProjectDevelopment }) {
         )}
       </div>
 
-      {item.assets && item.assets.length > 0 && (
+      {/* {item.assets && item.assets.length > 0 && (
         <div className="mt-2 flex flex-col gap-3">
           <p className="text-[14px] font-medium text-foreground">补充图片</p>
           <div className="grid gap-3 grid-cols-2 sm:grid-cols-3">
@@ -113,7 +113,7 @@ export function DevelopmentCard({ item }: { item: ProjectDevelopment }) {
             ))}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
