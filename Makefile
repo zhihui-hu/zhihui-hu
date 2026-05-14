@@ -20,6 +20,8 @@ endif
 
 POST_BANNER_INPUT_EXPR := $${POST_BANNER_INPUT:-$${FILE:-$${POST:-$${SLUG:-$(POST_BANNER_GOAL_INPUT)}}}}
 POST_BANNER_PROVIDER_ARG := $(strip $(if $(PROVIDER),--provider $(PROVIDER)))
+COMPRESS ?= true
+POST_BANNER_COMPRESS_ARG := $(strip $(if $(filter false 0 no off,$(COMPRESS)),,--compress))
 POST_BANNER_PATH_HINT := For non-ASCII paths, use: make $(firstword $(MAKECMDGOALS)) FILE='posts/article.md'
 
 
@@ -93,7 +95,7 @@ banner-gemini:
 
 img:
 	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make img <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
-	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh "$$input_ref" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh "$$input_ref" $(POST_BANNER_PROVIDER_ARG) $(POST_BANNER_COMPRESS_ARG) $(ARGS)
 
 img-prepare:
 	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make img-prepare <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
@@ -105,7 +107,7 @@ img-generate:
 
 img-upload:
 	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make img-upload <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
-	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh upload "$$input_ref" $(POST_BANNER_PROVIDER_ARG) $(ARGS)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh upload "$$input_ref" $(POST_BANNER_PROVIDER_ARG) $(POST_BANNER_COMPRESS_ARG) $(ARGS)
 
 img-inject:
 	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make img-inject <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
@@ -113,4 +115,4 @@ img-inject:
 
 img-gemini:
 	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make img-gemini <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
-	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh "$$input_ref" --provider gemini $(ARGS)
+	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh "$$input_ref" --provider gemini $(POST_BANNER_COMPRESS_ARG) $(ARGS)
