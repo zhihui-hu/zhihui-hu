@@ -1,7 +1,7 @@
 ---
 title: 常见个人邮箱添加指南：Gmail、QQ、网易、Outlook 等邮箱怎么配置
 slug: personal-email-account-add-guide-imap-smtp-app-password
-image: ''
+image: https://img.huzhihui.com/2026/05/14/personal-email-account-add-guide-imap-smtp-app-password-banner.webp
 publishedAt: 2026-05-14T17:09
 summary: 这篇按邮箱服务商逐个整理添加方法，覆盖 Gmail、Yahoo、阿里、189、搜狐、QQ/Foxmail、网易、Outlook/Hotmail、新浪、139、21CN、88、iCloud、AOL、Yandex、Mail.ru 的 IMAP/SMTP 参数、授权码或应用密码获取方式，以及客户端里应该填什么。
 keywords:
@@ -21,6 +21,8 @@ tags:
   - 授权码
   - 应用密码
 ---
+
+![常见个人邮箱添加指南：Gmail、QQ、网易、Outlook 等邮箱怎么配置头图](https://img.huzhihui.com/2026/05/14/personal-email-account-add-guide-imap-smtp-app-password-banner.webp)
 
 ## 快速对照表
 
