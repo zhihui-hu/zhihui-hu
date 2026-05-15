@@ -265,7 +265,9 @@ export function formatBlogRelativeDate(date: string) {
   return formatDistanceToNow(parsedDate, {
     addSuffix: true,
     locale: zhCN,
-  });
+  })
+    .replace(/^大约\s*/, '')
+    .replace(/\s+/g, '');
 }
 
 export function getBlogWordCount(content: string) {
