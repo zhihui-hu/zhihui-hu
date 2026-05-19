@@ -94,7 +94,11 @@ export default function Page() {
             title="开源项目"
             transitionTypes={[ROUTE_LIST_NAVIGATION_TRANSITION]}
           />
-          <ProjectGrid enableNativeTransition projects={openSourceProjects} />
+          <ProjectGrid
+            enableNativeTransition
+            projects={openSourceProjects}
+            showCompanyName={false}
+          />
         </div>
       </section>
     </>

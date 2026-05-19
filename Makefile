@@ -116,3 +116,6 @@ img-inject:
 img-gemini:
 	@input_ref="$(POST_BANNER_INPUT_EXPR)"; test -n "$$input_ref" || (echo "Usage: make img-gemini <文章地址|slug|文章文件> [ARGS='...']"; echo "$(POST_BANNER_PATH_HINT)"; exit 1)
 	@input_ref="$(POST_BANNER_INPUT_EXPR)"; bash scripts/post-banner.sh "$$input_ref" --provider gemini $(POST_BANNER_COMPRESS_ARG) $(ARGS)
+
+typora-upload-image:
+	@bash scripts/typora-upload-image.sh $(ARGS)

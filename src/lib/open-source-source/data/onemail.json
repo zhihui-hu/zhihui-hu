@@ -1,0 +1,84 @@
+{
+  "sortOrder": 2,
+  "slug": "onemail",
+  "name": "OneMail",
+  "repo": "https://github.com/zhihui-hu/one-mail",
+  "logo": "https://img.huzhihui.com/2026/05/19/onemail%20(2).webp",
+  "overview": "OneMail 是一个完全开源、本地优先的桌面邮件客户端，用本地 SQLite 管理账号、邮件、附件元数据、搜索索引和设置，把 Gmail、Outlook、QQ、163 和自定义 IMAP 收到同一个桌面工作台里。",
+  "tags": ["桌面邮件客户端", "本地优先", "IMAP", "SQLite", "Electron"],
+  "urls": {
+    "official": "https://github.com/zhihui-hu/one-mail"
+  },
+  "companyName": "zhihui-hu",
+  "startDate": "2026-05-18",
+  "ongoing": true,
+  "category": "Productivity",
+  "industry": "开源工具",
+  "family": {
+    "key": "open-source-tools",
+    "title": "开源工具",
+    "description": "围绕日常开发、部署、内容管理和效率提升沉淀出来的开源项目。",
+    "sortOrder": 1,
+    "variantLabel": "桌面邮件",
+    "variantOrder": 2
+  },
+  "categories": ["桌面邮件客户端", "多邮箱管理", "本地优先工具"],
+  "platforms": ["macOS", "Windows", "Linux"],
+  "langs": ["中文简体"],
+  "price": "开源免费",
+  "headline": "一个本地优先的桌面邮件客户端，用 Electron、React 和 SQLite 把多邮箱聚合、安全预览、附件处理、写信回复和 SQL 备份迁移收进同一个桌面工作台。",
+  "introduction": [
+    "OneMail 解决的是多个邮箱分散在不同服务商里的日常问题。工作邮箱、个人邮箱、国内服务邮箱和自定义域名 IMAP 不再需要反复切网页，而是先同步到同一个桌面窗口里，再按账号、未读、有附件、星标和今日等条件快速筛选。",
+    "项目采用本地优先的设计，账号、邮件头、正文、附件元数据、搜索索引和设置都落在本机 SQLite 数据库里。导出就是 SQL，导入还是 SQL，换机器、重装系统或备份恢复时，不需要猜哪些配置目录和缓存文件才是完整数据。",
+    "邮件阅读区默认走安全预览。HTML 邮件会先做基础净化，远程图片和外部资源默认拦截，需要完整内容时再手动加载，减少一打开邮件就暴露 IP、User-Agent 和打开时间的风险。"
+  ],
+  "summary": [
+    "支持 Gmail、Outlook、QQ 邮箱、163 邮箱和自定义 IMAP，多账号统一收件箱可以集中查看未读、星标、附件和今日邮件。",
+    "本地 SQLite 管理账号、邮件正文、附件元数据、搜索索引和设置，数据库路径清楚，便于个人备份和迁移。",
+    "邮箱凭据使用本地数据库密钥派生 AES-256-GCM 密钥后加密保存，附件默认只保存元数据，点击下载时才写入本地文件。",
+    "HTML 邮件默认安全预览，远程图片和外部资源默认拦截，用户可以按需加载完整内容。",
+    "写信窗口支持写信、回复、回复全部、转发、抄送、密送、富文本格式、附件和草稿保存。",
+    "支持 SQL 备份导出和首次启动导入，适合换机器、重装系统或长期归档。"
+  ],
+  "techStack": [
+    "Electron 39",
+    "React 19",
+    "TypeScript 5.9",
+    "Tailwind CSS 4",
+    "shadcn/ui",
+    "SQLite",
+    "IMAP",
+    "SMTP",
+    "Vite",
+    "electron-builder"
+  ],
+  "resources": [
+    {
+      "label": "GitHub 仓库",
+      "url": "https://github.com/zhihui-hu/one-mail",
+      "kind": "repository"
+    },
+    {
+      "label": "项目介绍",
+      "url": "/blog/onemail-local-first-desktop-email-client",
+      "kind": "article"
+    }
+  ],
+  "screenshots": [
+    {
+      "image": "https://img.huzhihui.com/2026/05/15/OnaMail-02.webp"
+    },
+    {
+      "image": "https://img.huzhihui.com/2026/05/15/OnaMail-03.webp"
+    },
+    {
+      "image": "https://img.huzhihui.com/2026/05/15/OnaMail-01.webp"
+    }
+  ],
+  "assets": [
+    {
+      "label": "OneMail 头图",
+      "image": "https://img.huzhihui.com/2026/05/18/onemail-local-first-desktop-email-client.webp"
+    }
+  ]
+}

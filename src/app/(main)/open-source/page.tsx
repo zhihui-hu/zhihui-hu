@@ -31,7 +31,11 @@ export default function OpenSourcePage() {
 
   return (
     <section className="container mx-auto px-4 sm:px-6 lg:px-8">
-      <ProjectGroupList enableNativeTransition groups={groups} />
+      <ProjectGroupList
+        enableNativeTransition
+        groups={groups}
+        showCompanyName={false}
+      />
     </section>
   );
 }

@@ -13,11 +13,13 @@ import { ProjectCardDescription } from './project-card-description';
 type ProjectCardProps = {
   project: Project;
   enableNativeTransition?: boolean;
+  showCompanyName?: boolean;
 };
 
 export function ProjectCard({
   project,
   enableNativeTransition = false,
+  showCompanyName = true,
 }: ProjectCardProps) {
   const variantLabel = project.family?.variantLabel;
   const logo = project.logo ? (
@@ -78,7 +80,7 @@ export function ProjectCard({
               </div>
             )}
           </div>
-          {project.companyName && (
+          {showCompanyName && project.companyName && (
             <p className="mt-1 text-[0.76rem] leading-5 text-muted-foreground/80">
               {project.companyName}
             </p>
@@ -103,11 +105,13 @@ export function ProjectCard({
 type ProjectGridProps = {
   projects: Project[];
   enableNativeTransition?: boolean;
+  showCompanyName?: boolean;
 };
 
 export function ProjectGrid({
   projects,
   enableNativeTransition = false,
+  showCompanyName = true,
 }: ProjectGridProps) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -116,6 +120,7 @@ export function ProjectGrid({
           enableNativeTransition={enableNativeTransition}
           key={project.slug}
           project={project}
+          showCompanyName={showCompanyName}
         />
       ))}
     </div>
@@ -125,11 +130,13 @@ export function ProjectGrid({
 type ProjectGroupListProps = {
   groups: ProjectGroup[];
   enableNativeTransition?: boolean;
+  showCompanyName?: boolean;
 };
 
 export function ProjectGroupList({
   groups,
   enableNativeTransition = false,
+  showCompanyName = true,
 }: ProjectGroupListProps) {
   return (
     <div className="flex flex-col gap-9 sm:gap-11">
@@ -162,6 +169,7 @@ export function ProjectGroupList({
             <ProjectGrid
               enableNativeTransition={enableNativeTransition}
               projects={group.projects}
+              showCompanyName={showCompanyName}
             />
           </section>
         );
