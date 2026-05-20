@@ -1,5 +1,5 @@
 ---
-title: 完全开源、本地 SQLite 管理一切：我写了一个桌面邮件客户端 OneMail
+title: 完全开源、本地 SQLite 管理一切：我写了一个多桌面邮件客户端 OneMail
 slug: onemail-local-first-desktop-email-client
 image: https://img.huzhihui.com/2026/05/18/onemail-local-first-desktop-email-client.webp
 publishedAt: 2026-05-18T18:31

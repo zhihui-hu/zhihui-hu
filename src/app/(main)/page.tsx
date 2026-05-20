@@ -79,7 +79,7 @@ export default function Page() {
         <div className="flex flex-col gap-6">
           <SectionHeader
             href="/projects"
-            title="最新作品"
+            title="商业项目"
             transitionTypes={[ROUTE_LIST_NAVIGATION_TRANSITION]}
           />
           <ProjectGrid enableNativeTransition projects={projects} />
