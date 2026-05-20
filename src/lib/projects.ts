@@ -22,7 +22,7 @@ type ProjectAsset = {
 };
 
 export type ProjectHeroAction = {
-  kind: 'website' | 'ios' | 'android' | 'qr';
+  kind: 'website' | 'repository' | 'ios' | 'android' | 'qr';
   label: string;
   url?: string;
   imageSrc?: string;
@@ -441,10 +441,18 @@ function buildProjectHeroActions(
 ): ProjectHeroAction[] {
   const actions: ProjectHeroAction[] = [];
 
+  if (urls.official) {
+    actions.push({
+      kind: 'website',
+      label: '官方网站',
+      url: urls.official,
+    });
+  }
+
   if (urls.web) {
     actions.push({
       kind: 'website',
-      label: '在线体验',
+      label: urls.official ? '在线体验' : '官方网站',
       url: urls.web,
     });
   }
@@ -473,10 +481,10 @@ function buildProjectHeroActions(
     });
   }
 
-  if (projectSource.repo && projectSource.repo !== urls.web) {
+  if (projectSource.repo) {
     actions.push({
-      kind: 'website',
-      label: '查看源码',
+      kind: 'repository',
+      label: '开源项目',
       url: projectSource.repo,
     });
   }

@@ -24,7 +24,7 @@ import {
   QrCodeIcon,
 } from 'lucide-react';
 import Link from 'next/link';
-import { type CSSProperties, useState } from 'react';
+import { type CSSProperties, type ComponentProps, useState } from 'react';
 
 import { isExternalUrl } from './shared';
 
@@ -93,12 +93,13 @@ function HeroLinkAction({ action }: { action: ProjectHeroAction }) {
   }
 
   const isPrimary = action.kind === 'website';
-  const Icon = isPrimary ? GlobeIcon : DownloadIcon;
+  const isRepository = action.kind === 'repository';
+  const Icon = isPrimary ? GlobeIcon : isRepository ? GitHubLogo : DownloadIcon;
   const className = cn(
-    'h-9 rounded-full border px-4 text-[12.5px] font-semibold shadow-[0_14px_32px_rgba(0,0,0,0.22)] backdrop-blur-md sm:h-10 sm:px-5 sm:text-[13px]',
+    'h-9 rounded-full border px-4 text-[12.5px] font-semibold shadow-[0_14px_32px_rgba(0,0,0,0.18)] backdrop-blur-md sm:h-10 sm:px-5 sm:text-[13px]',
     isPrimary
-      ? 'border-white/18 bg-white text-black hover:bg-white/92'
-      : 'border-white/14 bg-white/10 text-white hover:bg-white/18 hover:text-white',
+      ? 'border-white/18 bg-white text-black hover:bg-white/90'
+      : 'border-white/18 bg-white/8 text-white hover:bg-white/16 hover:text-white',
   );
 
   if (isExternalUrl(action.url)) {
@@ -194,6 +195,20 @@ function HeroActionButton({
   return <HeroLinkAction action={action} />;
 }
 
+function GitHubLogo(props: ComponentProps<'svg'>) {
+  return (
+    <svg
+      aria-hidden="true"
+      fill="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+    </svg>
+  );
+}
+
 export function ProjectHeroHeader({
   project,
   heroImage,
@@ -266,7 +281,7 @@ export function ProjectHeroHeader({
         className={cn(
           'relative flex h-49.75 items-center overflow-hidden text-(--systemPrimary-onDark) sm:h-71.5',
           'bg-center bg-cover',
-          '[background:linear-gradient(to_bottom,transparent_20%,rgba(0,0,0,.8)_100%),var(--background-image),var(--background-color,#000)]',
+          '[background:var(--background-image),var(--background-color,#fff)]',
           'transform-[translate(0)]',
           'transition-[border-bottom-left-radius,border-bottom-right-radius]',
           'duration-210 ease-out sm:rounded-[24px]',
@@ -288,10 +303,10 @@ export function ProjectHeroHeader({
             animation: 'shift-background 60s linear 10s infinite',
             backgroundImage: 'var(--background-image)',
             backgroundRepeat: 'repeat',
-            filter: 'brightness(1.3) saturate(0) blur(50px)',
+            filter: 'brightness(1.08) saturate(1.25) blur(50px)',
             height: '500%',
             left: '0',
-            mixBlendMode: 'overlay',
+            mixBlendMode: 'soft-light',
             opacity: '0',
             position: 'absolute',
             top: '0',
@@ -300,7 +315,7 @@ export function ProjectHeroHeader({
             zIndex: 2,
           }}
         />
-        <div className="pointer-events-none absolute inset-0 z-3 bg-linear-to-b from-black/10 via-black/30 to-black/75" />
+        <div className="pointer-events-none absolute inset-0 z-3 bg-black/24" />
         <div className="relative z-10 flex h-full w-full items-center px-4 py-5 sm:px-8 sm:py-7 lg:px-10">
           <div className="flex w-full items-center gap-5 sm:gap-6 lg:gap-8">
             <div className="self-center">

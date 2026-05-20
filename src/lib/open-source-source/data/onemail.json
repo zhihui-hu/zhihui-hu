@@ -7,7 +7,7 @@
   "overview": "OneMail 是一个完全开源、本地优先的桌面邮件客户端，用本地 SQLite 管理账号、邮件、附件元数据、搜索索引和设置，把 Gmail、Outlook、QQ、163 和自定义 IMAP 收到同一个桌面工作台里。",
   "tags": ["桌面邮件客户端", "本地优先", "IMAP", "SQLite", "Electron"],
   "urls": {
-    "official": "https://github.com/zhihui-hu/one-mail"
+    "official": "https://zhihui-hu.github.io/one-mail/"
   },
   "companyName": "zhihui-hu",
   "startDate": "2026-05-18",
