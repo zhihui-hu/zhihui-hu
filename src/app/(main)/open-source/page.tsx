@@ -31,6 +31,15 @@ export default function OpenSourcePage() {
 
   return (
     <section className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="mb-8 flex flex-col gap-2">
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+          开源项目
+        </h1>
+        <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+          自己写、自己用，也适合复用的工具项目。
+        </p>
+      </header>
+
       <ProjectGroupList
         enableNativeTransition
         groups={groups}

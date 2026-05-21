@@ -1,4 +1,5 @@
 import { BlogLink } from '@/components/blog/blog-link';
+import { RelativeTime } from '@/components/blog/relative-time';
 import {
   SharedElementTransition,
   getSharedTitleTransitionName,
@@ -52,27 +53,26 @@ export function BlogPosts({
       {visiblePosts.map((post) => (
         <BlogLink
           key={post.slug}
-          className="mb-4 flex flex-col gap-1"
+          className="mb-3 block"
           href={`/blog/${post.slug}`}
         >
-          <div className="flex w-full flex-col gap-1 md:flex-row md:gap-2">
-            <p className="w-[100px] shrink-0 whitespace-nowrap tabular-nums text-muted-foreground">
-              {post.formattedPublishedAt}
-            </p>
+          <div className="grid w-full grid-cols-[5.5rem_minmax(0,1fr)] items-baseline gap-2 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-3">
+            <RelativeTime
+              className="text-sm whitespace-nowrap text-muted-foreground"
+              dateTime={post.metadata.publishedAt}
+              fallback={post.formattedPublishedAt}
+            />
             {enableNativeTransition ? (
               <SharedElementTransition
                 name={getSharedTitleTransitionName('blog', post.slug)}
               >
                 <p className="min-w-0 tracking-tight text-foreground line-clamp-1">
-                  <span className="underline-hover">
-                    {' '}
-                    {post.metadata.title}
-                  </span>
+                  <span className="underline-hover">{post.metadata.title}</span>
                 </p>
               </SharedElementTransition>
             ) : (
               <p className="min-w-0 tracking-tight text-foreground line-clamp-1">
-                <span className="underline-hover"> {post.metadata.title}</span>
+                <span className="underline-hover">{post.metadata.title}</span>
               </p>
             )}
           </div>

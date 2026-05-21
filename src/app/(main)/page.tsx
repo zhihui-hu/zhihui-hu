@@ -3,7 +3,7 @@ import { SectionHeader } from '@/components/home/section-header';
 import { ProjectGrid } from '@/components/projects/project-card';
 import { ROUTE_LIST_NAVIGATION_TRANSITION } from '@/components/route-view-transitions';
 import { Button } from '@/components/ui/button';
-import { formatBlogRelativeDate, getBlogPosts } from '@/lib/blog';
+import { formatBlogDate, getBlogPosts } from '@/lib/blog';
 import { getOpenSourceProjects } from '@/lib/open-source';
 import { getProjects } from '@/lib/projects';
 import { MailIcon } from 'lucide-react';
@@ -13,7 +13,7 @@ export default function Page() {
     .slice(0, 5)
     .map((post) => ({
       ...post,
-      formattedPublishedAt: formatBlogRelativeDate(post.metadata.publishedAt),
+      formattedPublishedAt: formatBlogDate(post.metadata.publishedAt),
     }));
 
   const projects = getProjects().slice(0, 4);

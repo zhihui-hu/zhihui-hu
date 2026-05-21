@@ -7,14 +7,14 @@ import pkg from '../../../../package.json';
 const projectsUrl = `${pkg.seo.og.url}/projects`;
 
 export const metadata: Metadata = {
-  title: '作品',
-  description: '个人项目与开源作品展示。',
+  title: '商业项目',
+  description: '个人商业项目展示。',
   alternates: {
     canonical: projectsUrl,
   },
   openGraph: {
-    title: `${pkg.seo.siteName} — 作品`,
-    description: '个人项目与开源作品展示。',
+    title: `${pkg.seo.siteName} — 商业项目`,
+    description: '个人商业项目展示。',
     url: projectsUrl,
     type: 'website',
     images: [
@@ -31,6 +31,15 @@ export default function ProjectsPage() {
 
   return (
     <section className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="mb-8 flex flex-col gap-2">
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+          商业项目
+        </h1>
+        <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+          参与过的金融、医疗和跨平台产品实践。
+        </p>
+      </header>
+
       <ProjectGroupList enableNativeTransition groups={projectGroups} />
     </section>
   );

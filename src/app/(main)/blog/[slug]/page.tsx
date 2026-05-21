@@ -7,7 +7,11 @@ import { ShareBar } from '@/components/blog/share-bar';
 import { TableOfContents } from '@/components/blog/table-of-contents';
 import { parseToc } from '@/components/blog/toc';
 import { StructuredData } from '@/components/structured-data';
-import { getBlogPostBySlug, getBlogPosts } from '@/lib/blog';
+import {
+  getBlogLastModified,
+  getBlogPostBySlug,
+  getBlogPosts,
+} from '@/lib/blog';
 import { cn } from '@/lib/utils';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -87,6 +91,7 @@ export default async function BlogPostPage(props: PageProps<'/blog/[slug]'>) {
 
   const articleUrl = `${pkg.seo.og.url}/blog/${post.slug}`;
   const articleImage = resolveImageUrl(post.metadata.image);
+  const modifiedDate = getBlogLastModified(post).toISOString();
   const tocItems = parseToc(post.content);
   const hasToc = tocItems.length > 0;
   const renderedPost = await renderBlogMdx({
@@ -98,7 +103,7 @@ export default async function BlogPostPage(props: PageProps<'/blog/[slug]'>) {
     headline: post.metadata.title,
     description: post.metadata.summary,
     datePublished: post.metadata.publishedAt || undefined,
-    dateModified: post.metadata.publishedAt || undefined,
+    dateModified: modifiedDate,
     image: articleImage,
     keywords: post.metadata.keywords?.join(', '),
     url: articleUrl,

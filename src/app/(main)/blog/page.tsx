@@ -1,12 +1,12 @@
 import pkg from '@/../package.json';
 import { BlogPosts } from '@/components/blog/posts';
-import { formatBlogRelativeDate, getBlogPosts } from '@/lib/blog';
+import { formatBlogDate, getBlogPosts } from '@/lib/blog';
 import type { Metadata } from 'next';
 
 const blogUrl = `${pkg.seo.og.url}/blog`;
 
 export const metadata: Metadata = {
-  title: 'Blog',
+  title: '博客',
   description: '记录软件开发、AI 应用和工程化实践的文章列表。',
   alternates: {
     canonical: blogUrl,
@@ -31,17 +31,23 @@ export const metadata: Metadata = {
 export default function BlogPage() {
   const posts = getBlogPosts().map((post) => ({
     ...post,
-    formattedPublishedAt: formatBlogRelativeDate(post.metadata.publishedAt),
+    formattedPublishedAt: formatBlogDate(post.metadata.publishedAt),
   }));
 
   return (
-    <>
-      {/* <h1 className="text-3xl font-semibold tracking-tight text-foreground mb-2">
-        博客
-      </h1> */}
-      <section className="container mx-auto px-4 py-2 sm:px-6 lg:px-8">
+    <section className="container mx-auto px-4 py-2 sm:px-6 lg:px-8">
+      <header className="mb-8 flex flex-col gap-2">
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+          博客
+        </h1>
+        <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+          记录软件开发、AI 应用和工程化实践。
+        </p>
+      </header>
+
+      <div>
         <BlogPosts enableNativeTransition posts={posts} />
-      </section>
-    </>
+      </div>
+    </section>
   );
 }

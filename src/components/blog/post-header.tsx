@@ -6,10 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import {
   type BlogPost,
   estimateBlogReadingTime,
-  formatBlogAbsoluteDate,
-  formatBlogRelativeDate,
+  formatBlogDate,
   getBlogWordCount,
 } from '@/lib/blog';
+
+import { RelativeTime } from './relative-time';
 
 interface PostHeaderProps {
   post: BlogPost;
@@ -18,8 +19,7 @@ interface PostHeaderProps {
 export function PostHeader({ post }: PostHeaderProps) {
   const wordCount = getBlogWordCount(post.content);
   const readingTime = estimateBlogReadingTime(post.content);
-  const formattedDate = formatBlogRelativeDate(post.metadata.publishedAt);
-  const absoluteDate = formatBlogAbsoluteDate(post.metadata.publishedAt);
+  const formattedDate = formatBlogDate(post.metadata.publishedAt);
   const tags = post.metadata.tags ?? [];
 
   return (
@@ -37,9 +37,10 @@ export function PostHeader({ post }: PostHeaderProps) {
           <p>
             {wordCount.toLocaleString()} 字 · {readingTime} 分钟读完
           </p>
-          <time dateTime={post.metadata.publishedAt} title={absoluteDate}>
-            {formattedDate}
-          </time>
+          <RelativeTime
+            dateTime={post.metadata.publishedAt}
+            fallback={formattedDate}
+          />
         </div>
 
         {tags.length > 0 ? (

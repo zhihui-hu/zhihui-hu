@@ -1,13 +1,5 @@
-import {
-  compareAsc,
-  compareDesc,
-  format,
-  formatDistanceToNow,
-  isFuture,
-  isValid,
-  parseISO,
-} from 'date-fns';
-import { zhCN } from 'date-fns/locale';
+import { formatAbsoluteDateTime, formatReadableDate } from '@/lib/dates';
+import { compareAsc, compareDesc, isFuture, isValid, parseISO } from 'date-fns';
 import fs from 'node:fs';
 import path from 'node:path';
 import { cache } from 'react';
@@ -19,6 +11,7 @@ export type BlogMetadata = {
   title: string;
   summary: string;
   publishedAt: string;
+  updatedAt?: string;
   slug: string;
   image?: string;
   keywords?: string[];
@@ -86,6 +79,7 @@ function extractFrontmatter(fileContent: string) {
       key === 'title' ||
       key === 'summary' ||
       key === 'publishedAt' ||
+      key === 'updatedAt' ||
       key === 'slug' ||
       key === 'image'
     ) {
@@ -220,6 +214,7 @@ function normalizePost(fileName: string) {
       title: frontmatter.title || createTitle(content, slug),
       summary: frontmatter.summary || createSummary(content),
       publishedAt: frontmatter.publishedAt || '',
+      updatedAt: frontmatter.updatedAt,
       slug,
       image: frontmatter.image,
       keywords: frontmatter.keywords,
@@ -239,35 +234,15 @@ export const getBlogPostBySlug = cache((slug: string) => {
 });
 
 export function formatBlogAbsoluteDate(date: string) {
-  const parsedDate = parsePublishedAt(date);
-
-  if (!parsedDate) {
-    return '未标注日期';
-  }
-
-  return format(
-    parsedDate,
-    date.includes('T') ? 'yyyy-MM-dd HH:mm' : 'yyyy-MM-dd',
-  );
+  return formatAbsoluteDateTime(date);
 }
 
 export function formatBlogDate(date: string) {
-  return formatBlogAbsoluteDate(date);
+  return formatReadableDate(date);
 }
 
 export function formatBlogRelativeDate(date: string) {
-  const parsedDate = parsePublishedAt(date);
-
-  if (!parsedDate) {
-    return '未标注日期';
-  }
-
-  return formatDistanceToNow(parsedDate, {
-    addSuffix: true,
-    locale: zhCN,
-  })
-    .replace(/^大约\s*/, '')
-    .replace(/\s+/g, '');
+  return formatReadableDate(date);
 }
 
 export function getBlogWordCount(content: string) {
@@ -283,6 +258,10 @@ export function estimateBlogReadingTime(content: string) {
   return Math.max(1, Math.round(minutes));
 }
 
-export function getBlogLastModified(date: string) {
-  return parsePublishedAt(date) || new Date();
+export function getBlogLastModified(post: BlogPost) {
+  return (
+    parsePublishedAt(post.metadata.updatedAt || '') ||
+    parsePublishedAt(post.metadata.publishedAt) ||
+    new Date(0)
+  );
 }

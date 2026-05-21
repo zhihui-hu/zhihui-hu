@@ -13,7 +13,10 @@ const font = Geist({
 });
 
 export const metadata: Metadata = {
-  title: pkg.seo.title,
+  title: {
+    default: pkg.seo.title,
+    template: `%s | ${pkg.seo.siteName}`,
+  },
   description: pkg.seo.description,
   applicationName: pkg.seo.siteName,
   keywords: pkg.seo.keywords,

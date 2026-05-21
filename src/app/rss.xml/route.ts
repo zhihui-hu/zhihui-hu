@@ -20,9 +20,7 @@ export async function GET() {
   const items = posts
     .map((post) => {
       const url = `${siteUrl}/blog/${post.slug}`;
-      const publishedAt = getBlogLastModified(
-        post.metadata.publishedAt,
-      ).toUTCString();
+      const publishedAt = getBlogLastModified(post).toUTCString();
 
       return `
   <item>

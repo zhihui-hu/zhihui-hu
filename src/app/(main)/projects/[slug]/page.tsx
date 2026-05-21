@@ -37,7 +37,7 @@ export async function generateMetadata(
   const image = resolveImageUrl(project.logo);
 
   return {
-    title: `${project.name} | 作品`,
+    title: `${project.name} | 商业项目`,
     description: project.description,
     keywords: project.tags,
     alternates: {
