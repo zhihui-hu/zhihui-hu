@@ -2,12 +2,12 @@
  * GitHub Markdown CSS — class-based dark mode
  *
  * Derived from github-markdown-css v5.9 (https://github.com/sindresorhus/github-markdown-css).
- * Adapted to use `data-theme` attribute on the `.markdown-body` element
- * instead of `@media (prefers-color-scheme: …)`, so the theme can be
- * toggled with JavaScript independently of the OS setting.
+ * Adapted to follow the root `.dark` class instead of
+ * `@media (prefers-color-scheme: …)`, so the theme follows the app toggle
+ * and the cached root theme before React hydrates.
  *
  * Usage:
- *   <article class="markdown-body" data-theme="light|dark"> … </article>
+ *   <html class="light|dark"> … <article class="markdown-body"> … </article>
  */
 
 /* ──────────────────────────────────────────────────────────────
@@ -86,7 +86,7 @@
 }
 
 /* Dark */
-.markdown-body[data-theme='dark'] {
+html.dark .markdown-body {
   color-scheme: dark;
   --fgColor-default: #f0f6fc;
   --fgColor-muted: #9198a1;
@@ -1348,16 +1348,14 @@
   background-color: transparent !important;
 }
 
-.markdown-body[data-theme='dark'] .github-code-block pre[data-theme] {
+html.dark .markdown-body .github-code-block pre[data-theme] {
   color: var(--shiki-dark) !important;
   background-color: #1f1f1f;
 }
 
-.markdown-body[data-theme='dark']
-  .github-code-block
-  pre[data-theme]
-  code[data-theme],
-.markdown-body[data-theme='dark']
+html.dark .markdown-body .github-code-block pre[data-theme] code[data-theme],
+html.dark
+  .markdown-body
   .github-code-block
   pre[data-theme]
   code[data-theme]
