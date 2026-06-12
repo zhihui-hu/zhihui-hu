@@ -138,6 +138,8 @@ export function ProjectGroupList({
   enableNativeTransition = false,
   showCompanyName = true,
 }: ProjectGroupListProps) {
+  const showGroupHeader = groups.length > 1;
+
   return (
     <div className="flex flex-col gap-9 sm:gap-11">
       {groups.map((group) => {
@@ -149,23 +151,29 @@ export function ProjectGroupList({
             className="flex flex-col gap-4"
             key={group.key}
           >
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-              <div className="flex flex-col gap-1.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2
-                    className="font-heading text-2xl font-semibold tracking-tight text-foreground"
-                    id={headingId}
-                  >
-                    {group.title}
-                  </h2>
+            {showGroupHeader ? (
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2
+                      className="font-heading text-2xl font-semibold tracking-tight text-foreground"
+                      id={headingId}
+                    >
+                      {group.title}
+                    </h2>
+                  </div>
+                  {group.description && (
+                    <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
+                      {group.description}
+                    </p>
+                  )}
                 </div>
-                {group.description && (
-                  <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-                    {group.description}
-                  </p>
-                )}
               </div>
-            </div>
+            ) : (
+              <h2 className="sr-only" id={headingId}>
+                {group.title}
+              </h2>
+            )}
             <ProjectGrid
               enableNativeTransition={enableNativeTransition}
               projects={group.projects}
