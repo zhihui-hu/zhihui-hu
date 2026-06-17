@@ -1,6 +1,7 @@
 ---
 title: 深入理解 JavaScript 之 new 原理及模拟实现
 slug: javascript-new-operator-principle-implementation
+image: https://img.huzhihui.com/2026/06/17/javascript-new-operator-principle-implementation.webp
 publishedAt: 2026-06-12T13:10
 summary: 从构造函数的基础用法出发，深入理解 JavaScript new 运算符在对象创建、原型链接、this 绑定和返回值处理上的完整过程，并手写一个更接近真实行为的模拟实现。
 keywords:
@@ -19,25 +20,23 @@ tags:
   - 前端
 ---
 
+![深入理解 JavaScript 之 new 原理及模拟实现头图](https://img.huzhihui.com/2026/06/17/javascript-new-operator-principle-implementation.webp)
+
 ## 前言
 
 最近重新回顾 JavaScript 原型链和构造函数，发现 `new` 是一个很适合拿来串知识点的运算符。
-
-它看起来只是：
 
 ```js
 const person = new Person(18);
 ```
 
-但背后其实同时涉及：
+背后同时涉及：
 
 1. 对象是怎么创建出来的。
 2. 实例为什么能访问构造函数原型上的方法。
 3. 构造函数里的 `this` 为什么会指向实例。
 4. 构造函数主动 `return` 时，最终结果到底取哪个。
 5. 为什么手写 `new` 可以理解原理，但不能完全替代真正的 `new`。
-
-本文就顺着这些问题，把 `new` 的基本行为、规范里的核心步骤，以及模拟实现的边界一起过一遍。
 
 ## 从一个例子开始
 
@@ -66,9 +65,7 @@ person.getAge();
 1. 可以访问构造函数 `Person` 内部通过 `this` 挂载的属性，比如 `age`。
 2. 可以访问 `Person.prototype` 上的方法，比如 `getAge`。
 
-这也是我们刚开始学 `new` 时最容易记住的部分：**new 出来的实例，一方面拿到了构造函数里的实例属性，另一方面连上了构造函数的原型对象**。
-
-但如果只记到这里，还不够。
+**new 出来的实例，一方面拿到了构造函数里的实例属性，另一方面连上了构造函数的原型对象**。
 
 接下来我们继续看几个返回值相关的例子。
 
@@ -172,7 +169,7 @@ console.log(person);
 
 虽然 `typeof null === 'object'`，但它不是一个真正可以作为实例结果返回的对象。实现时也需要把 `null` 排除掉。
 
-到这里，`new` 的返回值规则就比较清楚了：
+`new` 的返回值规则：
 
 | 构造函数返回值            | new 的最终结果             |
 | ------------------------- | -------------------------- |
@@ -204,7 +201,7 @@ new Person(18)
 3. 判断 `Person` 是否是构造器，也就是是否具备 `[[Construct]]` 能力。
 4. 调用 `Construct(Person, [18])`。
 
-这里要注意一个细节：**能被调用，不代表能被 new**。
+注意一个细节：**能被调用，不代表能被 new**。
 
 比如箭头函数可以调用，但不能作为构造函数：
 
@@ -224,7 +221,7 @@ new Person();
 
 ## 从流程图理解 new
 
-可以先用一张图把流程串起来：
+一张图把流程串起来：
 
 ```mermaid
 flowchart TD
@@ -238,9 +235,7 @@ flowchart TD
   G -- "否" --> I["返回默认创建的新对象"]
 ```
 
-接下来我们就按这个流程来手写一个模拟实现。
-
-## 第一版模拟实现
+## 手搓实现
 
 `new` 是关键字，不能直接覆盖。这里我们用 `create` 来模拟：
 
@@ -277,8 +272,6 @@ person.getAge();
 // 年龄为:18
 ```
 
-一步步看：
-
 1. `new Object()` 创建一个空对象。
 2. `[].shift.call(arguments)` 取出第一个参数，也就是构造函数。
 3. `obj.__proto__ = Constructor.prototype` 让实例能访问构造函数原型上的属性。
@@ -295,7 +288,7 @@ person.getAge();
 4. 没处理 `Constructor.prototype` 不是对象的情况。
 5. 没说明它和真正 `new` 的差距。
 
-所以我们再优化一版。
+再优化一版。
 
 ## 更稳妥的模拟实现
 
@@ -330,11 +323,11 @@ function create(Constructor, ...args) {
 
 这里改动主要有三点。
 
-首先，用 `Object.create(prototype)` 创建对象。
+先用 `Object.create(prototype)` 创建对象。
 
 `Object.create` 的作用就是创建一个新对象，并把这个新对象的原型指向传入对象。相比直接改 `__proto__`，这样更清晰。
 
-其次，对 `Constructor.prototype` 做了兜底。
+再对 `Constructor.prototype` 做了兜底。
 
 根据规范里的 [`OrdinaryCreateFromConstructor`](https://tc39.es/ecma262/multipage/ordinary-and-exotic-objects-behaviours.html#sec-ordinarycreatefromconstructor)，创建对象时会尝试从构造器的 `prototype` 属性上拿原型；如果这个值不是对象，就使用默认原型。
 
@@ -361,7 +354,7 @@ const prototype = isObject(Constructor.prototype)
   : Object.prototype;
 ```
 
-最后，返回值判断不再用 `instanceof Object`。
+结尾，返回值判断不再用 `instanceof Object`。
 
 更直接的判断是：
 
@@ -371,7 +364,7 @@ value !== null && (typeof value === 'object' || typeof value === 'function');
 
 这样可以覆盖普通对象、数组、函数，也可以排除 `null` 和基本类型。
 
-## 测试一下模拟实现
+## 测试一下手搓代码
 
 ### 没有 return
 
@@ -441,8 +434,6 @@ console.log(typeof person);
 // function
 ```
 
-到这里，一个适合学习 `new` 原理的模拟实现基本就完成了。
-
 ## 为什么不建议用 `__proto__`
 
 很多手写 `new` 的文章会这么写：
@@ -451,9 +442,9 @@ console.log(typeof person);
 obj.__proto__ = Constructor.prototype;
 ```
 
-这行代码确实能把 `obj` 的原型指向 `Constructor.prototype`，但它不适合作为推荐写法。
+这行代码确实能把 `obj` 的原型指向 `Constructor.prototype`，它不适合作为推荐写法。
 
-原因很简单：我们真正想表达的是“创建一个指定原型的新对象”，而不是“先创建一个对象，再修改它的原型”。从意图上看，`Object.create(Constructor.prototype)` 更直接。
+原因很简单：真正想表达的是“创建一个指定原型的新对象”，而不是“先创建一个对象，再修改它的原型”。从意图上看，`Object.create(Constructor.prototype)` 更直接。
 
 也就是说：
 
@@ -550,15 +541,13 @@ new Person();
 // TypeError: Person is not a constructor
 ```
 
-但我们的模拟实现只判断了 `typeof Constructor === 'function'`。箭头函数也是 function，所以这一点无法完全模拟。
+但上面手搓只判断了 `typeof Constructor === 'function'`。箭头函数也是 function，所以这一点无法完全模拟。
 
 如果用 `create(Person)`，它不会和真实 `new Person()` 完全一致。
 
 这是因为真正的 `new` 判断的是函数是否具备 `[[Construct]]` 内部方法，而不是简单判断类型。
 
 ### 2. class 构造函数不能直接 apply
-
-再看 `class`：
 
 ```js
 class Person {
@@ -573,7 +562,7 @@ console.log(person.age);
 // 18
 ```
 
-但如果用我们的 `create`：
+但如果用手搓的 `create`：
 
 ```js
 create(Person, 18);
@@ -582,7 +571,7 @@ create(Person, 18);
 
 原因是 `class` 构造函数必须通过 `new` 调用，不能像普通函数一样通过 `apply` 调用。
 
-这也是手写 `new` 的一个天然边界：**我们用 apply 只能模拟普通函数构造器，不能模拟 class 构造器的完整语义**。
+这也是手写 `new` 的一个天然边界：**用 apply 只能模拟普通函数构造器，不能模拟 class 构造器的完整语义**。
 
 ### 3. new.target 无法被模拟出来
 
@@ -632,7 +621,7 @@ console.log(person.age);
 
 ### 4. 内置对象可能有内部槽
 
-再看一个更容易忽略的例子：
+再来看一个更容易忽略的例子：
 
 ```js
 const date = new Date();
@@ -644,7 +633,7 @@ console.log(date.getTime());
 // 正常返回时间戳
 ```
 
-如果用我们的 `create` 去模拟：
+如果用上面手搓的 `create` 去模拟：
 
 ```js
 const fakeDate = create(Date);
@@ -658,13 +647,11 @@ console.log(fakeDate.getTime());
 
 这里看起来很反直觉：`fakeDate instanceof Date` 是 `true`，但 `getTime()` 依然报错。
 
-原因是 `instanceof` 主要检查原型链，而真正的 `Date` 实例内部还有日期相关的内部槽。我们手动 `Object.create(Date.prototype)` 只能伪造原型链，不能创建这些引擎内部的数据结构。
+原因是 `instanceof` 主要检查原型链，而真正的 `Date` 实例内部还有日期相关的内部槽。手动 `Object.create(Date.prototype)` 只能伪造原型链，不能创建这些引擎内部的数据结构。
 
 所以，手写 `new` 最适合用来理解普通构造函数，不适合拿来模拟所有内置对象。
 
 ## new 和原型链的关系
-
-再回到最开始的例子：
 
 ```js
 function Person(age) {
@@ -708,15 +695,7 @@ person.getAge();
 
 这就是 `new` 和原型链之间的核心关系：**new 不会把原型方法复制到实例上，而是让实例通过原型链访问这些方法**。
 
-## 再看 constructor 属性
-
-很多人会把这句话说成：
-
-```text
-new 会把实例的 constructor 指向构造函数
-```
-
-这个说法不够准确。
+## constructor 属性
 
 真正发生的是：实例的 `[[Prototype]]` 指向了构造函数的 `prototype` 对象。而 `prototype` 对象上默认有一个 `constructor` 属性，指回构造函数。
 
@@ -817,7 +796,7 @@ function create(Constructor, ...args) {
 
 `new` 的核心其实可以压缩成一句话：
 
-> 创建一个新对象，把它连到构造函数的原型上，再用它作为 `this` 执行构造函数，最后根据构造函数返回值决定返回谁。
+> **创建一个新对象，把它连到构造函数的原型上，再用它作为 `this` 执行构造函数，最后根据构造函数返回值决定返回谁。**
 
 但真正写模拟实现时，细节就会冒出来：
 
@@ -827,8 +806,6 @@ function create(Constructor, ...args) {
 4. `__proto__` 可以帮助理解，但实现上更推荐 `Object.create`。
 5. `instanceof Object` 不是最好的返回值判断方式。
 6. 手写 `new` 理解普通函数构造器足够，但不要误以为它能覆盖 `class`、`new.target` 和所有内置对象。
-
-写到这里，`new` 大致就算过完了。它看起来是一个语法糖，但背后其实把对象、原型链、构造函数、`this` 和返回值规则都串在了一起。
 
 ## 参考文章和规范
 
