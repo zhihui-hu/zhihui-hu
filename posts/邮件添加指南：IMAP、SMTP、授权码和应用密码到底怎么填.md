@@ -210,10 +210,6 @@ flowchart TD
 
 ![输入 IMAP 和 SMTP 服务器信息](https://img.huzhihui.com/2026/05/14/mail-guide-ali-01-banner.webp)
 
-![设置邮件同步选项](https://img.huzhihui.com/2026/05/14/mail-guide-ali-02-banner.webp)
-
-![邮箱状态显示正常](https://img.huzhihui.com/2026/05/14/mail-guide-ali-03-banner.webp)
-
 ### 容易出错的地方
 
 如果登录密码确认没错但仍然失败，去阿里邮箱网页版检查 IMAP/SMTP 服务是否被关闭。它通常默认可用，但也可能被手动关掉。
@@ -306,8 +302,6 @@ flowchart TD
 
 ![成功获取用于第三方客户端登录的独立密码](https://img.huzhihui.com/2026/05/14/mail-guide-sohu-04-banner.webp)
 
-![在客户端的密码框中填入独立密码](https://img.huzhihui.com/2026/05/14/mail-guide-sohu-05-banner.webp)
-
 ### IP 白名单要不要开
 
 普通用户建议关闭 IP 白名单模式。
@@ -371,10 +365,6 @@ QQ 邮箱和 Foxmail 邮箱走同一套腾讯邮箱后台。添加第三方客�
 
 ![成功生成授权码并进行复制](https://img.huzhihui.com/2026/05/14/mail-guide-qq-foxmail-06-banner.webp)
 
-![在第三方客户端的密码栏中输入获取的授权码](https://img.huzhihui.com/2026/05/14/mail-guide-qq-foxmail-07-banner.webp)
-
-![邮箱成功添加后显示正常状态](https://img.huzhihui.com/2026/05/14/mail-guide-qq-foxmail-08-banner.webp)
-
 ### 容易出错的地方
 
 如果你之前开启过 IMAP 服务，但忘记了授权码，不能找回旧授权码。回到 QQ 邮箱账户设置里重新生成即可。
@@ -430,10 +420,6 @@ flowchart TD
 
 ![成功生成客户端授权码并复制](https://img.huzhihui.com/2026/05/14/mail-guide-netease-04-banner.webp)
 
-![在第三方客户端的密码栏中输入获取的客户端授权码](https://img.huzhihui.com/2026/05/14/mail-guide-netease-05-banner.webp)
-
-![邮箱成功添加后显示正常状态](https://img.huzhihui.com/2026/05/14/mail-guide-netease-06-banner.webp)
-
 ### 多个网易后缀怎么处理
 
 `@163.com`、`@126.com`、`@yeah.net` 的授权码流程一样。
@@ -486,10 +472,6 @@ flowchart TD
 ![在高级安全选项中找到并点击创建新应用密码](https://img.huzhihui.com/2026/05/14/mail-guide-outlook-hotmail-03-banner.webp)
 
 ![成功生成应用密码并进行复制](https://img.huzhihui.com/2026/05/14/mail-guide-outlook-hotmail-04-banner.webp)
-
-![在客户端密码框中输入微软应用密码](https://img.huzhihui.com/2026/05/14/mail-guide-outlook-hotmail-05-banner.webp)
-
-![邮箱成功添加后显示正常状态](https://img.huzhihui.com/2026/05/14/mail-guide-outlook-hotmail-06-banner.webp)
 
 ### 容易出错的地方
 
@@ -623,10 +605,6 @@ flowchart TD
 3. 密码填写 21CN 邮箱网页登录密码。
 4. 如果需要手动配置，填写 `imap.21cn.com:993` 和 `smtp.21cn.com:465`。
 5. 保存后测试收信和发信。
-
-### 操作截图
-
-![在第三方客户端添加 21CN 邮箱账户的界面截图](https://img.huzhihui.com/2026/05/14/mail-guide-21cn-01-banner.webp)
 
 ### 容易出错的地方
 
