@@ -1,4 +1,5 @@
 import pkg from '@/../package.json';
+import { BlogHashScroll } from '@/components/blog/hash-scroll';
 import { MarkdownBody } from '@/components/blog/markdown-body';
 import { renderBlogMdx } from '@/components/blog/mdx';
 import { PostHeader } from '@/components/blog/post-header';
@@ -121,6 +122,7 @@ export default async function BlogPostPage(props: PageProps<'/blog/[slug]'>) {
 
   return (
     <section className="container mx-auto w-full px-4 sm:px-6 lg:px-8">
+      <BlogHashScroll routeKey={post.slug} />
       <StructuredData data={jsonLd} id={`blog-post-jsonld-${post.slug}`} />
       <div
         className={cn(

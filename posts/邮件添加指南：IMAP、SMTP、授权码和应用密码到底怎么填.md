@@ -95,7 +95,7 @@ Gmail 不能直接拿 Google 账号主密码去登录第三方客户端。正确
 1. 打开 Google 账号安全设置页面。
 2. 找到“两步验证”，按页面提示开启。
 3. 开启两步验证后，进入“应用密码”页面。
-4. 新建一个应用密码，名称可以写成“来发信”或你正在使用的客户端名称。
+4. 新建一个应用密码，名称可以写成“onemail”或你正在使用的客户端名称。
 5. Google 会生成一个 16 位应用密码，立即复制保存。
 6. 回到邮件客户端添加 Gmail。
 7. 用户名填写完整 Gmail 地址。
@@ -119,8 +119,6 @@ Gmail 不能直接拿 Google 账号主密码去登录第三方客户端。正确
 ![输入应用名称并创建](https://img.huzhihui.com/2026/05/14/mail-guide-gmail-07-banner.webp)
 
 ![生成并保存应用密码](https://img.huzhihui.com/2026/05/14/mail-guide-gmail-08-banner.webp)
-
-![在来发信中输入应用密码](https://img.huzhihui.com/2026/05/14/mail-guide-gmail-09-banner.webp)
 
 ### 容易出错的地方
 
@@ -156,7 +154,7 @@ Yahoo 添加到第三方客户端时要使用“应用程式密码”，不是 Y
 2. 点击右上角头像或姓名，进入“账户资料”。
 3. 进入“账户安全性”。
 4. 找到“产生应用程式密码”或“管理应用程式密码”。
-5. 输入应用名称，比如“来发信”。
+5. 输入应用名称，比如“onemail”。
 6. 点击生成，复制 16 位应用程式密码。
 7. 在邮件客户端里添加 Yahoo 邮箱。
 8. 用户名填写完整邮箱地址。
@@ -172,10 +170,6 @@ Yahoo 添加到第三方客户端时要使用“应用程式密码”，不是 Y
 ![输入应用名称](https://img.huzhihui.com/2026/05/14/mail-guide-yahoo-03-banner.webp)
 
 ![生成并复制密码](https://img.huzhihui.com/2026/05/14/mail-guide-yahoo-04-banner.webp)
-
-![在来发信中输入应用程式密码](https://img.huzhihui.com/2026/05/14/mail-guide-yahoo-05-banner.webp)
-
-![绑定成功状态](https://img.huzhihui.com/2026/05/14/mail-guide-yahoo-06-banner.webp)
 
 ### 容易出错的地方
 
@@ -260,8 +254,6 @@ flowchart TD
 ### 操作截图
 
 ![在 189 邮箱网页版设置中启用 IMAP/SMTP 服务](https://img.huzhihui.com/2026/05/14/mail-guide-189-01-banner.webp)
-
-![在来发信中输入邮箱和登录密码](https://img.huzhihui.com/2026/05/14/mail-guide-189-02-banner.webp)
 
 ### 容易出错的地方
 
@@ -551,8 +543,6 @@ flowchart TD
 
 ![新浪邮箱成功获取客户端授权码提示](https://img.huzhihui.com/2026/05/14/mail-guide-sina-03-banner.webp)
 
-![来发信系统添加邮箱界面输入客户端授权码作为密码](https://img.huzhihui.com/2026/05/14/mail-guide-sina-04-banner.webp)
-
 ### 容易出错的地方
 
 新浪授权码只显示一次。如果忘记了，只能重新走一遍开启和验证流程获取新的授权码。
@@ -600,8 +590,6 @@ flowchart TD
 ### 操作截图
 
 ![在 139 邮箱后台开启 IMAP/SMTP 服务](https://img.huzhihui.com/2026/05/14/mail-guide-139-01-banner.webp)
-
-![在来发信中使用客户端密码完成邮箱绑定](https://img.huzhihui.com/2026/05/14/mail-guide-139-02-banner.webp)
 
 ### 容易出错的地方
 
@@ -677,7 +665,7 @@ flowchart TD
 5. 确认 `POP3/SMTP` 服务已开启。
 6. 在同一页面下方找到“专用密码”。
 7. 点击“新建专用密码”。
-8. 输入一个容易识别的名称，比如“来发信客户端”。
+8. 输入一个容易识别的名称，比如“onemail客户端”。
 9. 点击确定后，系统会生成 16 位专用密码。
 10. 立即复制并保存。
 11. 回到邮件客户端添加邮箱。
@@ -692,8 +680,6 @@ flowchart TD
 ![为专用密码设置一个可识别的名称](https://img.huzhihui.com/2026/05/14/mail-guide-88-02-banner.webp)
 
 ![成功生成 16 位专用密码并复制](https://img.huzhihui.com/2026/05/14/mail-guide-88-03-banner.webp)
-
-![在来发信中使用专用密码完成邮箱绑定](https://img.huzhihui.com/2026/05/14/mail-guide-88-04-banner.webp)
 
 ### 容易出错的地方
 
@@ -730,7 +716,7 @@ iCloud 邮箱必须使用 Apple ID 的 App 专用密码。直接填 Apple ID 主
 4. 进入“登录与安全”。
 5. 找到“App 专用密码”。
 6. 点击生成 App 专用密码。
-7. 输入标签，比如“来发信”。
+7. 输入标签，比如“onemail”。
 8. Apple 会生成类似 `xxxx-xxxx-xxxx-xxxx` 的专用密码。
 9. 立即复制保存。
 10. 回到邮件客户端添加 iCloud 邮箱。
@@ -745,8 +731,6 @@ iCloud 邮箱必须使用 Apple ID 的 App 专用密码。直接填 Apple ID 主
 ![输入一个便于识别的密码标签](https://img.huzhihui.com/2026/05/14/mail-guide-icloud-02-banner.webp)
 
 ![成功生成并复制 App 专用密码](https://img.huzhihui.com/2026/05/14/mail-guide-icloud-03-banner.webp)
-
-![在来发信中使用 App 专用密码完成邮箱绑定](https://img.huzhihui.com/2026/05/14/mail-guide-icloud-04-banner.webp)
 
 ### 容易出错的地方
 
@@ -783,7 +767,7 @@ AOL Mail 要生成“应用程序密码”。它的流程和 Yahoo 很像。
 2. 进入账户信息页面。
 3. 从左侧菜单选择 `Account security`。
 4. 找到 `Generate app password`。
-5. 输入应用名称，比如“来发信”。
+5. 输入应用名称，比如“onemail”。
 6. 点击生成。
 7. 系统会显示 16 位应用程序密码。
 8. 立即复制并保存。
@@ -803,8 +787,6 @@ AOL Mail 要生成“应用程序密码”。它的流程和 Yahoo 很像。
 ![为您的应用程序密码输入一个可识别的名称](https://img.huzhihui.com/2026/05/14/mail-guide-aol-04-banner.webp)
 
 ![成功生成 16 位应用程序密码并复制](https://img.huzhihui.com/2026/05/14/mail-guide-aol-05-banner.webp)
-
-![在来发信中使用应用程序密码完成邮箱绑定](https://img.huzhihui.com/2026/05/14/mail-guide-aol-06-banner.webp)
 
 ### 容易出错的地方
 
@@ -845,7 +827,7 @@ Yandex 要先开启 IMAP/POP3 客户端访问，再生成应用密码。
 8. 打开 `Security` 标签页。
 9. 找到 `App passwords`。
 10. 选择为 Yandex Mail 创建新密码。
-11. 输入名称，比如“来发信”。
+11. 输入名称，比如“onemail”。
 12. 点击 `Create`。
 13. 复制系统生成的应用密码。
 14. 回到邮件客户端添加 Yandex 邮箱。
@@ -868,8 +850,6 @@ Yandex 要先开启 IMAP/POP3 客户端访问，再生成应用密码。
 ![为应用密码命名以便于识别](https://img.huzhihui.com/2026/05/14/mail-guide-yandex-06-banner.webp)
 
 ![成功生成并复制 Yandex 应用密码](https://img.huzhihui.com/2026/05/14/mail-guide-yandex-07-banner.webp)
-
-![在来发信中使用应用密码完成邮箱绑定](https://img.huzhihui.com/2026/05/14/mail-guide-yandex-08-banner.webp)
 
 ### 容易出错的地方
 
@@ -905,7 +885,7 @@ Mail.ru 建议开启两步验证，并使用应用专用密码登录第三方客
 3. 找到 `App passwords`，部分账号可能显示为 `External application passwords`。
 4. 如果页面要求先开启两步验证，先按提示完成。
 5. 创建应用密码前，可能需要完成人机验证。
-6. 输入一个便于识别的应用名称，比如“来发信”。
+6. 输入一个便于识别的应用名称，比如“onemail”。
 7. 点击创建。
 8. 系统会生成应用专用密码。
 9. 立即复制并保存。
@@ -921,8 +901,6 @@ Mail.ru 建议开启两步验证，并使用应用专用密码登录第三方客
 ![完成人机身份验证](https://img.huzhihui.com/2026/05/14/mail-guide-mailru-02-banner.webp)
 
 ![生成并复制应用专用密码](https://img.huzhihui.com/2026/05/14/mail-guide-mailru-03-banner.webp)
-
-![在来发信中使用应用专用密码完成邮箱绑定](https://img.huzhihui.com/2026/05/14/mail-guide-mailru-04-banner.webp)
 
 ### 容易出错的地方
 
