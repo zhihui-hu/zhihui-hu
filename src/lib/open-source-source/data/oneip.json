@@ -1,0 +1,77 @@
+{
+  "sortOrder": 3,
+  "slug": "oneip",
+  "name": "One IP",
+  "repo": "https://github.com/zhihui-hu/one-ip",
+  "urls": {
+    "official": "https://ip.huzhihui.com"
+  },
+  "logo": "https://img.huzhihui.com/2026/09/11/icon.svg",
+  "overview": "One IP 是一个集 IP 查询、网络诊断、浏览器检测和 AI 服务状态于一体的工具箱，在同一个页面查看网络出口、网站分流、浏览器环境与服务运行情况。",
+  "tags": [
+    "IP 查询",
+    "网络诊断",
+    "浏览器检测",
+    "AI 服务状态",
+    "Cloudflare Workers"
+  ],
+  "companyName": "zhihui-hu",
+  "ongoing": true,
+  "category": "Developer Tools",
+  "industry": "开源工具",
+  "family": {
+    "key": "open-source-tools",
+    "title": "开源工具",
+    "description": "围绕日常开发、部署、内容管理和效率提升沉淀出来的开源项目。",
+    "sortOrder": 1,
+    "variantLabel": "网络诊断",
+    "variantOrder": 3
+  },
+  "categories": ["IP 查询", "网络诊断", "浏览器检测"],
+  "platforms": ["Web 应用"],
+  "langs": ["中文简体", "English"],
+  "price": "开源免费",
+  "headline": "从当前网络出口到全球 Ping，从浏览器指纹到 AI 服务状态，把日常网络排查需要的工具收进一个支持桌面与手机的工作台。",
+  "introduction": [
+    "One IP 将分散的网络检测工具集中起来。打开首页即可查看 IPv4 / IPv6 出口、归属信息、网站分流、网络连通性、浏览器环境和 AI 平台访问情况，再进入对应页面查看详细结果。",
+    "网络模块支持 IP 多源查询、域名与地址的 RDAP 注册信息、全球 ICMP Ping、DNS 出口和 CDN 节点检测，方便排查代理分流、解析路径和不同地区的网络表现。",
+    "界面支持中英文、浅色与深色主题，并针对手机提供底部导航和详情抽屉。前端静态文件与 API 由同一个 Cloudflare Worker 提供，方便自行部署。"
+  ],
+  "summary": [
+    "查询公网 IP 的归属地、运营商和 ASN，支持多源对比；通过 RDAP 查看域名、IP 和 ASN 的注册信息。",
+    "检测网站分流与 HTTP 连通性，使用 Globalping 查看全球节点的 ICMP 延迟和丢包，并检查 DNS 出口与 CDN 命中节点。",
+    "查看浏览器环境、FingerprintJS 指纹、WebRTC 地址、环境一致性及权限隐私，按需体验验证码检测。",
+    "支持 ChatGPT、Claude、Gemini 等 AI 平台的浏览器访问检测，并独立聚合官方服务状态；资源响应不代表登录、对话或模型 API 可用。",
+    "IP 和 WHOIS 查询历史保存在当前浏览器，支持中英文切换、深浅主题和桌面与移动端响应式布局。"
+  ],
+  "techStack": [
+    "React 19",
+    "TypeScript",
+    "Vite",
+    "Tailwind CSS",
+    "shadcn/ui",
+    "TanStack Query",
+    "GSAP",
+    "Cloudflare Workers",
+    "FingerprintJS",
+    "Globalping"
+  ],
+  "resources": [
+    {
+      "label": "GitHub 仓库",
+      "url": "https://github.com/zhihui-hu/one-ip",
+      "kind": "repository"
+    }
+  ],
+  "screenshots": [
+    {
+      "image": "https://img.huzhihui.com/2026/09/11/desktop-home-redacted.webp"
+    },
+    {
+      "image": "https://img.huzhihui.com/2026/09/11/mobile-home-light-redacted.webp"
+    },
+    {
+      "image": "https://img.huzhihui.com/2026/09/11/mobile-home-dark-redacted.webp"
+    }
+  ]
+}
