@@ -2,8 +2,8 @@
 title: 云电脑里不能直接传文件，我写了一个用剪贴板和二维码传输的 One Transfer
 slug: one-transfer-restricted-environment-file-transfer
 publishedAt: 2026-08-21T10:00
-updatedAt: 2026-08-28T18:00
-summary: 在受限云电脑、VDI 和临时隔离环境里，文件不能直接上传下载时怎么办？本文结合 One Transfer 当前源码，详细拆解 ONE_TRANSFER_V2、Base91、LT 喷泉码、四二维码并行传输、真实带宽模型，以及电脑、手机和远程桌面之间的传输优化。
+updatedAt: 2026-09-01T18:30
+summary: 在受限云电脑、VDI 和临时隔离环境里，文件不能直接上传下载时怎么办？本文结合 One Transfer 当前源码，详细拆解 ONE_TRANSFER_V2、Base91、LT 喷泉码、OTH1 设备能力前导帧、四二维码并行传输和动态链路调参。
 keywords:
   - One Transfer
   - 云电脑文件传输
@@ -41,11 +41,10 @@ tags:
 
 ```text
 One Transfer: 0.2.0
-commit: ee9c5d03c2e22c886589ce1955c15d7586000db3
-date: 2026-08-25
+source snapshot: 2026-09-01 当前实现
 ```
 
-接下来除了讲怎么使用，还会重点拆开 LT 喷泉码、鲁棒孤子分布、确定性随机数、Peeling 解码、二维码容量和实际带宽，以及电脑、手机、低性能设备和远程桌面之间应该怎么调参。
+接下来除了讲怎么使用，还会重点拆开 LT 喷泉码、鲁棒孤子分布、确定性随机数、Peeling 解码、二维码容量和实际带宽，以及发送端如何先广播设备能力，接收端再根据真实负载动态调参。
 
 ## 我想解决的不是“怎么上传”，而是“没有文件通道怎么办”
 
@@ -447,6 +446,67 @@ sessionId : K : blockLen : totalLen : payloadFnv
 
 恢复后先检查 FNV-1a，再解析容器、限制 gzip 解压长度，最后计算原始内容 SHA-256。FNV 用于快速发现光学恢复错误，不是密码学认证；SHA-256 能证明内容一致，也不能证明发送者身份。
 
+## 发送数据前，为什么先广播设备能力
+
+数据帧能告诉接收端“这是哪个会话的第几个 Symbol”，却没有告诉它发送端正在以多少 FPS、每次更新几个码。如果接收端一开始就盲目使用 `60 FPS + 4 Workers`，低性能设备可能在还没看到第一个文件帧前就被 WASM 解码压满。
+
+因此每个光学会话会先发送一个 20 字节的 `OTH1` 能力记录。它不是 LT 数据帧，接收端在 `parseFrame()` 之前先尝试用 `parseSenderCapabilityHello()` 识别：
+
+| 偏移 | 类型     | 字段                | 说明                                       |
+| ---: | -------- | ------------------- | ------------------------------------------ |
+|    0 | `4 × u8` | Magic               | ASCII `OTH1`                               |
+|    4 | `u8`     | Version             | 当前为 1                                   |
+|    5 | `u8`     | Logical Cores       | 发送端逻辑线程数                           |
+|    6 | `u8`     | Device Memory       | GiB，0 表示浏览器没有提供                  |
+|    7 | `u8`     | Refresh Rate        | 估算 Hz，0 表示未知                        |
+| 8–11 | `4 × u8` | Send State          | 每 Tick 码数、目标 FPS、DPR×10、输出达成率 |
+|   12 | `u16`    | Short Viewport Edge | 发送窗口短边 CSS 像素                      |
+|   14 | `u16`    | Frame Bytes         | 当前每码总字节数                           |
+|   16 | `u16`    | Session ID          | 与后续 LT 数据帧一致                       |
+|   18 | `u16`    | Checksum            | 前 18 字节的 16 位加和校验                 |
+
+这张能力 QR 使用 ECC M，比数据帧的 ECC L 更偏向可识别性。时序上分两段：
+
+```text
+数据流开始
+  -> 四格同时显示 OTH1，持续 1.5 秒
+  -> 切换为 LT 数据帧
+  -> 每 10 秒用一个码位重播约 500 ms OTH1
+```
+
+首次重复四份是为了让接收端尽快建立会话；周期性重播则解决“接收页比发送页晚打开”的问题。能力帧和数据帧使用同一个 `sessionId`，接收端不会把旧会话的调参结果套到新文件上。
+
+### 接收端怎样动态调整
+
+收到 `OTH1` 后，接收端先根据发送符号率 `txFps × symbolsPerTick` 和自身逻辑线程数选择初值：
+
+| 接收端 CPU | 捕获 FPS                        | Worker |
+| ---------- | ------------------------------- | -----: |
+| ≤4 线程    | 30                              |      2 |
+| 5–7 线程   | 发送符号率 >60 时用 45，否则 30 |      3 |
+| ≥8 线程    | 发送符号率 >60 时用 60，否则 30 |      4 |
+
+文件帧开始后，页面每 500 ms 更新指标，每 8 秒才允许做一次参数变更，避免 FPS 和 Worker 在阈值边缘来回抖动。解码利用率估算为：
+
+```text
+utilization% = averageDecodeMs × captureFps / workers / 10
+```
+
+动态规则是保守的：
+
+- 忙碌丢帧率超过 8%、接收端至少 6 线程且 Worker 少于 4 时，先增加一个 Worker；
+- 利用率超过 82% 或忙碌丢帧率超过 10% 时，捕获 FPS 按 `60 -> 45 -> 30` 降低；
+- 发送符号率高于 60、利用率低于 50%、忙碌丢帧低于 3% 时，再按 `30 -> 45 -> 60` 试探提升；
+- 用户手动改过的 FPS 或 Worker 保持手动值，自动逻辑只调整未锁定字段。
+
+接收端还会结合不重复帧率、重复率、净 goodput 和发送端实际输出达成率，显示一组发送参数建议。但这里必须区分“单向自适应”和“双向闭环”：
+
+- 接收端能根据 `OTH1` 自动改自己的 FPS/Worker；
+- 接收端不能把建议通过光学链路回传给发送端；
+- 发送端不会因为接收结果自动改参数，建议值仍需要操作者确认。
+
+这个边界非常重要。`OTH1` 优化了接收端的冷启动和负载匹配，却没有把一条单向光学通道“变成”有 ACK 的双向网络。
+
 ## 为什么现在同时显示四个二维码
 
 单个 QR 每次只能携带有限字节。提高带宽有两条路：
@@ -454,20 +514,22 @@ sessionId : K : blockLen : totalLen : payloadFnv
 1. 让一个 QR 更密；
 2. 同一画面并行显示多个可独立识别的 QR。
 
-One Transfer 当前使用 `2 × 2` 四格布局，每次视觉 Tick 同步替换 4 个 Symbol：
+One Transfer 当前使用 `2 × 2` 四格布局，四个码始终可见，但每个视觉 Tick 可以只替换 1 格，也可以同步替换 4 格：
 
 ```text
-稳定档：4 × 24 = 96 symbols/s
-平衡档：4 × 30 = 120 symbols/s
-高速档：4 × 30 = 120 symbols/s
+稳定初值：60 Tick/s × 1 Symbol/Tick = 60 symbols/s
+平衡初值：30 Tick/s × 4 Symbols/Tick = 120 symbols/s
+高速初值：30 Tick/s × 4 Symbols/Tick = 120 symbols/s
 ```
 
-四个码彼此独立。接收端一次最多识别 4 个有效 QR，任何一个失败都只相当于丢失一个喷泉 Symbol。
+稳定初值不是只显示一个 QR，而是每个 Tick 轮流改一格；因此每格约每秒更新 15 次，屏幕只需重绘四分之一的网格。平衡和高速初值则在每个 Tick 同时替换四格。
+
+四个码彼此独立。接收端一次最多识别 4 个有效 QR，任何一个失败都只相当于丢失一个喷泉 Symbol。稳定参数里一帧往往同时带有“1 个新码 + 3 个仍在画面中的旧码”，所以重复帧多不等于链路损坏。
 
 发送端固定使用：
 
 - QR Byte Mode，直接写入二进制帧；
-- ECC L；
+- 数据帧 ECC L（`OTH1` 能力帧使用 ECC M）；
 - Mask Pattern 4；
 - 4 module quiet zone；
 - 整数像素放大，关闭图像平滑。
@@ -501,20 +563,22 @@ ECC L 看起来纠错较弱，但这是有意的。QR 层负责把一张图完�
 每个 Symbol 的前 20 字节是协议头，所以：
 
 ```text
-symbolsPerSecond = qrCount × ticksPerSecond
+symbolsPerSecond = txFps × symbolsPerTick
 blockBytes = frameBytes - 20
 rawKiB/s = symbolsPerSecond × blockBytes / 1024
 ```
 
-当前三个档位为：
+当前三组自动初值为：
 
-| 档位 | QR 数 | Tick/s | 每码总字节 | 每码载荷 | Symbol/s | 原始载荷上限 |
-| ---- | ----: | -----: | ---------: | -------: | -------: | -----------: |
-| 稳定 |     4 |     24 |     1465 B |   1445 B |       96 | 135.47 KiB/s |
-| 平衡 |     4 |     30 |     1700 B |   1680 B |      120 | 196.88 KiB/s |
-| 高速 |     4 |     30 |     2331 B |   2311 B |      120 | 270.82 KiB/s |
+| 初始参数 | Tick/s | Symbol/Tick | 每码总字节 | 每码载荷 | Symbol/s | 原始载荷上限 |
+| -------- | -----: | ----------: | ---------: | -------: | -------: | -----------: |
+| 稳定     |     60 |           1 |     1465 B |   1445 B |       60 |  84.67 KiB/s |
+| 平衡     |     30 |           4 |     1700 B |   1680 B |      120 | 196.88 KiB/s |
+| 高速     |     30 |           4 |     2331 B |   2311 B |      120 | 270.82 KiB/s |
 
-这也是发送页显示的“约 135/197/271 KiB/s”。它是屏幕成功显示全部 Symbol 时的数学上限，不是接收完成速度。
+发送页现在允许直接编辑三个数字，页面显示的“理论约”会按当前参数重算。上表只是三组自动初值，不是只能选择的固定档位。
+
+这个 raw 模型还没扣除能力帧占用的时间：每次会话有 1.5 秒固定前导，之后每 10 秒重播约 500 ms。重播期间会预留一个 Symbol 位：四码同步参数仍可在其他 3 个位置发数据，单码轮换参数则会短暂停顿数据帧。因此小文件的完成时间更容易被前导延迟主导，长流的平均 goodput 也会略低于表格上限。
 
 ### 第二层：扣除识别损失与喷泉冗余
 
@@ -526,11 +590,11 @@ netKiB/s ≈ rawKiB/s × decodeSuccessRate / fountainOverhead
 
 假设不重复 Symbol 的识别成功率为 75%，LT 实际需要 1.2 倍 Symbol：
 
-| 档位 |     原始上限 |   估算净速率 | 1 MiB 数学耗时 | 10 MiB 数学耗时 |
-| ---- | -----------: | -----------: | -------------: | --------------: |
-| 稳定 | 135.47 KiB/s |  84.67 KiB/s |     约 12.1 秒 |       约 121 秒 |
-| 平衡 | 196.88 KiB/s | 123.05 KiB/s |      约 8.3 秒 |        约 83 秒 |
-| 高速 | 270.82 KiB/s | 169.26 KiB/s |      约 6.0 秒 |        约 60 秒 |
+| 初始参数 |     原始上限 |   估算净速率 | 1 MiB 数学耗时 | 10 MiB 数学耗时 |
+| -------- | -----------: | -----------: | -------------: | --------------: |
+| 稳定     |  84.67 KiB/s |  52.92 KiB/s |     约 19.4 秒 |       约 194 秒 |
+| 平衡     | 196.88 KiB/s | 123.05 KiB/s |      约 8.3 秒 |        约 83 秒 |
+| 高速     | 270.82 KiB/s | 169.26 KiB/s |      约 6.0 秒 |        约 60 秒 |
 
 这张表仍然不是实测 Benchmark，只是帮助理解参数关系。真实时间还会受到压缩率、重复帧、摄像头曝光、视频压缩、Worker 忙碌和 Peeling 波动影响。
 
@@ -579,7 +643,7 @@ uniqueFrames × blockLen / overhead(K) / elapsed
 每秒成功收到的不重复有效载荷最大
 ```
 
-## 文件上限为什么随档位变化
+## 文件上限为什么随每码字节数变化
 
 帧头中的 `K` 是 `u16`，最多表示 65535 个源块。于是一个流能描述的最大容器为：
 
@@ -589,11 +653,11 @@ maximumPayload = 65535 × (frameBytes - 20)
 
 项目还为 49 字节容器头、最长文件名和 MIME 类型预留空间，得到保守文件上限：
 
-| 档位 | blockLen | 最大原始文件字节 |     约合 MiB |
-| ---- | -------: | ---------------: | -----------: |
-| 稳定 |     1445 |       94,566,956 |  约 90.2 MiB |
-| 平衡 |     1680 |      109,967,681 | 约 104.9 MiB |
-| 高速 |     2311 |      151,320,266 | 约 144.3 MiB |
+| 初始参数 | blockLen | 最大原始文件字节 |     约合 MiB |
+| -------- | -------: | ---------------: | -----------: |
+| 稳定     |     1445 |       94,566,956 |  约 90.2 MiB |
+| 平衡     |     1680 |      109,967,681 | 约 104.9 MiB |
+| 高速     |     2311 |      151,320,266 | 约 144.3 MiB |
 
 这只是线协议和当前帧尺寸的容量上限，不代表适合用相机发送 144 MiB 文件。按照 100 KiB/s 的实际 goodput，144 MiB 需要约 25 分钟，期间任何移动、锁屏和对焦变化都会影响接收。
 
@@ -603,7 +667,7 @@ maximumPayload = 65535 × (frameBytes - 20)
 - `K` 更小，编码和 Pending Frame 数量下降；
 - 同一个 u16 块编号空间能覆盖更大文件。
 
-项目选择文件后会检查当前档位是否容得下。如果稳定档超过 65535 块，会建议切到更高档，而不是在接收端溢出。
+项目选择文件后会检查当前 `frameBytes` 是否容得下。如果当前字节数会产生超过 65535 个源块，页面会计算并提示能容纳该文件的最小 `frameBytes`，而不是在接收端溢出。
 
 ## 接收端为什么要先裁剪再降采样
 
@@ -621,11 +685,11 @@ sourceSize = min(videoWidth, videoHeight)
 
 ```text
 解码宽度：1280，可选 960 / 1280 / 1920
-捕获 FPS：60，可选 30 / 60
+捕获 FPS：60，可选 30 / 45 / 60
 Worker：启动后按 CPU 自动选择 2 / 3 / 4
 ```
 
-采集优先使用 `requestVideoFrameCallback()`，因为它跟随真正送到合成器的视频帧；旧浏览器回退到 `requestAnimationFrame()`。
+这是尚未识别 `OTH1` 时的起点。一旦能力帧到达，接收端会再根据发送符号率和自身 CPU 把 FPS 调成 30/45/60，并在运行中持续精修。采集优先使用 `requestVideoFrameCallback()`，因为它跟随真正送到合成器的视频帧；旧浏览器回退到 `requestAnimationFrame()`。
 
 ## ZXing Worker 为什么分 Fast 和 Robust 两条路
 
@@ -667,7 +731,7 @@ LT Code 能吸收丢帧，排队反而会增加延迟和重复识别。
 其他 -> 2 Workers
 ```
 
-每 500ms 更新统计。如果用户没有手动锁定 Worker 数，并且新的忙碌丢帧达到 5 次，池会自动增加一个 Worker，最多 4 个。
+每 500 ms 更新统计，但不会因为偶发丢了几帧就立即扩容。只有在至少累积 6 秒样本后，并且距上次自动调整已经 8 秒，才会按忙碌丢帧率、解码利用率和当前 Worker 数做一次小步变更。忙碌丢帧率超过 8%、至少 6 线程且尚未到 4 Workers 时，才会先增加一个 Worker。
 
 更多 Worker 能提高并行解码能力，但也会：
 
@@ -690,11 +754,11 @@ LT Code 能吸收丢帧，排队反而会增加延迟和重复识别。
 
 推荐逻辑如下：
 
-| 档位 | 自动推荐条件                                                      |
-| ---- | ----------------------------------------------------------------- |
-| 高速 | 8+ 线程、内存未知或 ≥8 GiB、刷新率未知或 ≥55 Hz、物理短边 ≥1800px |
-| 平衡 | 4+ 线程、内存未知或 ≥4 GiB、刷新率未知或 ≥45 Hz、物理短边 ≥1200px |
-| 稳定 | 其他情况                                                          |
+| 初始类型 | 自动推荐条件                                                      |
+| -------- | ----------------------------------------------------------------- |
+| 高速     | 8+ 线程、内存未知或 ≥8 GiB、刷新率未知或 ≥55 Hz、物理短边 ≥1800px |
+| 平衡     | 6+ 线程、内存未知或 ≥4 GiB、刷新率未知或 ≥45 Hz、物理短边 ≥1200px |
+| 稳定     | 其他情况                                                          |
 
 物理短边按下面计算：
 
@@ -702,13 +766,15 @@ LT Code 能吸收丢帧，排队反而会增加延迟和重复识别。
 physicalShortEdge = CSS short edge × devicePixelRatio
 ```
 
-这只是发送端建议。它看不到另一台手机的相机、远程桌面压缩、接收 CPU 和环境光，所以页面仍保留手动档位。
+检测结果会自动应用为发送初值，而不只是把推荐数字填进表单等用户再点一次。如果用户已经开始手动编辑，延迟返回的设备检测不会覆盖输入；后续手动参数也要明确确认才生效。
 
-二维码真正生成后，发送端还会检查四格 QR 能否在当前窗口里以整数像素显示。放不下时会自动降档，避免 module 落在半像素上变灰。如果降档后的 blockLen 容不下当前文件，则不会偷偷破坏传输，而是保留能表达该文件的档位并提示调整画面。
+这仍然只是发送端本机建议。它看不到另一台手机的相机、远程桌面压缩、接收 CPU 和环境光。`OTH1` 解决的是“接收端根据发送信息调整自己”，不是“发送端已经知道接收结果”。
+
+二维码真正生成后，发送端还会检查四格 QR 能否在当前窗口里以整数物理像素显示。放不下时会尝试把 `frameBytes` 降低 100，避免 module 落在半像素上变灰。如果降低后的 `blockLen` 容不下当前文件，则不会偷偷破坏传输，而是保留能表达该文件的字节数并提示调整画面。
 
 ## 不同设备之间应该怎样优化
 
-自动推荐只能看发送电脑，真实链路至少有发送屏幕、采集方式、接收设备三个变量。下面按常见组合来讲。
+本地自动初值只能看发送电脑，真实链路至少有发送屏幕、采集方式、接收设备三个变量。接收端会利用能力帧和运行指标调整自己，但操作者仍需要根据它显示的发送建议手动完成跨端调参。下面按常见组合来讲。
 
 ### 电脑发送，电脑屏幕捕获接收
 
@@ -718,7 +784,7 @@ physicalShortEdge = CSS short edge × devicePixelRatio
 
 1. 发送窗口尽量完整显示四格二维码。
 2. 接收端只共享二维码窗口，不要共享包含大量空白的整个 4K 桌面。
-3. 解码宽度先用 1280，捕获 60 FPS。
+3. 解码宽度先用 1280，捕获 FPS 让 `OTH1` 能力匹配从 30/45/60 中选择。
 4. 让 Worker 自动选择，不要一开始就手动拉到 4。
 5. 如果有效码 FPS 已接近 120，再提高捕获 FPS没有意义。
 
@@ -737,7 +803,7 @@ physicalShortEdge = CSS short edge × devicePixelRatio
 5. 等自动对焦稳定后再保持距离不动。
 6. 识别稳定后再从稳定切到平衡。
 
-如果相机能识别但重复帧很多，不一定是故障。相机 60 FPS 捕获稳定档 24 Tick/s，本来就会多次看到同一画面。真正应该关注的是每秒不重复 Symbol 和最终 goodput。
+如果相机能识别但重复帧很多，不一定是故障。稳定参数每个 Tick 只替换一格，其他三格仍保留旧 Symbol；相机或屏幕捕获每帧都扫描整个四格时，重复本来就会较多。真正应该关注的是每秒不重复 Symbol 和最终 goodput。
 
 ### 手机或平板作为发送端
 
@@ -771,7 +837,7 @@ RDP、VDI 或会议软件可能把黑白二维码当成高频纹理，进行缩�
 
 这种场景建议：
 
-- 使用稳定档的 1465 B、24 Tick/s；
+- 使用稳定起点 `1465 B / 60 FPS / 每次 1 码`，让四格轮流更新；
 - 不要让远程桌面再次缩放发送窗口；
 - 保持二维码网格位于画面中心，因为接收端会裁中心正方形；
 - 关闭“适应窗口”等非整数缩放；
@@ -780,7 +846,7 @@ RDP、VDI 或会议软件可能把黑白二维码当成高频纹理，进行缩�
 
 视频链路可能重复或丢弃整批四格 Symbol。LT Code 能把它们当作擦除，但无法恢复一个被压缩到无法识别的 QR。
 
-### HiDPI 小窗口为什么也会自动降档
+### HiDPI 小窗口为什么也会自动降低每码字节
 
 设备推荐使用 `CSS 像素 × DPR` 判断物理短边，所以 Retina 屏幕可能满足高速条件。但如果浏览器窗口很窄，四格 QR 仍然放不下。
 
@@ -813,7 +879,7 @@ RDP、VDI 或会议软件可能把黑白二维码当成高频纹理，进行缩�
 
 查看“新帧/重复”：
 
-- 重复很多：捕获 FPS 高于发送 Tick，或视频链路冻结/重复画面；
+- 重复很多：捕获 FPS 高于有效新 Symbol 产生率、稳定参数中其他三格尚未更新，或视频链路冻结/重复画面；
 - 新帧正常但 K 很小：小文件的 LT overhead 本来就更高；
 - solved blocks 前期增长慢：可能只是 Peeling 的后置级联，不要立即判断卡死；
 - 容器很小但原文件很大：gzip 已经生效，最终耗时应按容器算。
@@ -829,10 +895,10 @@ RDP、VDI 或会议软件可能把黑白二维码当成高频纹理，进行缩�
 发送进度只表示当前这一轮建议广播：
 
 ```text
-targetSymbols = ceil(K × expectedOverhead(K) / 4) × 4
+targetSymbols = ceil(K × expectedOverhead(K) / symbolsPerTick) × symbolsPerTick
 ```
 
-到 100% 后会开始下一轮，二维码继续播放。它不能证明接收端已经收到。
+这里用当前 `symbolsPerTick` 对齐一个可完整绘制的批次，而不是固定写死为 4。能力帧不计入文件 Symbol 进度。到 100% 后会开始下一轮，二维码继续播放；它不能证明接收端已经收到。
 
 接收端进度才基于真实状态：
 
@@ -920,13 +986,14 @@ pnpm dev:lan
 1. [`shared/clipboard-transfer.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/shared/clipboard-transfer.ts)：V2、Base91、gzip 和 SHA-256。
 2. [`shared/protocol.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/shared/protocol.ts)：DCF2 容器、20 字节帧头和流身份。
 3. [`shared/fountain.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/shared/fountain.ts)：鲁棒孤子分布、确定性选块、LT Encoder/Decoder。
-4. [`shared/send-settings.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/shared/send-settings.ts)：三个发送档位和四码参数。
-5. [`shared/device-profile.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/shared/device-profile.ts)：设备能力与自动推荐。
-6. [`shared/throughput.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/shared/throughput.ts)：raw/net 光学吞吐模型。
-7. [`send/main.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/send/main.ts)：四码生成、Lookahead Queue 和播放调度。
-8. [`receive/main.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/receive/main.ts)：媒体捕获、裁剪、Worker 池、进度与最终恢复。
-9. [`receive/worker.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/receive/worker.ts)：ZXing WASM Fast/Robust 双路径。
-10. [`shared/progress.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/shared/progress.ts)：K 相关喷泉冗余和 ETA。
+4. [`shared/send-settings.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/shared/send-settings.ts)：发送数字边界、三组自动初值和四码参数。
+5. [`shared/device-profile.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/shared/device-profile.ts)：发送设备能力与本地初值推荐。
+6. [`shared/link-calibration.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/shared/link-calibration.ts)：`OTH1` 能力帧、接收端动态调参和发送数字建议。
+7. [`shared/throughput.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/shared/throughput.ts)：raw/net 光学吞吐模型。
+8. [`send/main.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/send/main.ts)：能力前导帧、四码生成、Lookahead Queue 和播放调度。
+9. [`receive/main.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/receive/main.ts)：能力匹配、媒体捕获、Worker 池、运行指标与最终恢复。
+10. [`receive/worker.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/receive/worker.ts)：ZXing WASM Fast/Robust 双路径。
+11. [`shared/progress.ts`](https://github.com/zhihui-hu/one-transfer/blob/main/shared/progress.ts)：K 相关喷泉冗余和 ETA。
 
 ## 结语
 
