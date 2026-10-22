@@ -1,4 +1,6 @@
 import { ProjectGroupList } from '@/components/projects/project-card';
+import { sortByGitHubStars } from '@/lib/github';
+import { getGitHubStatsBySlug } from '@/lib/github-stats';
 import { getOpenSourceGroups } from '@/lib/open-source';
 import type { Metadata } from 'next';
 
@@ -26,8 +28,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function OpenSourcePage() {
-  const groups = getOpenSourceGroups();
+export default async function OpenSourcePage() {
+  const githubStats = await getGitHubStatsBySlug(
+    getOpenSourceGroups().flatMap((group) => group.projects),
+  );
+  const groups = getOpenSourceGroups().map((group) => ({
+    ...group,
+    projects: sortByGitHubStars(
+      group.projects,
+      (project) => githubStats[project.slug]?.stargazers_count,
+    ),
+  }));
 
   return (
     <section className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,6 +54,7 @@ export default function OpenSourcePage() {
       <ProjectGroupList
         enableNativeTransition
         groups={groups}
+        githubStats={githubStats}
         showCompanyName={false}
       />
     </section>

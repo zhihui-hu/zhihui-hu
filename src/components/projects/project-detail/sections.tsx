@@ -27,13 +27,13 @@ function getProjectPreviewKind(project: Project) {
 
 export function DevelopmentCard({ item }: { item: ProjectDevelopment }) {
   return (
-    <div className="flex flex-col gap-5 py-1">
+    <div className="flex min-w-0 flex-col gap-5 py-1 wrap-anywhere">
       <div className="flex flex-col gap-4 text-[15px] leading-relaxed text-muted-foreground/90">
         <ul className="flex flex-col gap-3">
           {item.summary.map((point) => (
             <li key={point} className="flex items-start gap-2.5">
               <DotIcon className="mt-[1px] size-4 shrink-0 text-primary/70" />
-              <span>{point}</span>
+              <span className="min-w-0">{point}</span>
             </li>
           ))}
         </ul>
@@ -45,7 +45,11 @@ export function DevelopmentCard({ item }: { item: ProjectDevelopment }) {
             </p>
             <div className="flex flex-wrap gap-2">
               {item.techStack.map((tech) => (
-                <Badge key={`${item.name}-${tech}`} variant="outline">
+                <Badge
+                  className="h-auto min-h-5 max-w-full whitespace-normal"
+                  key={`${item.name}-${tech}`}
+                  variant="outline"
+                >
                   {tech}
                 </Badge>
               ))}
@@ -138,29 +142,31 @@ export function ScreenshotShelf({
   const previewKind = getProjectPreviewKind(project);
 
   return (
-    <div className="flex flex-col gap-3 mt-4">
+    <div className="mt-2 flex min-w-0 flex-col gap-3 sm:mt-4">
       <div className="flex items-center gap-2">
         <MonitorSmartphoneIcon className="size-4 text-muted-foreground" />
-        <h2 className="text-[20px] font-bold tracking-tight text-foreground">
+        <h2 className="text-[18px] font-bold tracking-tight text-foreground sm:text-[20px]">
           界面预览
         </h2>
       </div>
 
-      <div className="-mx-4 overflow-x-auto px-4 pb-2 hide-scrollbar mt-1">
+      <div className="mt-1 min-w-0 snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <ProjectImageGallery
           buttonClassName={cn(
-            'snap-start',
-            screenshots.length === 1 && 'max-w-full',
+            'max-w-full snap-start rounded-xl sm:rounded-[1.6rem]',
+            screenshots.length === 1 &&
+              previewKind === 'desktop' &&
+              'w-full sm:w-auto',
           )}
           imageClassName={cn(
-            'max-w-none bg-transparent',
+            'max-w-full bg-transparent',
             previewKind === 'desktop'
-              ? 'aspect-[16/10] h-[210px] w-[336px] sm:h-[260px] sm:w-[416px] lg:h-[340px] lg:w-[544px]'
-              : 'aspect-[6/13] h-[360px] w-[166px] sm:h-[420px] sm:w-[194px] lg:h-[600px] lg:w-[277px]',
+              ? 'aspect-[16/10] h-auto w-[min(336px,calc(100vw-3rem))] sm:h-[260px] sm:w-[416px] lg:h-[340px] lg:w-[544px]'
+              : 'aspect-[6/13] h-auto w-[148px] sm:h-[420px] sm:w-[194px] lg:h-[600px] lg:w-[277px]',
             screenshots.length === 1 &&
               (previewKind === 'desktop'
-                ? 'h-[240px] w-[384px] max-w-full sm:h-[360px] sm:w-[576px] lg:h-[520px] lg:w-[832px]'
-                : 'h-[460px] w-[212px] max-w-full sm:h-[560px] sm:w-[258px] lg:h-[76vh] lg:w-[35.1vh]'),
+                ? 'h-auto w-full sm:h-[360px] sm:w-[576px] lg:h-[520px] lg:w-[832px]'
+                : 'h-auto w-[212px] sm:h-[560px] sm:w-[258px] lg:h-[76vh] lg:w-[35.1vh]'),
           )}
           images={previewImages}
         />

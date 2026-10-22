@@ -476,7 +476,7 @@ export function ProjectImageGallery({
 
   return (
     <>
-      <div className="flex justify-start gap-5 snap-x snap-mandatory">
+      <div className="flex min-w-0 justify-start gap-3 sm:gap-5">
         {images.map((image, index) => (
           <ProjectPreviewTriggerCard
             alt={image.alt}

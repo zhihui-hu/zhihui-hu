@@ -77,11 +77,11 @@ export function ProjectMetricsBar({ project }: { project: Project }) {
         <span className="text-[11px] font-medium text-muted-foreground/80">
           {item.label}
         </span>
-        <span className="max-w-33 px-1 text-[17px] leading-[1.3] font-semibold text-foreground sm:max-w-41 sm:text-[20px]">
+        <span className="w-full min-w-0 max-w-full text-[14px] leading-snug font-semibold wrap-anywhere text-foreground sm:w-auto sm:max-w-41 sm:px-1 sm:text-[20px] sm:leading-[1.3]">
           {item.value}
         </span>
         {showMetricSub && (
-          <span className="line-clamp-2 max-w-33 text-[11px] text-muted-foreground/78 sm:max-w-41 sm:text-[12px]">
+          <span className="line-clamp-2 max-w-full text-[11px] wrap-anywhere text-muted-foreground/78 sm:max-w-41 sm:text-[12px]">
             {item.sub}
           </span>
         )}
@@ -95,7 +95,7 @@ export function ProjectMetricsBar({ project }: { project: Project }) {
     return (
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="flex cursor-help flex-col items-center justify-start gap-1.5">
+          <div className="flex min-w-0 max-w-full cursor-help flex-col items-center justify-start gap-1.5">
             {content}
           </div>
         </TooltipTrigger>
@@ -107,10 +107,10 @@ export function ProjectMetricsBar({ project }: { project: Project }) {
   }
 
   return (
-    <div className="mt-1 mb-6 flex items-start gap-1 overflow-x-auto border-b border-border/35 pb-4 hide-scrollbar scroll-pl-4">
+    <div className="mt-1 mb-5 grid min-w-0 grid-cols-3 items-start gap-x-2 gap-y-4 border-b border-border/35 pb-4 sm:mb-6 sm:flex sm:gap-1 sm:overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {visibleMetrics.map((item: ProjectMetric) => (
         <div
-          className="relative min-w-30 shrink-0 px-3 text-center after:absolute after:right-0 after:top-2 after:bottom-2 after:w-px after:bg-border/50 last:after:hidden sm:min-w-[148px] sm:px-4"
+          className="relative min-w-0 px-1 text-center after:absolute after:right-0 after:top-2 after:bottom-2 after:hidden after:w-px after:bg-border/50 sm:min-w-[148px] sm:shrink-0 sm:px-4 sm:after:block sm:last:after:hidden"
           key={`${item.label}-${item.value}`}
         >
           {item.href ? (

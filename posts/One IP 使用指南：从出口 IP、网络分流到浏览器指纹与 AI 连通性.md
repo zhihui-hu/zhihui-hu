@@ -2,9 +2,9 @@
 title: One IP 使用指南：从出口 IP、网络分流到浏览器指纹与 AI 连通性
 slug: one-ip-guide
 publishedAt: 2026-09-11T14:49:00+08:00
-updatedAt: 2026-09-27T00:00:00+08:00
+updatedAt: 2026-10-15T00:00:00+08:00
 image: https://img.huzhihui.com/2026/09/11/desktop-home-redacted.webp
-summary: One IP 网站使用说明。结合网络排查场景，从基本检查讲到 IP 与分流、全球 Ping、DNS、浏览器指纹、AI 连通性和服务状态，整理各工具的操作步骤、结果含义、常见问题与 API 用法。
+summary: One IP 网页与 API 使用指南。介绍出口 IP、网络分流、浏览器与 AI 检测，并详细说明服务器 curl、Node.js、Python 调用，JSON 与文本返回、指定 IPv4 / IPv6 查询，以及通过自己的后端直接返回 API 结果。
 keywords:
   - One IP
   - IP 查询
@@ -14,6 +14,7 @@ keywords:
   - 浏览器指纹
   - AI 连通性
   - IP 健康度 API
+  - 服务器 API 调用
 tags:
   - 开源项目
   - 网络工具
@@ -26,18 +27,18 @@ tags:
 
 这些检测单独做都不复杂，麻烦的是结果分散，放在一起又容易混淆。比如 IP 查询显示的是某次请求的出口，全球 Ping 测的是远程机器到目标的路径，它们回答的其实是不同的问题。
 
-于是我把日常用到的检测整理成了 [One IP](https://ip.huzhihui.com/)。这篇也是网站的使用说明：先从一次基本检查开始，再结合具体场景，说明各个工具的用法和结果含义。没有网络基础也可以跟着操作，遇到术语时看对应解释即可。终端与 API 放在后面，只使用网页可以跳过。
+于是我把日常用到的检测整理成了 [One IP](https://ip.huzhihui.com/)。这篇既是网页使用说明，也是 API 接入指南：前半部分结合场景说明检测步骤与结果含义；后半部分介绍如何在服务器上查询出口或指定 IP，如何用 Node.js、Python 读取结果，以及如何通过自己的接口把结果直接返回给调用方。只想接入 API，可以从后面的 API 章节开始。
 
 - 在线使用：[ip.huzhihui.com](https://ip.huzhihui.com/)
 - 开源代码：[GitHub / one-ip](https://github.com/zhihui-hu/one-ip)
 - 接口说明：[API 使用](https://ip.huzhihui.com/docs/api)
 - 问题反馈：[ip@huzhihui.com](mailto:ip@huzhihui.com)
 
-> 本文按 2026 年 9 月整理的开源项目页面说明。“分流出口”已合并到“网站连通与出口”，旧入口会跳转。文中截图来自此前版本，用于认识页面布局；按钮位置与功能名称以当前页面为准。
+> 网页部分基于 2026 年 9 月整理的页面说明，API 示例于 2026 年 10 月 15 日核对。“分流出口”已合并到“网站连通与出口”，旧入口会跳转。文中截图来自此前版本，用于认识页面布局；按钮位置与功能名称以当前页面为准。
 
 ## 如何使用这份文档
 
-第一次使用，可以从“快速开始”往下读。已经有具体问题时，直接找到对应章节，按操作步骤完成检测，再对照结果说明。前半部分介绍网页工具，后半部分整理常见问题、API 和数据说明。
+第一次使用网页，可以从“快速开始”往下读。已经有具体问题时，直接找到对应章节。服务器、脚本和后端开发者可以直接阅读 API 接入部分，不需要先操作网页。
 
 | 当前想做的事              | 阅读章节                                                                                 |
 | ------------------------- | ---------------------------------------------------------------------------------------- |
@@ -50,7 +51,9 @@ tags:
 | 排查 AI 平台使用问题      | [AI 检测](#ai-检测从网络响应到实际使用)、[服务状态](#服务状态核对厂商的故障与维护)       |
 | 检查浏览器环境和权限      | [浏览器检测](#浏览器检测环境指纹与权限)                                                  |
 | 根据具体症状找排查步骤    | [常见问题](#常见问题与排查思路)                                                          |
-| 在终端或脚本中读取结果    | [API 用法](#进阶使用通过-api-查询-ip-健康度)                                             |
+| 在服务器或脚本中调用 API  | [API 接入](#api-接入在服务器上调用并返回结果)                                            |
+| 直接打开接口读取数据      | [接口地址与返回格式](#接口地址与返回格式)                                                |
+| 通过自己的接口返回结果    | [后端转发示例](#直接返回-api-结果完整-nodejs-接口)                                       |
 
 ## 快速开始：完成一次基本检查
 
@@ -230,7 +233,7 @@ tags:
 
 ### 信誉分怎么看
 
-IP 健康度接口的分数范围是 0–100，越高表示上游数据源给出的信誉评价越好。项目将有效分数整理成以下状态：
+IP 健康度接口的分数范围是 0–100，越高表示接口根据可用数据给出的信誉评价越好。项目将有效分数整理成以下状态：
 
 | 分数                 | 英文状态   | 中文理解                 |
 | -------------------- | ---------- | ------------------------ |
@@ -493,83 +496,383 @@ reCAPTCHA v3 返回 0–1 范围的分数，本站当前通过阈值为 0.50。�
 
 先确认当前展示的是查询历史还是刚刚请求的结果。最近查询可能保留此前成功查询的数据，需要重新提交来更新。再确认当前检测已完成，必要时刷新页面。对比时记录检测时间，避免把旧结果和新结果混在一起。
 
-## 进阶使用：通过 API 查询 IP 健康度
+## API 接入：在服务器上调用并返回结果
 
-前面的操作都在网页里完成。如果希望在终端快速查看出口，或者把结果交给脚本处理，可以使用 IP 健康度 API。API 是供程序调用的接口，我们先用一条命令读取它，再看参数和返回字段。只使用网页的朋友可以跳过这一节。
+API 可以直接用于 Linux 服务器、定时脚本、后端服务和桌面工具，不需要打开网页，也不需要登录或 API Key。常见用途是确认服务器当前出口，查询某个公网 IP 的归属与健康度，或者把查询结果接入自己的系统。
 
-### 第一步：打开终端，先看文字结果
+下面按“直接请求 → 读取字段 → 服务端集成 → 向前端返回结果”的顺序说明。完整接口约定以本站的 [API 接入文档](https://ip.huzhihui.com/docs/api)为准。
 
-macOS 可以打开“终端”；Windows 可以打开 PowerShell。系统提供 curl 时，可以直接执行以下命令。旧版 Windows PowerShell 建议把 `curl` 写成 `curl.exe`，避免调用到同名别名。
+### 接口地址与返回格式
 
-```bash
-curl -sS 'https://ip.huzhihui.com/api/ip/health?format=text'
-```
+如果只想拿到 API 结果，直接访问下面的地址即可。浏览器打开会显示数据，程序发送 GET 请求会收到同样格式的响应，不需要从网页中提取内容。
 
-复制整行，粘贴后按回车。`curl` 用来发送请求，`-sS` 隐藏进度条但保留请求错误，`format=text` 表示希望得到便于阅读的文字。
+| 想得到什么                     | 可直接访问的 API 地址                                                                                                        | 成功时的返回格式 |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| 当前请求出口的 IP、归属与 ASN  | [https://ip.huzhihui.com/api/me](https://ip.huzhihui.com/api/me)                                                             | JSON             |
+| 当前请求出口的健康度与风险标记 | [https://ip.huzhihui.com/api/ip/health](https://ip.huzhihui.com/api/ip/health)                                               | JSON             |
+| 指定 IP 的健康度               | [https://ip.huzhihui.com/api/ip/health?ip=1.1.1.1](https://ip.huzhihui.com/api/ip/health?ip=1.1.1.1)                         | JSON             |
+| 便于终端阅读的健康度结果       | [https://ip.huzhihui.com/api/ip/health?ip=1.1.1.1&format=text](https://ip.huzhihui.com/api/ip/health?ip=1.1.1.1&format=text) | 纯文本           |
 
-无需提供 API Key，也就是无需填写接口密钥。不要在命令里加入账号密码。若提示找不到命令，可以继续使用网页，不影响其他功能。
+`/api/me` 适合只需要出口及基础归属的场景。需要信誉分和分类标记时，使用 `/api/ip/health`。健康度接口的参数如下，都是 URL 查询参数，不需要发送请求体：
 
-### 第二步：理解它查的是谁
+| 参数     | 是否必填 | 含义                                                | 示例                              |
+| -------- | -------- | --------------------------------------------------- | --------------------------------- |
+| `ip`     | 否       | 要查询的公网 IPv4 或 IPv6；省略时查询本次请求的出口 | `1.1.1.1`、`2606:4700:4700::1111` |
+| `format` | 否       | `json` 或 `text`，默认 `json`                       | `format=text`                     |
 
-没有填写 `ip` 参数时，接口查的是 **这次终端请求的公网出口**，不是自动读取浏览器里的结果。
+成功的 JSON 响应使用 `application/json`，文本响应使用 `text/plain; charset=utf-8`。程序接入建议使用默认 JSON；`format=text` 适合人直接阅读，不建议再从文本中按行提取字段。
 
-想查询指定地址，可以这样写：
+### 先分清：查询服务器出口，还是查询指定 IP
 
-```bash
-curl -sS 'https://ip.huzhihui.com/api/ip/health?ip=1.1.1.1&format=text'
-```
+这是服务端接入时最容易用错的地方。**省略 `ip`，查的是发出这次请求的程序所使用的公网出口。**
 
-这里 `?` 后面是参数，`&` 用来连接多个参数。把 `1.1.1.1` 换成你要查询的公网地址即可。IPv6 也可以：
+| 在哪里调用                                | 不传 `ip` 时查询谁                           |
+| ----------------------------------------- | -------------------------------------------- |
+| 本机终端                                  | 终端请求使用的出口                           |
+| 云服务器 SSH 终端                         | 云服务器请求使用的出口                       |
+| 容器或后端进程                            | 该进程通过宿主机、NAT 或代理访问接口时的出口 |
+| 浏览器直接打开 API 地址                   | 浏览器这次请求使用的出口                     |
+| 浏览器请求自己的后端，再由后端调用 One IP | 自己的后端出口                               |
 
-```bash
-curl -sS 'https://ip.huzhihui.com/api/ip/health?ip=2606:4700:4700::1111&format=text'
-```
+例如，用户在上海访问你的服务器，服务器在新加坡。服务器调用 `/api/ip/health` 而不传参数，得到的是服务器这次请求的出口信息；API 不会自动知道上海用户的地址。
 
-不要填写 `192.168.x.x` 这类内网地址。自部署的本地开发环境无法直接识别真实访客出口，需要明确指定公网 `ip`。
+如果业务需要查询访客 IP，应由自己的后端根据连接信息和**已配置的可信反向代理**确定访客地址，再通过 `ip` 参数查询。不要直接信任客户端随意提交的 `X-Forwarded-For`，也不要尝试把访客地址塞进请求头来改变 One IP 对调用方的识别。
 
-### 第三步：程序需要时再使用 JSON
+显式传入 `ip=1.1.1.1` 只是查询该地址的数据，不会把服务器出口切换成它，也不会测量这个地址访问 ChatGPT、Claude 或其他网站的实际连通性。
 
-不写 `format=text`，默认返回 JSON，也就是按字段名称组织的数据：
+### 在服务器终端调用：curl 示例
 
-```bash
-curl -sS 'https://ip.huzhihui.com/api/ip/health?ip=1.1.1.1'
-```
+先通过 SSH 登录需要检查的服务器，再在它的终端执行命令。macOS、本地 Linux 也可以执行；旧版 Windows PowerShell 可以把 `curl` 写成 `curl.exe`，避免同名别名。
 
-主要字段如下：
-
-| 字段                        | 含义                                  | 怎么读                     |
-| --------------------------- | ------------------------------------- | -------------------------- |
-| `ip`                        | 本次查询的地址                        | 先核对目标是否正确         |
-| `checked_at`                | 检查时间                              | 用来区分不同批次结果       |
-| `score`                     | 0–100 的信誉分                        | `null` 表示没有有效分数    |
-| `status`                    | `good`、`moderate`、`poor`、`unknown` | 对照前面的信誉分说明       |
-| `country`、`region`、`city` | 国家、区域、城市                      | 数据库归属，不是 GPS       |
-| `isp`、`asn`                | 网络服务提供方与自治系统编号          | 辅助判断网络归属           |
-| `flags`                     | 住宅、数据中心、VPN、代理等分类       | 分类标记，不是账号风控结论 |
-
-分类字段中的 `true` 是肯定标记，`false` 是否定标记，`null` 是没有有效数据。不要把 `null` 转换成 `false` 或 0，否则会把未知误判为明确结论。
-
-已经安装 `jq` 的用户，可以提取部分字段：
+**1. 查询服务器本次请求的出口。**
 
 ```bash
-curl -fsS 'https://ip.huzhihui.com/api/ip/health?ip=1.1.1.1' \
-  | jq '{ip, score, status, country, isp, asn, flags}'
+curl -sS --connect-timeout 5 --max-time 15 \
+  'https://ip.huzhihui.com/api/me'
 ```
 
-这条命令用于脚本处理，额外使用了 `-f`，HTTP 错误时会以失败状态退出。若想阅读服务端返回的错误正文，可以去掉 `-f`。
+只取出口 IP，需要额外安装 `jq`：
 
-### 接口报错时怎么处理
+```bash
+curl -fsS --connect-timeout 5 --max-time 15 \
+  'https://ip.huzhihui.com/api/me' | jq -r '.ip'
+```
 
-| HTTP 状态码 | 含义                   | 建议操作                                         |
-| ----------- | ---------------------- | ------------------------------------------------ |
-| 400         | 参数或 IP 不符合要求   | 检查拼写、地址格式及是否为公网地址               |
-| 403         | 浏览器跨站请求被限制   | 使用本站网页或终端；自建网页不要假定支持跨站调用 |
-| 405         | 请求方法不支持         | 查询使用 GET，不要改成 POST                      |
-| 429         | 请求过于频繁           | 暂停后再试，减少频率与并发                       |
-| 502         | 上游数据获取失败或异常 | 稍后重试，不把它当成目标 IP 信誉差               |
-| 503         | 无法识别访客出口       | 使用 `ip` 参数指定查询地址                       |
+**2. 查询服务器出口的健康度，直接返回文本。**
 
-错误正文使用 `{"error":"…"}` 形式，即使请求文字格式也可能看到 JSON 错误。不要把所有非正常返回都当成网络不通，先读错误说明。
+```bash
+curl -sS --connect-timeout 5 --max-time 15 \
+  'https://ip.huzhihui.com/api/ip/health?format=text'
+```
+
+**3. 查询指定公网 IPv4，直接返回 JSON。**
+
+```bash
+curl -sS --connect-timeout 5 --max-time 15 \
+  'https://ip.huzhihui.com/api/ip/health?ip=1.1.1.1'
+```
+
+**4. 查询指定公网 IPv6。** 使用 `--get` 和 `--data-urlencode` 生成查询字符串，避免手动拼接参数：
+
+```bash
+curl -sS --connect-timeout 5 --max-time 15 --get \
+  'https://ip.huzhihui.com/api/ip/health' \
+  --data-urlencode 'ip=2606:4700:4700::1111' \
+  --data-urlencode 'format=json'
+```
+
+`-sS` 隐藏进度条但保留连接错误；`--connect-timeout 5` 限制建立连接的时间；`--max-time 15` 限制整次请求的时间。URL 两侧的引号要保留，否则 Shell 可能把参数里的 `&` 当作后台运行符。
+
+需要比较 IPv4 和 IPv6 出口时，可以分别给查询当前出口的命令添加 `-4`、`-6`。这两个选项改变的是访问 API 的连接协议；`ip=` 改变的是查询目标，两者作用不同。服务器没有 IPv6 路由时，`-6` 请求失败不能解释为某个目标 IP 的健康度差。
+
+### JSON 返回什么，程序该读哪一层
+
+健康度接口成功时直接返回字段对象，没有外层的 `data` 或 `result`。下面是**结构示例**，用 `null` 演示缺少数据的情况，不代表 `1.1.1.1` 的实时结果：
+
+```json
+{
+  "ip": "1.1.1.1",
+  "checked_at": "2026-10-15T00:00:00Z",
+  "score": null,
+  "status": "unknown",
+  "country": null,
+  "region": null,
+  "city": null,
+  "isp": null,
+  "asn": null,
+  "flags": {
+    "residential": null,
+    "datacenter": null,
+    "mobile": null,
+    "vpn": null,
+    "proxy": null,
+    "tor": null,
+    "crawler": null,
+    "abuser": null
+  }
+}
+```
+
+因此 JavaScript 中读取的是 `data.ip`、`data.score`，而不是 `data.data.ip`。`/api/me` 也是直接返回对象，但字段集合不同，不包含健康度的 `score`、`status`、`flags`，部分归属字段也可能缺失。
+
+| 健康度字段                  | 含义                                                     | 接入时注意                             |
+| --------------------------- | -------------------------------------------------------- | -------------------------------------- |
+| `ip`                        | 本次查询的地址                                           | 先核对查询目标                         |
+| `checked_at`                | 本次生成响应的时间                                       | 不代表全部数据源都在此刻更新           |
+| `score`                     | 0–100 的信誉分                                           | `null` 表示没有有效分数，不能转成 0    |
+| `status`                    | `good`、`moderate`、`poor`、`unknown`                    | 这是健康度评价，不是 HTTP 请求是否成功 |
+| `country`、`region`、`city` | 国家、区域、城市                                         | 数据库归属，不是 GPS                   |
+| `isp`、`asn`                | 网络服务提供方与自治系统编号                             | 可能为 `null`                          |
+| `flags`                     | 住宅、数据中心、移动网络、VPN、代理、Tor、爬虫与滥用标记 | 每个值都可能是 `true`、`false`、`null` |
+
+`true` 表示肯定标记，`false` 表示否定标记，`null` 表示未知。判断时保留这三种状态，不要用 `Boolean(value)` 把 `null` 变成 `false`。HTTP 200 且 `status: "unknown"` 表示请求成功但缺少评价数据；它和请求超时、HTTP 429、HTTP 503 是不同情况。
+
+### 服务器调用：用 Node.js 读取 JSON
+
+使用支持内置 `fetch` 的 Node.js，下面示例按 Node.js 22 及以上编写，无需安装第三方依赖。保存为 `lookup-ip.mjs`：
+
+```js
+const url = new URL('https://ip.huzhihui.com/api/ip/health');
+const targetIp = process.argv[2];
+
+if (targetIp) url.searchParams.set('ip', targetIp);
+
+try {
+  const response = await fetch(url, {
+    signal: AbortSignal.timeout(10_000),
+  });
+  const body = await response.text();
+
+  if (!response.ok) {
+    const retryAfter = response.headers.get('retry-after');
+    throw new Error(
+      `HTTP ${response.status}: ${body}` +
+        (retryAfter ? `; Retry-After: ${retryAfter}` : ''),
+    );
+  }
+
+  const data = JSON.parse(body);
+  console.log(JSON.stringify(data, null, 2));
+} catch (error) {
+  console.error(error);
+  process.exitCode = 1;
+}
+```
+
+在服务器上执行：
+
+```bash
+# 不传参数：查询这个 Node.js 进程请求使用的出口
+node lookup-ip.mjs
+
+# 传入参数：查询指定地址
+node lookup-ip.mjs 1.1.1.1
+node lookup-ip.mjs 2606:4700:4700::1111
+```
+
+这里先检查 `response.ok`，再解析成功数据。`fetch` 收到 400、429、503 仍然会返回一个响应对象，不能只依赖 `catch` 发现 HTTP 错误。读取错误正文可以保留 API 给出的具体原因；10 秒超时则用于避免脚本一直等待。内置接口用法可参考 [Node.js fetch 文档](https://nodejs.org/api/globals.html#fetch)。
+
+需要接入业务时，在解析后读取 `data.ip`、`data.score`、`data.flags.vpn` 等字段即可。不要仅凭分数或某个标记就认定账号一定安全、AI 平台一定可用。
+
+### 服务器调用：用 Python 读取 JSON
+
+Python 3 可以直接使用标准库，不需要安装 `requests`。保存为 `lookup_ip.py`：
+
+```python
+import json
+import sys
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
+
+url = "https://ip.huzhihui.com/api/ip/health"
+if len(sys.argv) > 1:
+    url += "?" + urlencode({"ip": sys.argv[1]})
+
+request = Request(url, headers={
+    "Accept": "application/json",
+    "User-Agent": "OneIP-Server-Example/1.0",
+})
+
+try:
+    with urlopen(request, timeout=10) as response:
+        data = json.load(response)
+    print(json.dumps(data, ensure_ascii=False, indent=2))
+except HTTPError as error:
+    body = error.read().decode("utf-8", errors="replace")
+    print(f"HTTP {error.code}: {body}", file=sys.stderr)
+    retry_after = error.headers.get("Retry-After")
+    if retry_after:
+        print(f"Retry-After: {retry_after}", file=sys.stderr)
+    sys.exit(1)
+except (URLError, TimeoutError) as error:
+    print(f"请求失败：{error}", file=sys.stderr)
+    sys.exit(1)
+```
+
+```bash
+# 当前 Python 进程请求使用的出口
+python3 lookup_ip.py
+
+# 指定 IPv4 / IPv6
+python3 lookup_ip.py 1.1.1.1
+python3 lookup_ip.py 2606:4700:4700::1111
+```
+
+`Request` 显式声明接收 JSON，并用 `User-Agent` 标识示例程序；接入时可以改成自己的真实应用名称。`urlencode` 负责参数编码，`timeout=10` 限制阻塞网络操作的等待时间。`HTTPError` 要在 `URLError` 前处理，才能读取 API 返回的状态和错误正文。标准库行为可参考 [Python urllib.request 文档](https://docs.python.org/3/library/urllib.request.html)。
+
+### 直接返回 API 结果：完整 Node.js 接口
+
+如果自己的网页要读取结果，推荐让网页请求自己的后端，再由后端调用 One IP：
+
+```text
+你的网页 → 你自己的 /api/ip-health → One IP /api/ip/health
+         ← 返回状态、正文和格式 ←
+```
+
+直接在浏览器地址栏打开 API，与在另一个网站的 JavaScript 中跨域读取 API，受不同的浏览器规则约束。One IP 的浏览器调用仅支持本站同源；自己的网页应通过后端接入，`mode: 'no-cors'` 得到的响应无法供 JavaScript 读取正文。
+
+下面给出一个可以独立启动的后端接口。保存为 `ip-api-server.mjs`，使用 Node.js 22 及以上运行，无需安装 Express：
+
+```js
+import { createServer } from 'node:http';
+
+const server = createServer(async (request, response) => {
+  const input = new URL(request.url, 'http://localhost');
+
+  if (input.pathname !== '/api/ip-health') {
+    response.writeHead(404);
+    response.end();
+    return;
+  }
+
+  if (request.method !== 'GET') {
+    response.writeHead(405, { Allow: 'GET' });
+    response.end();
+    return;
+  }
+
+  const url = new URL('https://ip.huzhihui.com/api/ip/health');
+  for (const name of ['ip', 'format']) {
+    if (input.searchParams.has(name)) {
+      url.searchParams.set(name, input.searchParams.get(name));
+    }
+  }
+
+  try {
+    const upstream = await fetch(url, {
+      signal: AbortSignal.timeout(10_000),
+    });
+    const body = Buffer.from(await upstream.arrayBuffer());
+    const headers = {
+      'Content-Type':
+        upstream.headers.get('content-type') ?? 'application/json',
+      'Cache-Control': 'no-store',
+    };
+    const retryAfter = upstream.headers.get('retry-after');
+    if (retryAfter) headers['Retry-After'] = retryAfter;
+
+    response.writeHead(upstream.status, headers);
+    response.end(body);
+  } catch (error) {
+    console.error(error);
+    const timedOut = error.name === 'TimeoutError';
+    response.writeHead(timedOut ? 504 : 502, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'no-store',
+    });
+    response.end(
+      JSON.stringify({
+        error: timedOut
+          ? 'One IP 请求超时'
+          : '无法连接 One IP，请检查服务端日志',
+      }),
+    );
+  }
+});
+
+server.listen(3000, '127.0.0.1', () => {
+  console.log('API: http://127.0.0.1:3000/api/ip-health');
+});
+```
+
+先启动服务：
+
+```bash
+node ip-api-server.mjs
+```
+
+再在同一台服务器的另一个终端测试：
+
+```bash
+# 查询自己的后端出口，返回 JSON
+curl -sS 'http://127.0.0.1:3000/api/ip-health'
+
+# 查询指定地址，返回 JSON
+curl -sS 'http://127.0.0.1:3000/api/ip-health?ip=1.1.1.1'
+
+# 原样返回文本
+curl -sS 'http://127.0.0.1:3000/api/ip-health?ip=1.1.1.1&format=text'
+```
+
+这里的“直接返回”包括三件事：保留上游 HTTP 状态码，保留响应正文，保留 `Content-Type`；遇到限流时也保留 `Retry-After`。所以正常查询直接得到 JSON 或文本，无效参数仍然是 400，限流仍然是 429，不会被包装成 HTTP 200，也不会把 JSON 对象再次编码成带引号的字符串。只有后端自己连接失败或超时，才生成本地的 502 或 504。
+
+例子只监听服务器回环地址。接入现有网站时，把这段处理逻辑放进现有后端，或让网站的反向代理将同源 `/api/ip-health` 转到该进程；浏览器中的 `127.0.0.1` 指向用户自己的电脑，不能把上面的测试地址直接当成线上接口地址。纯静态托管没有后端进程，需要另行部署服务。
+
+前端在**已经配置好同源后端路由**的页面中调用：
+
+```js
+const response = await fetch('/api/ip-health?ip=1.1.1.1');
+const body = await response.text();
+
+if (!response.ok) {
+  throw new Error(`HTTP ${response.status}: ${body}`);
+}
+
+const data = JSON.parse(body);
+console.log(data.ip, data.score, data.status);
+```
+
+这个转发示例允许调用方选择查询目标，不会自动识别访客 IP。省略 `ip` 仍然查询后端出口；如果需要“我的访客 IP”接口，应由后端从可信连接信息中确定目标，再传给 One IP。前端调用如果选择 `format=text`，直接读取 `body`，不要再执行 `JSON.parse`。
+
+### 错误、超时与限流怎么处理
+
+排查时先查看 HTTP 状态和原始正文。给 curl 添加 `-i` 可以同时看到响应头：
+
+```bash
+curl -i -sS --max-time 15 \
+  'https://ip.huzhihui.com/api/ip/health?ip=invalid'
+```
+
+这种无效参数会返回 HTTP 400，正文类似：
+
+```json
+{ "error": "请输入有效的公网 IPv4 或 IPv6 地址" }
+```
+
+| HTTP 状态码 | 常见含义                                                 | 处理方式                                       |
+| ----------- | -------------------------------------------------------- | ---------------------------------------------- |
+| 400         | IP 无效、非公网地址，或 `format` 不支持                  | 修正参数，不要原样重试                         |
+| 403         | 跨源 `Origin` 被拒绝、边缘安全策略拦截，或访问被暂时限制 | 检查调用方式和错误正文；自己的网页通过后端调用 |
+| 405         | 请求方法不支持                                           | 使用 GET                                       |
+| 429         | 调用频率或额度超限                                       | 按 `Retry-After` 等待，降低频率与并发          |
+| 502         | 网关、转发或数据获取异常                                 | 保留错误正文，检查服务端日志，稍后有限重试     |
+| 503         | 无法识别公网出口，或服务、数据暂不可用                   | 根据错误正文处理；识别出口失败时可显式传 `ip`  |
+| 504         | 网关或自己的后端等待超时                                 | 检查网络与超时设置，避免无限重试               |
+
+即使请求了 `format=text`，错误正文也可能是 JSON。不要用“有没有 `score`”代替 HTTP 状态判断，也不要把超时、拒绝访问、限流或数据缺失转成 `score: 0`、`status: "poor"`。
+
+站点安全层也可能返回纯文本或 HTML。例如 `403` 且正文包含 `error code: 1010`，表示客户端特征被安全策略拒绝，不是目标 IP 的信誉评价。Python 默认客户端在本次核对时遇到过这个响应，上面的显式请求头示例调用成功；若仍被拒绝，应保留时间、状态码和错误正文，联系站点排查。错误含义见 [Cloudflare 1010 说明](https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1010/)。
+
+脚本需要在 HTTP 错误时以非零状态退出并保留正文，可以将 `-sS` 改成 `-sS --fail-with-body`；旧版 curl 若不支持这个选项，可先用 `-i -sS` 查看响应。`-f` 也会让 HTTP 错误返回失败状态，但通常不保留错误正文。
+
+公开接口按请求来源限流。多名访客经同一台后端转发，会共享该后端出口对应的限额，不能按每个访客分别估算额度。收到 429 后不要立即循环重试；`Retry-After` 可能是等待秒数或 HTTP 日期，按响应值安排下一次请求。相关格式可参考 [Retry-After 说明](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Retry-After)，当前额度以 [API 接入文档](https://ip.huzhihui.com/docs/api)为准。
+
+### 哪些网页功能不能直接搬到服务器 API
+
+对外接入使用这里列出的 `/api/me` 和 `/api/ip/health`。网页内部的完整 IP 报告、WHOIS、全球探测等接口可能需要浏览器会话，不应把开发者工具里抓到的请求直接当成稳定开放接口。
+
+AI 连通性、网站分流、WebRTC 和浏览器指纹等功能还依赖用户的浏览器与网络环境。服务器调用 IP 健康度 API 得到的是地址资料，不能代替这些测量，也不会返回用户是否已登录或能否与 AI 正常对话的结论。
 
 ## 查询记录、数据与问题反馈
 

@@ -3,6 +3,7 @@ import { ThemeProvider } from '@/components/theme/provider';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 import { AppUpdateChecker } from './app-update-checker';
+import { QueryProvider } from './query';
 
 export function Providers({ children }: React.PropsWithChildren) {
   return (
@@ -11,7 +12,9 @@ export function Providers({ children }: React.PropsWithChildren) {
       <div className="relative min-h-screen">
         <InteractiveGridBackground className="fixed inset-0 z-0" />
         <div className="relative z-10">
-          <TooltipProvider>{children}</TooltipProvider>
+          <QueryProvider>
+            <TooltipProvider>{children}</TooltipProvider>
+          </QueryProvider>
         </div>
       </div>
     </ThemeProvider>

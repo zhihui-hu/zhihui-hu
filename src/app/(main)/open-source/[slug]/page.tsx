@@ -1,6 +1,7 @@
 import pkg from '@/../package.json';
 import { ProjectDetail } from '@/components/projects/project-detail';
 import { StructuredData } from '@/components/structured-data';
+import { getGitHubStatsBySlug } from '@/lib/github-stats';
 import { getOpenSourceBySlug, getOpenSourceSlugs } from '@/lib/open-source';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -79,6 +80,8 @@ export default async function OpenSourceDetailPage(
     notFound();
   }
 
+  const githubStats = await getGitHubStatsBySlug([project]);
+
   const canonicalUrl = `${pkg.seo.og.url}${project.route}`;
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -105,7 +108,10 @@ export default async function OpenSourceDetailPage(
   return (
     <>
       <StructuredData data={jsonLd} id={`open-source-jsonld-${project.slug}`} />
-      <ProjectDetail project={project} />
+      <ProjectDetail
+        githubStats={githubStats[project.slug]}
+        project={project}
+      />
     </>
   );
 }

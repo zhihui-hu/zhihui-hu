@@ -39,8 +39,8 @@ export function ProjectHeroIcon({
 }) {
   const logoSrc = imageSrc || project.logo;
   const iconSizeClass = compact
-    ? 'size-[128px] sm:size-[144px] lg:size-[162px]'
-    : 'size-[120px] sm:size-[144px] lg:size-[162px]';
+    ? 'size-20 sm:size-[144px] lg:size-[162px]'
+    : 'size-18 sm:size-[144px] lg:size-[162px]';
 
   if (!logoSrc) {
     return null;
@@ -61,7 +61,7 @@ export function ProjectHeroIcon({
           imageClassName="grayscale saturate-50 contrast-125"
           loading="eager"
           showError={false}
-          sizes="(max-width: 640px) 128px, 162px"
+          sizes="(max-width: 639px) 80px, (max-width: 1023px) 144px, 162px"
           src={logoSrc}
         />
       </div>
@@ -78,7 +78,7 @@ export function ProjectHeroIcon({
           className={cn(iconSizeClass, 'rounded-[22%] bg-background')}
           fit="cover"
           loading="eager"
-          sizes="(max-width: 640px) 128px, 162px"
+          sizes="(max-width: 639px) 80px, (max-width: 1023px) 144px, 162px"
           src={logoSrc}
         />
         <div className="pointer-events-none absolute inset-0 rounded-[22.5%] ring-1 ring-inset ring-white/10" />
@@ -96,7 +96,7 @@ function HeroLinkAction({ action }: { action: ProjectHeroAction }) {
   const isRepository = action.kind === 'repository';
   const Icon = isPrimary ? GlobeIcon : isRepository ? GitHubLogo : DownloadIcon;
   const className = cn(
-    'h-9 rounded-full border px-4 text-[12.5px] font-semibold shadow-[0_14px_32px_rgba(0,0,0,0.18)] backdrop-blur-md sm:h-10 sm:px-5 sm:text-[13px]',
+    'h-auto min-h-11 min-w-0 max-w-full rounded-full border px-3 py-2 text-[12.5px] font-semibold whitespace-normal shadow-[0_14px_32px_rgba(0,0,0,0.18)] backdrop-blur-md sm:h-10 sm:min-h-0 sm:px-5 sm:py-0 sm:text-[13px] sm:whitespace-nowrap',
     isPrimary
       ? 'border-white/18 bg-white text-black hover:bg-white/90'
       : 'border-white/18 bg-white/8 text-white hover:bg-white/16 hover:text-white',
@@ -107,7 +107,7 @@ function HeroLinkAction({ action }: { action: ProjectHeroAction }) {
       <Button asChild className={className} size="lg">
         <a href={action.url} rel="noopener noreferrer" target="_blank">
           <Icon data-icon="inline-start" />
-          <span>{action.label}</span>
+          <span className="min-w-0 wrap-anywhere">{action.label}</span>
           <ExternalLinkIcon data-icon="inline-end" />
         </a>
       </Button>
@@ -145,7 +145,7 @@ function HeroQrAction({
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          className="h-9 rounded-full border-white/14 bg-white/10 px-4 text-[12.5px] font-semibold text-white shadow-[0_14px_32px_rgba(0,0,0,0.18)] backdrop-blur-md hover:bg-white/18 hover:text-white sm:h-10 sm:px-5 sm:text-[13px]"
+          className="h-auto min-h-11 min-w-0 max-w-full rounded-full border-white/14 bg-white/10 px-3 py-2 text-[12.5px] font-semibold whitespace-normal text-white shadow-[0_14px_32px_rgba(0,0,0,0.18)] backdrop-blur-md hover:bg-white/18 hover:text-white sm:h-10 sm:min-h-0 sm:px-5 sm:py-0 sm:text-[13px] sm:whitespace-nowrap"
           size="lg"
           variant="outline"
         >
@@ -265,7 +265,7 @@ export function ProjectHeroHeader({
   `;
 
   return (
-    <section className="relative mb-4 -mx-4 sm:mx-0">
+    <section className="relative mb-4 -mx-4 min-w-0 sm:mx-0">
       <style dangerouslySetInnerHTML={{ __html: animationStyles }} />
       <div
         style={
@@ -279,7 +279,7 @@ export function ProjectHeroHeader({
           } as CSSProperties
         }
         className={cn(
-          'relative flex h-49.75 items-center overflow-hidden text-(--systemPrimary-onDark) sm:h-71.5',
+          'relative flex min-h-44 items-center overflow-hidden text-(--systemPrimary-onDark) sm:h-71.5 sm:min-h-0',
           'bg-center bg-cover',
           '[background:var(--background-image),var(--background-color,#fff)]',
           'transform-[translate(0)]',
@@ -316,9 +316,9 @@ export function ProjectHeroHeader({
           }}
         />
         <div className="pointer-events-none absolute inset-0 z-3 bg-black/24" />
-        <div className="relative z-10 flex h-full w-full items-center px-4 py-5 sm:px-8 sm:py-7 lg:px-10">
-          <div className="flex w-full items-center gap-5 sm:gap-6 lg:gap-8">
-            <div className="self-center">
+        <div className="relative z-10 flex h-full w-full min-w-0 items-center px-4 py-5 sm:px-8 sm:py-7 lg:px-10">
+          <div className="grid w-full min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-4 sm:gap-x-6 lg:gap-x-8">
+            <div className="self-center sm:row-span-2">
               <SharedElementTransition
                 name={getSharedMediaTransitionName('project', project.slug)}
                 share="route-shared-media"
@@ -331,12 +331,12 @@ export function ProjectHeroHeader({
               </SharedElementTransition>
             </div>
 
-            <div className="flex min-h-32 min-w-0 flex-1 flex-col justify-center gap-3 pt-1 sm:min-h-0 sm:gap-4 sm:pt-0">
+            <div className="flex min-w-0 flex-col justify-center">
               <div className="flex flex-col gap-1">
                 <SharedElementTransition
                   name={getSharedTitleTransitionName('project', project.slug)}
                 >
-                  <h1 className="title line-clamp-2 text-[22px] leading-[1.05] font-bold tracking-[-0.04em] text-white sm:text-[32px] lg:text-[36px]">
+                  <h1 className="title text-[22px] leading-tight font-bold tracking-[-0.04em] wrap-anywhere text-white sm:line-clamp-2 sm:text-[32px] sm:leading-[1.05] lg:text-[36px]">
                     {project.name}
                   </h1>
                 </SharedElementTransition>
@@ -365,24 +365,24 @@ export function ProjectHeroHeader({
                     </p>
                   ))}
                 {heroPanel.metaLine && (
-                  <p className="text-[12px] leading-[1.4] text-white/72 sm:text-[14px]">
+                  <p className="text-[12px] leading-[1.4] wrap-anywhere text-white/72 sm:text-[14px]">
                     {heroPanel.metaLine}
                   </p>
                 )}
               </div>
-
-              {heroActions.length > 0 && (
-                <div className="flex flex-wrap items-center gap-2.5 pt-1 sm:gap-3">
-                  {heroActions.map((action) => (
-                    <HeroActionButton
-                      action={action}
-                      key={`${action.kind}-${action.label}-${action.url || action.imageSrc || 'local'}`}
-                      projectName={project.name}
-                    />
-                  ))}
-                </div>
-              )}
             </div>
+
+            {heroActions.length > 0 && (
+              <div className="col-span-2 grid min-w-0 grid-cols-2 gap-2 sm:col-span-1 sm:col-start-2 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
+                {heroActions.map((action) => (
+                  <HeroActionButton
+                    action={action}
+                    key={`${action.kind}-${action.label}-${action.url || action.imageSrc || 'local'}`}
+                    projectName={project.name}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

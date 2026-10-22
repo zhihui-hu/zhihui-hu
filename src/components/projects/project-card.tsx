@@ -4,20 +4,25 @@ import {
   getSharedMediaTransitionName,
   getSharedTitleTransitionName,
 } from '@/components/route-view-transitions';
+import type { GitHubRepositoryStats as GitHubRepositoryStatsData } from '@/lib/github';
 import type { Project, ProjectGroup } from '@/lib/projects';
 import Link from 'next/link';
 
 import { Badge } from '../ui/badge';
+import { GitHubRepositoryStats } from './github-repository-stats';
+import { GitHubStarSortedGrid } from './github-star-sorted-grid';
 import { ProjectCardDescription } from './project-card-description';
 
 type ProjectCardProps = {
   project: Project;
+  githubStats?: GitHubRepositoryStatsData;
   enableNativeTransition?: boolean;
   showCompanyName?: boolean;
 };
 
 export function ProjectCard({
   project,
+  githubStats,
   enableNativeTransition = false,
   showCompanyName = true,
 }: ProjectCardProps) {
@@ -89,6 +94,10 @@ export function ProjectCard({
         </div>
       </div>
 
+      {project.route.startsWith('/open-source/') && project.repo && (
+        <GitHubRepositoryStats initialStats={githubStats} repo={project.repo} />
+      )}
+
       {project.listTags.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {project.listTags.map((tag) => (
@@ -106,37 +115,57 @@ type ProjectGridProps = {
   projects: Project[];
   enableNativeTransition?: boolean;
   showCompanyName?: boolean;
+  /** 传入时按 GitHub Star 数排序 */
+  githubStats?: Record<string, GitHubRepositoryStatsData>;
 };
 
 export function ProjectGrid({
   projects,
   enableNativeTransition = false,
   showCompanyName = true,
+  githubStats,
 }: ProjectGridProps) {
-  return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      {projects.map((project) => (
-        <ProjectCard
-          enableNativeTransition={enableNativeTransition}
-          key={project.slug}
-          project={project}
-          showCompanyName={showCompanyName}
-        />
-      ))}
-    </div>
+  const className = 'grid grid-cols-1 gap-4 sm:grid-cols-2';
+  const renderCard = (project: Project) => (
+    <ProjectCard
+      enableNativeTransition={enableNativeTransition}
+      githubStats={githubStats?.[project.slug]}
+      key={project.slug}
+      project={project}
+      showCompanyName={showCompanyName}
+    />
   );
+
+  if (githubStats) {
+    return (
+      <GitHubStarSortedGrid
+        className={className}
+        items={projects.map((project) => ({
+          key: project.slug,
+          repo: project.repo,
+          initialStats: githubStats[project.slug],
+          node: renderCard(project),
+        }))}
+      />
+    );
+  }
+
+  return <div className={className}>{projects.map(renderCard)}</div>;
 }
 
 type ProjectGroupListProps = {
   groups: ProjectGroup[];
   enableNativeTransition?: boolean;
   showCompanyName?: boolean;
+  /** 传入时按 GitHub Star 数排序 */
+  githubStats?: Record<string, GitHubRepositoryStatsData>;
 };
 
 export function ProjectGroupList({
   groups,
   enableNativeTransition = false,
   showCompanyName = true,
+  githubStats,
 }: ProjectGroupListProps) {
   const showGroupHeader = groups.length > 1;
 
@@ -178,6 +207,7 @@ export function ProjectGroupList({
               enableNativeTransition={enableNativeTransition}
               projects={group.projects}
               showCompanyName={showCompanyName}
+              githubStats={githubStats}
             />
           </section>
         );
