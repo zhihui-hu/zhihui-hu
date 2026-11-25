@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint",
     "prepare": "husky",
-    "deploy": "next build && npx wrangler deploy"
+    "deploy": "next build && npx wrangler deploy",
+    "ui:sync": "node scripts/sync-one-ui.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.0",
@@ -153,5 +154,13 @@
         }
       ]
     }
+  },
+  "oneUi": {
+    "components": [
+      "animated-counter",
+      "fluid-orb",
+      "rail-toc",
+      "scroll-progress"
+    ]
   }
 }

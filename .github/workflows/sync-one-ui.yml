@@ -1,0 +1,89 @@
+name: Sync One UI
+
+# pulls the latest One UI components (package.json#oneUi) and opens a PR when they change
+on:
+  schedule:
+    # daily at 09:00 Asia/Shanghai
+    - cron: '0 1 * * *'
+  # one-ui's deploy workflow fires this right after a new registry goes live
+  repository_dispatch:
+    types: [one-ui-updated]
+  workflow_dispatch:
+
+concurrency:
+  group: sync-one-ui
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    name: Sync components
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      HUSKY: 0
+      TZ: Asia/Shanghai
+      NEXT_TELEMETRY_DISABLED: 1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.32.1
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Pull One UI components
+        run: pnpm ui:sync
+
+      - name: Detect changes
+        id: diff
+        run: |
+          if git diff --quiet -- src/components/ui; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "One UI components are already up to date."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --stat -- src/components/ui
+          fi
+
+      # a PR opened with GITHUB_TOKEN does not trigger other workflows, so verify here
+      - name: Typecheck
+        if: steps.diff.outputs.changed == 'true'
+        run: pnpm exec tsc --noEmit
+
+      - name: Lint
+        if: steps.diff.outputs.changed == 'true'
+        run: pnpm exec eslint src/components/ui
+
+      - name: Build
+        if: steps.diff.outputs.changed == 'true'
+        run: pnpm build
+
+      - name: Open pull request
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/sync-one-ui
+          delete-branch: true
+          add-paths: src/components/ui
+          commit-message: 'chore(ui): sync One UI components'
+          title: 'chore(ui): sync One UI components'
+          body: |
+            Automated sync of the One UI components listed in `package.json#oneUi` from https://ui.huzhihui.com/r.
+
+            Typecheck, lint and `next build` passed in this run. Review the diff, then merge to deploy.
