@@ -2,7 +2,6 @@ import {
   SharedElementTransition,
   getSharedTitleTransitionName,
 } from '@/components/route-view-transitions';
-import { Badge } from '@/components/ui/badge';
 import {
   type BlogPost,
   estimateBlogReadingTime,
@@ -23,7 +22,7 @@ export function PostHeader({ post }: PostHeaderProps) {
   const tags = post.metadata.tags ?? [];
 
   return (
-    <header className="mb-8 border-b border-border/60 pb-6">
+    <header className="mb-10">
       <SharedElementTransition
         name={getSharedTitleTransitionName('blog', post.slug)}
       >
@@ -32,25 +31,27 @@ export function PostHeader({ post }: PostHeaderProps) {
         </h1>
       </SharedElementTransition>
 
-      <div className="mt-5 flex flex-col gap-3">
-        <div className="flex flex-col gap-2 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            {wordCount.toLocaleString()} 字 · {readingTime} 分钟读完
-          </p>
-          <RelativeTime
-            dateTime={post.metadata.publishedAt}
-            fallback={formattedDate}
-          />
-        </div>
-
+      <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted-foreground">
+        <RelativeTime
+          className="tabular-nums"
+          dateTime={post.metadata.publishedAt}
+          fallback={formattedDate}
+        />
+        <span aria-hidden="true" className="size-1 rounded-full bg-border" />
+        <span className="tabular-nums">
+          {wordCount.toLocaleString()} 字 · {readingTime} 分钟读完
+        </span>
         {tags.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
+          <ul className="flex basis-full flex-wrap gap-1.5 sm:basis-auto sm:pl-1">
             {tags.map((tag) => (
-              <Badge key={tag} variant="secondary">
-                #{tag}
-              </Badge>
+              <li
+                className="rounded-full bg-foreground/[0.05] px-2.5 py-0.5 text-xs font-medium text-foreground/70 [corner-shape:round]"
+                key={tag}
+              >
+                {tag}
+              </li>
             ))}
-          </div>
+          </ul>
         ) : null}
       </div>
     </header>

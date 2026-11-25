@@ -1,10 +1,15 @@
 'use client';
 
+import { cn } from '@/lib/utils';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 export function BackToTop() {
   const [visible, setVisible] = useState(false);
   const ticking = useRef(false);
+  const pathname = usePathname();
+  // post pages use the scroll-progress pill below xl
+  const isPost = /^\/blog\/[^/]+/.test(pathname);
 
   useEffect(() => {
     const onScroll = () => {
@@ -27,6 +32,7 @@ export function BackToTop() {
   return (
     <button
       aria-label="回到顶部"
+      className={cn(isPost ? 'hidden xl:flex' : 'flex')}
       onClick={scrollToTop}
       type="button"
       style={{
@@ -34,7 +40,6 @@ export function BackToTop() {
         bottom: '2rem',
         right: '2rem',
         zIndex: 50,
-        display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         width: '2.25rem',

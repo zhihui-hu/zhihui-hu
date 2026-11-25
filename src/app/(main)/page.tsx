@@ -2,11 +2,15 @@ import { BlogPosts } from '@/components/blog/posts';
 import { SectionHeader } from '@/components/home/section-header';
 import { ProjectGrid } from '@/components/projects/project-card';
 import { ROUTE_LIST_NAVIGATION_TRANSITION } from '@/components/route-view-transitions';
-import { Button } from '@/components/ui/button';
+import { FluidOrb } from '@/components/ui/fluid-orb';
 import { formatBlogDate, getBlogPosts } from '@/lib/blog';
 import { getOpenSourceProjects } from '@/lib/open-source';
 import { getProjects } from '@/lib/projects';
-import { MailIcon } from 'lucide-react';
+import { ArrowRightIcon, MailIcon } from 'lucide-react';
+import Link from 'next/link';
+
+const heroPill =
+  'inline-flex h-10 items-center gap-2 rounded-full bg-foreground/[0.05] px-4 text-sm font-medium text-foreground/80 transition-colors [corner-shape:round] hover:bg-foreground/[0.09] hover:text-foreground';
 
 export default function Page() {
   const posts = getBlogPosts()
@@ -22,43 +26,62 @@ export default function Page() {
   return (
     <>
       {/* ── Hero ──────────────────────────────────────────── */}
-      <section className="container mx-auto flex min-h-[50vh] items-center px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
-        <div className="flex w-full flex-col gap-6 sm:gap-8">
-          <h1 className="text-4xl leading-none font-semibold tracking-tight sm:text-6xl md:text-7xl">
-            胡志辉
-          </h1>
-          <div className="flex flex-col gap-4">
-            <p className="max-w-3xl text-base leading-8 text-muted-foreground md:text-lg">
-              从 2016
-              年入行起，大部分时间都在金融和医疗系统里打磨。这两个领域教给我最深的一件事：系统永远要对真实世界的混乱留有余地——无论是经不起半分差错的账目，还是关乎责任的业务留痕。国企的慢与规矩让我学会防御性思考，创业公司的快又逼着我切掉所有技术虚荣。
-              现在我更享受一个人贯穿全栈，把 AI
-              和现代工具揉进具体的业务里。对我来说，好的工程从来不是堆砌时髦名词，而是看透需求背后的本质，在成本、鲁棒性与体验之间，做出一套自洽且耐造的解法。
-            </p>
-            <div className="flex items-center gap-3">
-              <Button asChild size="icon" variant="outline">
-                <a
-                  aria-label="发送邮件到 i@huzhihui.com"
-                  href="mailto:i@huzhihui.com"
-                  title="i@huzhihui.com"
-                >
-                  <MailIcon aria-hidden="true" />
-                  <span className="sr-only">i@huzhihui.com</span>
-                </a>
-              </Button>
-              <Button asChild size="icon" variant="outline">
-                <a
-                  aria-label="打开 GitHub 主页"
-                  href="https://github.com/zhihui-hu/"
-                  rel="noreferrer"
-                  target="_blank"
-                  title="github.com/zhihui-hu"
-                >
-                  <GitHubLogo />
-                  <span className="sr-only">github.com/zhihui-hu</span>
-                </a>
-              </Button>
+      <section className="container mx-auto px-4 pt-6 pb-14 sm:px-6 sm:pt-12 sm:pb-20 lg:px-8">
+        <div className="grid items-center gap-10 md:grid-cols-[minmax(0,1fr)_auto] md:gap-16">
+          <div className="flex flex-col gap-7">
+            <span className="inline-flex w-fit items-center gap-2 rounded-full bg-foreground/[0.05] px-3 py-1 text-xs font-medium text-foreground/70 [corner-shape:round]">
+              <span
+                aria-hidden="true"
+                className="size-1.5 rounded-full bg-[#1A73F2]"
+              />
+              全栈工程师 · 金融 / 医疗 / AI 应用
+            </span>
+            <h1 className="text-5xl leading-none font-semibold tracking-[-0.04em] sm:text-7xl">
+              胡志辉
+            </h1>
+            <div className="flex max-w-2xl flex-col gap-3 text-[0.98rem] leading-8 text-muted-foreground md:text-lg md:leading-8">
+              <p>
+                从 2016
+                年入行起，大部分时间都在金融和医疗系统里打磨。这两个领域教给我最深的一件事：系统永远要对真实世界的混乱留有余地——无论是经不起半分差错的账目，还是关乎责任的业务留痕。国企的慢与规矩让我学会防御性思考，创业公司的快又逼着我切掉所有技术虚荣。
+              </p>
+              <p>
+                现在我更享受一个人贯穿全栈，把 AI
+                和现代工具揉进具体的业务里。对我来说，好的工程从来不是堆砌时髦名词，而是看透需求背后的本质，在成本、鲁棒性与体验之间，做出一套自洽且耐造的解法。
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                className="inline-flex h-10 items-center gap-1.5 rounded-full bg-foreground px-5 text-sm font-medium text-background transition-opacity [corner-shape:round] hover:opacity-85"
+                href="/blog"
+                transitionTypes={[ROUTE_LIST_NAVIGATION_TRANSITION]}
+              >
+                阅读博客
+                <ArrowRightIcon aria-hidden="true" className="size-3.5" />
+              </Link>
+              <a
+                className={heroPill}
+                href="https://github.com/zhihui-hu/"
+                rel="noreferrer"
+                target="_blank"
+              >
+                <GitHubLogo />
+                GitHub
+              </a>
+              <a
+                className={heroPill}
+                href="mailto:i@huzhihui.com"
+                title="i@huzhihui.com"
+              >
+                <MailIcon aria-hidden="true" className="size-4" />
+                i@huzhihui.com
+              </a>
             </div>
           </div>
+          <FluidOrb
+            aria-hidden="true"
+            className="hidden shadow-[0_40px_80px_-30px_rgba(26,115,242,0.55)] md:block"
+            size={260}
+          />
         </div>
       </section>
 
@@ -109,6 +132,7 @@ function GitHubLogo() {
   return (
     <svg
       aria-hidden="true"
+      className="size-4"
       fill="currentColor"
       viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"

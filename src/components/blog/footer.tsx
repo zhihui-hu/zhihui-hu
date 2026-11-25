@@ -1,5 +1,4 @@
 import { BlogLink } from '@/components/blog/blog-link';
-import { Button } from '@/components/ui/button';
 import { MailIcon, MapIcon, RssIcon } from 'lucide-react';
 import type { ComponentProps, ElementType } from 'react';
 
@@ -34,32 +33,36 @@ const footerLinks: Array<{
 
 export function BlogFooter() {
   return (
-    <footer className="mt-12 w-full border-t border-border/60">
-      <div className="container mx-auto flex flex-col gap-3 px-4 py-5 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-        <p className="text-xs text-muted-foreground sm:text-sm">
-          CC BY-NC 4.0 | 2016 - {new Date().getFullYear()} © 胡志辉
-        </p>
-        <ul className="flex flex-wrap gap-2 text-sm">
-          {footerLinks.map((item) => {
-            const Icon = item.icon;
+    <footer className="mt-20 w-full">
+      <div className="container mx-auto px-4 pb-[calc(env(safe-area-inset-bottom,0px)+1.5rem)] sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-4 border-t border-border/60 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="flex items-center gap-2 text-xs text-muted-foreground sm:text-sm">
+            <span
+              aria-hidden="true"
+              className="flex size-6 items-center justify-center rounded-full bg-foreground text-[11px] font-bold text-background [corner-shape:round]"
+            >
+              胡
+            </span>
+            CC BY-NC 4.0 · 2016 - {new Date().getFullYear()} © 胡志辉
+          </p>
+          <ul className="flex flex-wrap gap-1.5">
+            {footerLinks.map((item) => {
+              const Icon = item.icon;
 
-            return (
-              <li key={item.href}>
-                <Button
-                  asChild
-                  className=" border-border/60 bg-background/80 text-muted-foreground shadow-none hover:bg-muted/60 hover:text-foreground"
-                  size="sm"
-                  variant="outline"
-                >
-                  <BlogLink href={item.href}>
-                    <Icon aria-hidden="true" data-icon="inline-start" />
+              return (
+                <li key={item.href}>
+                  <BlogLink
+                    className="inline-flex h-8 items-center gap-1.5 rounded-full bg-foreground/[0.04] px-3 text-xs font-medium text-muted-foreground transition-colors [corner-shape:round] hover:bg-foreground/[0.08] hover:text-foreground [&_svg]:size-3.5"
+                    href={item.href}
+                  >
+                    <Icon aria-hidden="true" />
                     {item.label}
                   </BlogLink>
-                </Button>
-              </li>
-            );
-          })}
-        </ul>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
     </footer>
   );

@@ -31,8 +31,8 @@ export default function ProjectsPage() {
 
   return (
     <section className="container mx-auto px-4 sm:px-6 lg:px-8">
-      <header className="mb-8 flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+      <header className="mb-10 flex flex-col gap-3">
+        <h1 className="text-4xl font-semibold tracking-[-0.03em] text-foreground sm:text-5xl">
           商业项目
         </h1>
         <p className="max-w-2xl text-sm leading-6 text-muted-foreground">

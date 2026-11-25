@@ -5,9 +5,10 @@ import { renderBlogMdx } from '@/components/blog/mdx';
 import { PostHeader } from '@/components/blog/post-header';
 import { BlogRenderIssue } from '@/components/blog/render-issue';
 import { ShareBar } from '@/components/blog/share-bar';
-import { TableOfContents } from '@/components/blog/table-of-contents';
 import { parseToc } from '@/components/blog/toc';
 import { StructuredData } from '@/components/structured-data';
+import { RailToc } from '@/components/ui/rail-toc';
+import { ScrollProgress } from '@/components/ui/scroll-progress';
 import {
   getBlogLastModified,
   getBlogPostBySlug,
@@ -95,6 +96,14 @@ export default async function BlogPostPage(props: PageProps<'/blog/[slug]'>) {
   const modifiedDate = getBlogLastModified(post).toISOString();
   const tocItems = parseToc(post.content);
   const hasToc = tocItems.length > 0;
+  const railItems = tocItems.map((item) => ({
+    id: item.id,
+    label: item.text,
+    depth: item.level - 2,
+  }));
+  const progressSections = tocItems
+    .filter((item) => item.level === 2)
+    .map((item) => ({ id: item.id, label: item.text }));
   const renderedPost = await renderBlogMdx({
     source: post.content,
   });
@@ -133,10 +142,12 @@ export default async function BlogPostPage(props: PageProps<'/blog/[slug]'>) {
         {hasToc && (
           <aside className="order-1 hidden xl:order-2 xl:block">
             <div className="xl:sticky xl:top-(--blog-sticky-offset) xl:flex xl:max-h-(--blog-sticky-max-height) xl:flex-col xl:pb-8">
-              <div className="min-h-0 overflow-y-auto">
-                <TableOfContents
-                  content={post.content}
-                  initialItems={tocItems}
+              <div className="min-h-0 overflow-y-auto overflow-x-hidden pt-1 pl-1">
+                <RailToc
+                  className="w-full"
+                  items={railItems}
+                  offset={96}
+                  title="目录"
                 />
               </div>
               <ShareBar
@@ -161,6 +172,14 @@ export default async function BlogPostPage(props: PageProps<'/blog/[slug]'>) {
           <ShareBar title={post.metadata.title} url={articleUrl} />
         </div>
       </div>
+      {progressSections.length > 0 && (
+        <ScrollProgress
+          className="bottom-[max(1.5rem,env(safe-area-inset-bottom))] xl:hidden"
+          labels={{ showSections: '展开目录' }}
+          offset={120}
+          sections={progressSections}
+        />
+      )}
     </section>
   );
 }

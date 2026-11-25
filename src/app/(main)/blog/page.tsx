@@ -36,17 +36,17 @@ export default function BlogPage() {
 
   return (
     <section className="container mx-auto px-4 py-2 sm:px-6 lg:px-8">
-      <header className="mb-8 flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+      <header className="mb-10 flex flex-col gap-3">
+        <h1 className="text-4xl font-semibold tracking-[-0.03em] text-foreground sm:text-5xl">
           博客
         </h1>
         <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-          记录软件开发、AI 应用和工程化实践。
+          记录软件开发、AI 应用和工程化实践，共 {posts.length} 篇。
         </p>
       </header>
 
       <div>
-        <BlogPosts enableNativeTransition posts={posts} />
+        <BlogPosts enableNativeTransition groupByYear posts={posts} />
       </div>
     </section>
   );

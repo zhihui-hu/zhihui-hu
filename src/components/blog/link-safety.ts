@@ -44,6 +44,14 @@ export function isBlogSameSiteUrl(url: URL) {
   return BLOG_SITE_HOSTS.has(url.hostname.toLowerCase());
 }
 
+// every subdomain of the site (ui., img., ...) is ours, so it skips the warning
+export function isBlogOwnSubdomainUrl(url: URL) {
+  return url.hostname.toLowerCase().endsWith('.huzhihui.com');
+}
+
 export function isBlogTrustedExternalUrl(url: URL) {
-  return BLOG_TRUSTED_EXTERNAL_HOSTS.has(url.hostname.toLowerCase());
+  return (
+    BLOG_TRUSTED_EXTERNAL_HOSTS.has(url.hostname.toLowerCase()) ||
+    isBlogOwnSubdomainUrl(url)
+  );
 }

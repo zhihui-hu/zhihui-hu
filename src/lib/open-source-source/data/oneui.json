@@ -1,0 +1,73 @@
+{
+  "sortOrder": 4,
+  "slug": "oneui",
+  "name": "One UI",
+  "repo": "https://github.com/zhihui-hu/one-ui",
+  "urls": {
+    "official": "https://ui.huzhihui.com"
+  },
+  "logo": "https://ui.huzhihui.com/logos/oneui-stack.svg",
+  "overview": "One UI 是一个基于 shadcn registry 的动效组件库，每个组件都用 Motion 做了细致的动画，可以用 shadcn CLI 直接装进自己的项目，代码完全归你。",
+  "tags": [
+    "React 组件库",
+    "shadcn registry",
+    "Motion 动效",
+    "Tailwind CSS",
+    "MCP"
+  ],
+  "companyName": "zhihui-hu",
+  "ongoing": true,
+  "category": "Developer Tools",
+  "industry": "开源工具",
+  "family": {
+    "key": "open-source-tools",
+    "title": "开源工具",
+    "description": "围绕日常开发、部署、内容管理和效率提升沉淀出来的开源项目。",
+    "sortOrder": 1,
+    "variantLabel": "UI 组件库",
+    "variantOrder": 4
+  },
+  "categories": ["UI 组件库", "动效组件", "shadcn registry"],
+  "platforms": ["Web 应用"],
+  "langs": ["中文简体", "English"],
+  "price": "开源免费",
+  "headline": "一行 shadcn 命令装进项目的动效组件：从导航、目录到 AI 对话界面，每个组件都有细腻的弹簧动画，并尊重系统的减少动态效果设置。",
+  "introduction": [
+    "One UI 不是一个需要依赖的 npm 包，而是一个 shadcn registry。用 shadcn CLI 安装后，组件源码直接落在你的项目里，样式和行为都可以随意修改。",
+    "组件覆盖导航与侧边栏、阅读目录与滚动进度、表单输入、通知与反馈，以及 AI 对话相关的界面，例如模型选择、联网搜索来源、流式回复和思考状态。",
+    "所有交互组件都基于 Motion 实现动画，并遵循 prefers-reduced-motion。站点提供每个组件的在线预览、属性说明和安装命令，也支持通过 shadcn MCP 让 AI 编码助手直接添加组件。"
+  ],
+  "summary": [
+    "通过 npx shadcn@latest add https://ui.huzhihui.com/r/<组件名>.json 安装，或在 components.json 中注册 @one-ui 后用短名安装。",
+    "提供 gooey 导航、纸飞机阅读目录、滚动进度胶囊、OTP 与密码输入、Toast、通知铃铛、数字滚轮计数器等组件。",
+    "包含 AI 场景组件：模型选择器、按住时长控制思考强度的输入框、流式回复、联网搜索来源卡片和 AI 状态指示。",
+    "支持 shadcn MCP，在 Claude Code、Cursor、VS Code 中可以直接说“添加 One UI 的 fluid orb”。",
+    "本站的顶部导航、文章目录和阅读进度就使用了 One UI 组件。"
+  ],
+  "techStack": [
+    "Next.js",
+    "React 19",
+    "TypeScript",
+    "Tailwind CSS",
+    "Motion",
+    "shadcn/ui",
+    "Cloudflare Workers"
+  ],
+  "resources": [
+    {
+      "label": "GitHub 仓库",
+      "url": "https://github.com/zhihui-hu/one-ui",
+      "kind": "repository"
+    },
+    {
+      "label": "组件预览",
+      "url": "https://ui.huzhihui.com/components",
+      "kind": "website"
+    }
+  ],
+  "screenshots": [
+    {
+      "image": "https://ui.huzhihui.com/og/zh.png"
+    }
+  ]
+}
